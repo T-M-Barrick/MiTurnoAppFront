@@ -1,0 +1,541 @@
+/* ============================================================
+   HORARIOS MODAL — z-index 1200 (sobre ServicioModal 1100)
+   ============================================================ */
+
+.hm-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+  animation: hm-fade-in .16s ease;
+}
+
+@keyframes hm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.hm-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, .25);
+  animation: hm-slide-in .2s ease;
+  overflow: hidden;
+}
+
+@keyframes hm-slide-in {
+  from { opacity: 0; transform: translateY(-16px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Header ── */
+.hm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.hm-header__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.hm-header__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--text-muted);
+  transition: background .15s, color .15s;
+}
+
+.hm-header__close:hover {
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+/* ── Tabs de días (fila horizontal) ── */
+.hm-day-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.hm-day-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.hm-day-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  background: var(--bg-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, border-color .15s, color .15s;
+  flex-shrink: 0;
+}
+
+.hm-day-tab:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.hm-day-tab--active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.hm-day-tab--active:hover {
+  opacity: .9;
+  color: #fff;
+}
+
+/* Badge con cantidad de franjas */
+.hm-day-tab__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  background: var(--brand);
+  color: #fff;
+}
+
+.hm-day-tab--active .hm-day-tab__badge {
+  background: rgba(255, 255, 255, .3);
+  color: #fff;
+}
+
+/* ── Cuerpo scrollable ── */
+.hm-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Nombre completo del día seleccionado */
+.hm-day-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* Mensaje cuando no hay franjas */
+.hm-empty-day {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ── Lista de franjas ── */
+.hm-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Wrapper: franja + error */
+.hm-slot-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Franja individual ── */
+.hm-slot {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+.hm-slot--error {
+  border-color: var(--danger);
+}
+
+/* Grupo: label + input(s), centrado */
+.hm-slot__group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.hm-slot__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+/* Par de inputs HH : MM */
+.hm-slot__time {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.hm-slot__colon {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  line-height: 1;
+  margin-bottom: 1px;
+}
+
+/* Separador → entre inicio y fin */
+.hm-slot__arrow {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+/* Inputs base */
+.hm-slot__input {
+  padding: 7px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.hm-slot__input:focus {
+  border-color: var(--brand);
+}
+
+.hm-slot__input:disabled {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* Input horas: 2 dígitos (00-23) — mismo ancho que minutos */
+.hm-slot__input--hh {
+  width: 48px;
+  text-align: center;
+}
+
+/* Input minutos: 2 dígitos (00-59) — mismo ancho que horas */
+.hm-slot__input--mm {
+  width: 48px;
+  text-align: center;
+}
+
+/* Input turnos simultáneos */
+.hm-slot__input--max {
+  width: 56px;
+  text-align: center;
+}
+
+/* Input salto (intervalo libre, hasta 3 dígitos) */
+.hm-slot__input--salto {
+  width: 62px;
+  text-align: center;
+}
+
+/* Etiqueta de unidad junto a un input (ej: "minutos") */
+.hm-slot__unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Elimina flechas en inputs numéricos */
+.hm-slot__input[type="number"]::-webkit-inner-spin-button,
+.hm-slot__input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.hm-slot__input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Botón copiar franja a otro día */
+.hm-slot__copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--brand-light);
+  border: 1.5px solid var(--brand);
+  border-radius: 8px;
+  color: var(--brand);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+  margin-bottom: 1px;
+}
+
+.hm-slot__copy:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+[data-theme="dark"] .hm-slot__copy {
+  background: rgba(229, 57, 53, .15);
+}
+
+[data-theme="dark"] .hm-slot__copy:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* Botón eliminar franja (−) */
+.hm-slot__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--danger-bg);
+  border: 1.5px solid var(--danger);
+  border-radius: 8px;
+  color: var(--danger);
+  cursor: pointer;
+  transition: background .15s;
+  flex-shrink: 0;
+  margin-bottom: 1px;
+}
+
+.hm-slot__remove:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* Error de validación de franja */
+.hm-slot__error {
+  font-size: 11px;
+  color: var(--danger);
+  padding-left: 4px;
+}
+
+/* ── Botón agregar franja (+) ── */
+.hm-add-slot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--brand-light);
+  border: 1.5px solid var(--brand);
+  border-radius: 10px;
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s;
+  align-self: flex-start;
+}
+
+.hm-add-slot:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+[data-theme="dark"] .hm-add-slot {
+  background: rgba(229, 57, 53, .15);
+}
+
+[data-theme="dark"] .hm-add-slot:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ── Footer ── */
+.hm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.hm-btn-cancel {
+  width: 160px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: background .15s;
+}
+
+.hm-btn-cancel:hover {
+  background: var(--bg-alt);
+}
+
+.hm-btn-save {
+  width: 160px;
+  padding: 10px 20px;
+  background: var(--brand);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+  transition: opacity .15s;
+}
+
+.hm-btn-save:hover {
+  opacity: .88;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .hm-card {
+    border-radius: 12px;
+    max-height: 95vh;
+  }
+
+  .hm-header,
+  .hm-footer {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .hm-day-tabs {
+    padding: 10px 14px;
+  }
+
+  .hm-body {
+    padding: 14px 14px 16px;
+  }
+
+  /* En mobile las franjas se envuelven naturalmente por flex-wrap */
+  .hm-slot {
+    gap: 8px;
+  }
+
+  .hm-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hm-btn-cancel,
+  .hm-btn-save {
+    width: 100%;
+  }
+}
+
+/* ── Menú de copia a otro día ── */
+
+/* Overlay transparente que cierra el menú al hacer clic fuera */
+.hm-copy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, .18);
+  animation: hm-fade-in .12s ease;
+}
+
+.hm-copy-menu {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .2);
+  padding: 8px;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: hm-slide-in .16s ease;
+}
+
+.hm-copy-menu__title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 4px 10px 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.hm-copy-menu__item {
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: background .12s, color .12s;
+}
+
+.hm-copy-menu__item:hover {
+  background: var(--brand-light);
+  color: var(--brand);
+}
+
+[data-theme="dark"] .hm-copy-menu__item:hover {
+  background: rgba(229, 57, 53, .15);
+}

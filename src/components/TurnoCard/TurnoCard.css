@@ -1,0 +1,181 @@
+/* ── Tarjeta de turno ── */
+.tcard {
+  background: var(--card-bg);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  padding: 11px 13px;
+  gap: 10px;
+  height: 91px;
+  box-sizing: border-box;
+}
+
+.tcard:hover        { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.tcard:active       { transform: translateY(0); }
+.tcard:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* ── Fila 1: día · fecha · hora ── */
+.tcard__top {
+  display: flex;
+  align-items: center;
+}
+
+/* Día + fecha/hora en línea horizontal */
+/* font-size se controla desde JS para que se adapte al espacio disponible */
+.tcard__datetime {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px; /* valor inicial; JS lo reduce si hace falta */
+}
+
+.tcard__dia {
+  font-size: inherit;
+  font-weight: 700;
+  color: var(--brand);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.tcard__fecha-hora {
+  font-size: inherit;
+  font-weight: 700;
+  color: var(--brand);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tcard__countdown {
+  font-size: inherit;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* Badge de estado — formato base en main.css */
+.tcard__badge {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.tcard__badge--confirmado  { background: #dcfce7; color: #15803d; }
+.tcard__badge--en-hora     { background: #e0f2fe; color: #0369a1; }
+.tcard__badge--cancelado   { background: #fee2e2; color: #b91c1c; }
+.tcard__badge--cumplido    { background: #ffedd5; color: #c2410c; }
+.tcard__badge--no-cumplido { background: #ede9fe; color: #5b21b6; }
+.tcard__badge--vencido     { background: #f1f5f9; color: #64748b; }
+
+[data-theme="dark"] .tcard__badge--confirmado  { background: rgba(34,197,94,.18);   color: #4ade80; }
+[data-theme="dark"] .tcard__badge--en-hora     { background: rgba(3,105,161,.18);   color: #38bdf8; }
+[data-theme="dark"] .tcard__badge--cancelado   { background: rgba(239,68,68,.18);   color: #f87171; }
+[data-theme="dark"] .tcard__badge--cumplido    { background: rgba(249,115,22,.18);  color: #fb923c; }
+[data-theme="dark"] .tcard__badge--no-cumplido { background: rgba(99,102,241,.18);  color: #a5b4fc; }
+[data-theme="dark"] .tcard__badge--vencido     { background: rgba(100,116,139,.18); color: #94a3b8; }
+
+/* ── Fila 2: logo | nombre empresa · servicio ── */
+.tcard__bottom {
+  display: flex;
+  align-items: stretch; /* info se estira hasta la altura del logo */
+  gap: 8px;
+  min-width: 0;
+  margin-top: -3px;
+}
+
+/* Logo empresa — marca el alto del bloque inferior */
+.tcard__logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+  align-self: center;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  overflow: hidden;
+}
+
+.tcard__logo img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Nombre empresa (arriba) + servicio (abajo) en columna */
+.tcard__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tcard__nombre {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.tcard__servicio {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Emoji tijera — fijo a la izquierda */
+.tcard__servicio-emoji {
+  flex-shrink: 0;
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Nombre del servicio — justo a la derecha del emoji */
+.tcard__servicio-nombre {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Variante para tarjetas de sucursal: emoji de cliente en vez de logo */
+.tcard__logo--cliente {
+  font-size: 18px;
+  line-height: 1;
+  background: var(--border);
+  color: var(--text-muted);
+}
+
+/* DNI del cliente en la tarjeta — peso normal para no competir con el nombre */
+.tcard__cliente-dni {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text-muted);
+}

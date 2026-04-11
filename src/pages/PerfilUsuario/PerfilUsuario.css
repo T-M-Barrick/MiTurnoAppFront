@@ -1,0 +1,20 @@
+/* ============================================================
+   PERFIL USUARIO — estilos específicos de la página
+   Los estilos compartidos (reg-section, form-group, phone-*,
+   btn-*, reg-geo-status, etc.) vienen de Registro.css.
+   ============================================================ */
+
+/* Importa los estilos compartidos del formulario de registro */
+@import '../Registro/Registro.css';
+
+/* Columna DNI: mismo ancho relativo que en ClienteFormModal (33%) */
+.perf-col-dni { flex: 0 0 33% !important; }
+
+/* Hint inline en labels — más sutil que en Registro */
+.reg-hint-inline {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.perf-addr-list { margin-bottom: 4px; }

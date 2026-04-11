@@ -1,0 +1,152 @@
+/* Reutiliza todos los estilos de la página de reserva del usuario */
+@import '../../pages/PerfilSucursal/PerfilSucursal.css';
+
+/* ── Overlay ── */
+.rturno-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* ── Card del modal — tamaño fijo siempre ── */
+.rturno-modal {
+  background: var(--bg);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 760px;
+  height: 90vh;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+
+/* ── Cabecera roja ── */
+.rturno-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 52px;
+  background: var(--brand);
+  flex-shrink: 0;
+}
+
+/* Bloque central con título y nombre del cliente */
+.rturno-header__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.rturno-header__title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.rturno-header__cliente {
+  font-size: 15px;
+  font-weight: 400;
+  color: #fff;
+  opacity: .9;
+  margin: 0;
+}
+
+/* Cruz absoluta a la derecha — hover sutil sobre fondo rojo */
+.rturno-header__close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+}
+
+.rturno-header__close:hover {
+  background: rgba(255, 255, 255, .2) !important;
+}
+
+/* ── Cuerpo scrollable: 16px desde el header al primer título ── */
+.rturno-body.ps-body {
+  flex: 1;
+  overflow-y: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 24px 24px;
+  box-sizing: border-box;
+}
+
+/* ── Espaciado general desde el header ── */
+.rturno-body .ps-section {
+  padding-top: 0;
+}
+
+/* Paso 1 y 3: 16px desde header hasta el título */
+.rturno-body .ps-section__title {
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+/* Paso 2 — "Elegí un profesional" ── */
+
+/* Flecha centrada verticalmente respecto al bloque de título+sub */
+.rturno-body .ps-prof-header {
+  align-items: start;
+  margin-top: 16px;   /* 16px desde el header rojo */
+  margin-bottom: 20px; /* igual que PerfilSucursal usuario */
+}
+
+/* Anula el margin-top que pusimos en ps-section__title cuando está dentro del prof-header */
+.rturno-body .ps-prof-header .ps-section__title {
+  margin-top: 0;
+  margin-bottom: 0; /* igual que PerfilSucursal usuario */
+}
+
+/* Sub-título (nombre del servicio) sin margin extra */
+.rturno-body .ps-prof-header .ps-section__sub {
+  margin-bottom: 0;
+}
+
+/* Paso 3: 16px desde el header rojo hasta el nombre del servicio */
+.rturno-body .ps-reserva-header {
+  margin-top: 16px;
+}
+
+/* ── Footer centrado ── */
+.rturno-footer {
+  padding: 12px 20px 16px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.rturno-footer .btn {
+  min-width: 0;
+  width: 140px;
+  padding: 9px 16px;
+  font-size: 14px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 599px) {
+  .rturno-modal {
+    max-height: 95vh;
+    border-radius: 16px 16px 0 0;
+    align-self: flex-end;
+  }
+
+  .rturno-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+}

@@ -1,0 +1,80 @@
+.emodal-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn .18s ease;
+}
+
+.emodal {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 32px 28px 24px;
+  position: relative;
+  max-width: 400px;
+  width: 100%;
+  /* El modal crece con el contenido hasta un máximo del viewport */
+  max-height: calc(100vh - 32px);
+  /* Layout en columna para que el mensaje pueda scrollear
+     mientras el ícono, título y botón quedan fijos */
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  animation: slideUp .22s ease;
+}
+
+.emodal--error  { border-top: 4px solid var(--danger); }
+.emodal--success { border-top: 4px solid var(--success); }
+
+.emodal__icon  { font-size: 44px; margin-bottom: 12px; flex-shrink: 0; }
+
+.emodal__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+/* El mensaje es la única zona que puede crecer y scrollear */
+.emodal__message {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  overflow-y: auto;
+  /* Limita cuánto puede crecer el texto antes de activar el scroll:
+     el resto del espacio lo ocupan ícono + título + botón (~160px) */
+  max-height: calc(100vh - 32px - 160px);
+  /* Palabra larga (ej: email, URL) no desborda horizontalmente */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.emodal .emodal__btn { max-width: 160px; margin: 0 auto; flex-shrink: 0; padding: 10px 24px; }
+
+.emodal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--text-muted);
+  transition: background .15s, color .15s;
+}
+.emodal__close:hover { background: var(--bg-alt); color: var(--text); }
+
+@keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0 } to { transform: none; opacity: 1 } }

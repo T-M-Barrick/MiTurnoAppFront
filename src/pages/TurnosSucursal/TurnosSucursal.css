@@ -1,0 +1,33 @@
+/* ============================================================
+   TURNOS SUCURSAL — estilos de contenido
+   (layout base: hp-body, hp-sidebar*, hp-main de HomeUsuario.css)
+   ============================================================ */
+@import '../HomeUsuario/HomeUsuario.css';
+
+/* Página raíz */
+.tsuc-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* El área principal es la zona de scroll (topbar queda fija arriba) */
+.tsuc-page .hp-main {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* ── Área de contenido: misma distancia y padding que Historial ── */
+.tsuc-content {
+  padding: 24px 20px 48px;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  .tsuc-content { padding: 24px 14px 40px; }
+}

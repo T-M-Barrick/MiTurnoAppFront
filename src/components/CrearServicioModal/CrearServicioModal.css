@@ -1,0 +1,115 @@
+/* ============================================================
+   CREAR SERVICIO MODAL — estilos adicionales
+   (los estilos base sm-* vienen de ServicioModal.css)
+   ============================================================ */
+
+/* Título del header */
+.csm-title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Asterisco de campo requerido */
+.csm-required {
+  color: var(--brand);
+  margin-left: 2px;
+  font-size: 16px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* Botón de ayuda en el header */
+.csm-btn-help {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+  flex-shrink: 0;
+}
+
+.csm-btn-help:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* Ícono de interrogación con CSS puro — sin SVG, sin recorte */
+.csm-btn-help__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Panel de ayuda desplegable */
+.csm-help {
+  padding: 14px 24px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.csm-help__section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin: 8px 0 2px;
+}
+
+.csm-help__section-title:first-child {
+  margin-top: 0;
+}
+
+.csm-help__text {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Separador de sección dentro del body — mismo estilo que sm-field__label */
+.csm-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 4px 0 2px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+/* Contador de franjas junto al botón de horarios */
+.csm-horarios-count {
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}

@@ -1,0 +1,95 @@
+.cmodal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: cfadeIn .18s ease;
+}
+
+.cmodal {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+
+  padding: 28px 24px 20px;
+  max-width: 300px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: cslideUp .22s ease;
+  position: relative;
+}
+
+.cmodal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--text-muted);
+  transition: background .15s, color .15s;
+}
+.cmodal__close:hover { background: var(--bg-alt); color: var(--text); }
+
+.cmodal__icon {
+  font-size: 34px;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+
+.cmodal__message {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  word-break: break-word;
+}
+
+/* Contenido extra (ej: selector de calificación) */
+.cmodal__extra {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.cmodal__actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
+.cmodal__actions .btn {
+  width: 120px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* Botón cancelar — formato ghost */
+.cmodal__actions .btn-secondary {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+.cmodal__actions .btn-secondary:hover:not(:disabled) {
+  background: var(--bg-alt);
+  opacity: 1;
+}
+
+@keyframes cfadeIn  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes cslideUp { from { transform: translateY(20px); opacity: 0 } to { transform: none; opacity: 1 } }

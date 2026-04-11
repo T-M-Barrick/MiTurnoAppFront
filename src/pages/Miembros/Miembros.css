@@ -1,0 +1,146 @@
+/* Reutiliza estilos de tarjetas, grid, buscador, vacíos y cabecera */
+@import '../Clientes/Clientes.css';
+
+/* ── Página ── */
+.miem-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.miem-page .hp-main {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* ── Área de contenido ── */
+.miem-content {
+  padding: 24px 24px 48px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Fila de botones de acción propia ── */
+.miem-actions-row {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  max-width: 770px;
+  margin: 0 auto 16px;
+}
+
+.miem-action-btn {
+  min-width: 152px;
+  width: fit-content;
+  padding: 9px 16px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 13px;
+  transition: opacity .15s;
+}
+
+.miem-action-btn:hover:not(:disabled) { opacity: .88; }
+.miem-action-btn:disabled             { opacity: .5; cursor: not-allowed; }
+
+.miem-action-btn--indigo { background: #4f46e5; }
+[data-theme="dark"] .miem-action-btn--indigo { background: #818cf8; }
+
+.miem-action-btn--orange { background: #ea580c; }
+
+/* Selector de sucursal: ocupa todo el espacio restante a la derecha */
+.miem-actions-row__sucursal {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Fila: buscador + selector de sucursal ── */
+.miem-search-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  max-width: 770px;
+  width: 100%;
+  margin: 0 auto 16px;
+}
+
+/* Barra buscadora centrada, ancho fijo */
+.miem-search-row__input {
+  width: 100%;
+  max-width: 450px;
+  min-width: 0;
+}
+
+/* Sin selector al lado, la fila queda centrada por justify-content: center */
+.miem-search-row {
+  justify-content: center;
+}
+
+/* Fondo blanco (override del var(--bg) de HomeUsuario) */
+.miem-page .hp-search__input {
+  background: var(--card-bg);
+}
+
+/* ── Grid — mismo ancho que la barra buscadora ── */
+.miem-grid {
+  max-width: 770px;
+  margin: 0 auto;
+}
+
+/* ── Badges de rol en la tarjeta — formato base en main.css ── */
+.miem-card__badge { flex-shrink: 0; }
+
+/* Propietario — verde (= CONFIRMADO en turnos) */
+.miem-card__badge--propietario {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Gerente de empresa — azul (= EN_HORA en turnos) */
+.miem-card__badge--gerente-empresa {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* Gerente de sucursal — indigo (= NO_CUMPLIDO en turnos) */
+.miem-card__badge--gerente-sucursal {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+/* Empleado — amarillo/marrón (= color anterior de propietario) */
+.miem-card__badge--empleado {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+/* ── Dark mode ── */
+[data-theme="dark"] .miem-card__badge--propietario      { background: rgba(34,197,94,.18);  color: #4ade80; }
+[data-theme="dark"] .miem-card__badge--gerente-empresa  { background: rgba(3,105,161,.18);  color: #38bdf8; }
+[data-theme="dark"] .miem-card__badge--gerente-sucursal { background: rgba(99,102,241,.18); color: #a5b4fc; }
+[data-theme="dark"] .miem-card__badge--empleado         { background: rgba(234,179,8,.18);  color: #facc15; }
+
+/* ── Tarjeta propia: borde de color brand para destacarse ── */
+.miem-card--self {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+.miem-card--self .cli-card__nombre::after {
+  content: ' (vos)';
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--brand);
+  margin-left: 4px;
+  position: relative;
+  top: -1px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  .miem-content { padding: 16px 14px 40px; }
+}

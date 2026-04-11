@@ -1,0 +1,472 @@
+/* ============================================================
+   DETAIL MODAL — base compartida por todos los modales de detalle
+   (turno usuario, turno sucursal, cliente, miembro)
+   ============================================================ */
+
+/* ── Overlay ── */
+.tdmodal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+  z-index: 1100;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn .2s ease;
+}
+
+/* ── Modal principal ── */
+.tdmodal {
+  background: var(--card-bg);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 660px;
+  margin: 0 auto;
+  max-height: 96vh;
+  overflow-y: auto;
+  animation: slideUp .28s ease;
+  font-family: inherit;
+  scrollbar-width: none;
+}
+.tdmodal::-webkit-scrollbar { display: none; }
+
+/* Handle de arrastre (solo mobile) */
+.tdmodal__handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 10px auto 0;
+}
+
+/* ── Cabecera sticky ── */
+.tdmodal__header {
+  position: sticky;
+  top: 0;
+  background: var(--card-bg);
+  z-index: 1;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tdmodal__header h3 { font-size: 17px; font-weight: 700; margin: 0; }
+
+/* ── Cuerpo ── */
+.tdmodal__body { padding: 10px 20px 8px; }
+
+/* ── Empresa: logo + nombre + badge ── */
+.tdmodal__empresa {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.tdmodal__empresa-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.tdmodal__logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--brand);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.tdmodal__logo img { width: 40px; height: 40px; object-fit: contain; }
+
+.tdmodal__empresa-nombre {
+  flex: 1;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badge de estado — formato base en main.css */
+.tdmodal__badge { flex-shrink: 0; }
+
+.tdmodal__badge--confirmado  { background: #dcfce7; color: #15803d; }
+.tdmodal__badge--en-hora     { background: #e0f2fe; color: #0369a1; }
+.tdmodal__badge--cancelado   { background: #fee2e2; color: #b91c1c; }
+.tdmodal__badge--cumplido    { background: #ffedd5; color: #c2410c; }
+.tdmodal__badge--no-cumplido { background: #ede9fe; color: #5b21b6; }
+.tdmodal__badge--vencido     { background: #f1f5f9; color: #64748b; }
+
+[data-theme="dark"] .tdmodal__badge--confirmado  { background: rgba(34,197,94,.18);   color: #4ade80; }
+[data-theme="dark"] .tdmodal__badge--en-hora     { background: rgba(3,105,161,.18);   color: #38bdf8; }
+[data-theme="dark"] .tdmodal__badge--cancelado   { background: rgba(239,68,68,.18);   color: #f87171; }
+[data-theme="dark"] .tdmodal__badge--cumplido    { background: rgba(249,115,22,.18);  color: #fb923c; }
+[data-theme="dark"] .tdmodal__badge--no-cumplido { background: rgba(99,102,241,.18);  color: #a5b4fc; }
+[data-theme="dark"] .tdmodal__badge--vencido     { background: rgba(100,116,139,.18); color: #94a3b8; }
+
+/* ── Info general ── */
+.tdmodal__info {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 4px;
+}
+
+/* Fila genérica: emoji | label + value */
+.tdmodal__row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.tdmodal__row--sub { padding-left: 0; }
+
+.tdmodal__row-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  line-height: 1;
+  width: 20px;
+  text-align: center;
+}
+
+.tdmodal__row-body {
+  display: block;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.tdmodal__row-label {
+  display: inline;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.tdmodal__row-val {
+  display: inline;
+  font-weight: 400;
+  color: var(--text);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.tdmodal__row-val--dir {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tdmodal__maps-link {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  transition: opacity .15s;
+  text-decoration: none;
+}
+.tdmodal__maps-link:hover { opacity: 0.75; }
+.tdmodal__maps-icon { width: 20px; height: 20px; }
+
+/* ── Fila de dos columnas: Duración+Precio | Recordatorio ── */
+.tdmodal__dur-rec {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+
+.tdmodal__dur-col {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+
+.tdmodal__rec-col {
+  flex: 1;
+  min-width: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tdmodal__rec-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.tdmodal__btn-rec {
+  width: auto;
+  padding: 8px 14px;
+  font-size: 13px;
+  align-self: flex-start;
+}
+
+.tdmodal__row--rec { align-items: center; }
+
+.tdmodal__row-body--rec {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tdmodal__rec-val {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.tdmodal__btn-rec-edit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand);
+  background: none;
+  border: 1.5px solid var(--brand);
+  border-radius: 8px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.tdmodal__btn-rec-edit:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ── Acciones ── */
+.tdmodal__actions {
+  padding: 14px 20px 28px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tdmodal__actions .btn {
+  flex: 0 0 calc(33.33% - 6px);
+  padding: 9px 12px;
+  font-size: 13px;
+}
+
+.tdmodal-rec-modal .btn {
+  width: 120px !important;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* ── Variantes de color ── */
+.btn-orange { background: #ea580c; color: #fff; border: none; }
+.btn-orange:hover { opacity: .88; }
+[data-theme="dark"] .btn-orange { background: #fb923c; }
+
+.btn-indigo { background: #4f46e5; color: #fff; border: none; }
+.btn-indigo:hover { opacity: .88; }
+[data-theme="dark"] .btn-indigo { background: #818cf8; }
+
+/* ── Campo de motivo de cancelación ── */
+.tdmodal__motivo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.tdmodal__motivo-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.tdmodal__motivo-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.tdmodal__motivo-input:focus { border-color: var(--brand); }
+.tdmodal__motivo-input::placeholder { color: var(--text-muted); }
+
+/* ── Selector de calificación ── */
+.tdmodal__rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.tdmodal__rating-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.tdmodal__rating .cselect__trigger {
+  font-size: 14px;
+  background: var(--card-bg);
+}
+
+/* ── Sub-modal: edición de recordatorio ── */
+.tdmodal-rec-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn .18s ease;
+}
+
+.tdmodal-rec-modal {
+  position: relative;
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 18px 16px 14px;
+  width: 100%;
+  max-width: 282px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.22);
+  animation: scaleIn .2s ease;
+}
+
+.tdmodal-rec-modal__title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.tdmodal-rec-modal__btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tdmodal-rec-modal__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+.tdmodal-rec-modal__success-icon { font-size: 36px; }
+.tdmodal-rec-modal__success-msg {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Solo lectura: Cerrar centrado ── */
+.tdmodal__actions--center { justify-content: center; }
+
+/* ── Fila superior de modales de detalle de sucursal/cliente/miembro ── */
+.tdsumodal__top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.tdsumodal__cliente-row {
+  margin-top: 18px;
+  flex: 1;
+  min-width: 0;
+}
+
+.tdsumodal__badge-wrap {
+  flex-shrink: 0;
+  margin-top: -4px;
+}
+
+.tdsumodal__dni-icon {
+  position: relative;
+  top: -2px;
+}
+
+/* Campo de motivo en modales de sucursal */
+.tdsumodal__motivo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.tdsumodal__motivo-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.tdsumodal__motivo-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.tdsumodal__motivo-input:focus { border-color: var(--brand); }
+.tdsumodal__motivo-input::placeholder { color: var(--text-muted); }
+
+/* ── Responsive ── */
+@media (max-width: 479px) {
+  .tdmodal { font-size: 13px; }
+  .tdmodal__header h3 { font-size: 15px; }
+  .tdmodal__empresa-nombre { font-size: 16px; }
+  .tdmodal__row { font-size: 12px; }
+  .tdmodal__row-icon { font-size: 13px; }
+}
+
+@media (min-width: 480px) {
+  .tdmodal-overlay { align-items: center; }
+  .tdmodal {
+    border-radius: 20px;
+    max-height: calc(100vh - 24px);
+  }
+  .tdmodal__handle { display: none; }
+}
+
+@media (max-width: 360px) {
+  .tdmodal__dur-rec { flex-direction: column; }
+}
+
+@keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes scaleIn { from { transform: scale(.92); opacity: 0 } to { transform: scale(1); opacity: 1 } }

@@ -1,0 +1,58 @@
+/* ── DateInput — wrapper sobre input[type="date"] ── */
+
+.date-wrap {
+  position: relative;
+  display: block;
+}
+
+.date-wrap__input {
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+/* ── Ícono del calendario en rojo (WebKit: Chrome, Safari, Edge) ── */
+.date-wrap__input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: .75;
+  /* Transforma el ícono negro/gris del browser a color rojo de la app */
+  filter: invert(20%) sepia(90%) saturate(2000%) hue-rotate(340deg) brightness(95%) contrast(100%);
+  transition: opacity .15s;
+}
+
+.date-wrap__input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Variante indigo — para contextos que no usan el rojo de marca */
+.date-wrap--indigo .date-wrap__input::-webkit-calendar-picker-indicator {
+  filter: invert(31%) sepia(74%) saturate(1200%) hue-rotate(225deg) brightness(90%) contrast(95%);
+}
+
+/* ── Placeholder personalizado "DD/MM/AAAA" cuando el campo está vacío ──
+   Aparece sobre el input vía ::before del wrapper.
+   pointer-events: none deja pasar el clic al input para abrir el calendario. */
+.date-wrap--empty::before {
+  content: "DD/MM/AAAA";
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: .08em;
+  opacity: .55;
+  z-index: 1;
+}
+
+/* ── WebKit: ocultar el texto nativo "dd/mm/aaaa" cuando está vacío ── */
+.date-wrap--empty .date-wrap__input::-webkit-datetime-edit-text,
+.date-wrap--empty .date-wrap__input::-webkit-datetime-edit-month-field,
+.date-wrap--empty .date-wrap__input::-webkit-datetime-edit-day-field,
+.date-wrap--empty .date-wrap__input::-webkit-datetime-edit-year-field {
+  color: transparent;
+}
+
+/* Firefox: no soporta -webkit-datetime-edit-*, el texto nativo permanece visible.
+   El comportamiento funcional es idéntico en todos los navegadores.               */

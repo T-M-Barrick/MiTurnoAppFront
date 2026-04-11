@@ -1,0 +1,403 @@
+/* =========================================================
+   MI TURNO — Estilos globales
+   Modo claro/oscuro controlado por data-theme en <html>
+   ========================================================= */
+
+:root {
+  /* Color de marca — igual en ambos temas */
+  --brand:        #E53935;
+  --brand-dark:   #C62828;
+  --brand-light:  #FFEBEE;
+
+  /* Tema claro (por defecto) */
+  --bg:           #f8f9fa;
+  --bg-alt:       #f1f3f5;
+  --card-bg:      #ffffff;
+  --text:         #1a1a2e;
+  --text-muted:   #6c757d;
+  --border:       #dee2e6;
+  --shadow:       0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:    0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:    0 10px 25px rgba(0,0,0,.10);
+  --radius:       12px;
+
+  /* Estados */
+  --success:      #22c55e;
+  --success-bg:   #dcfce7;
+  --danger:       #ef4444;
+  --danger-bg:    #fee2e2;
+  --info:         #3b82f6;
+  --info-bg:      #dbeafe;
+  --warning:      #f59e0b;
+  --warning-bg:   #fef3c7;
+}
+
+[data-theme="dark"] {
+  --bg:           #0f0f1a;
+  --bg-alt:       #161624;
+  --card-bg:      #1a1a2e;
+  --text:         #f0f0f0;
+  --text-muted:   #9ca3af;
+  --border:       #2d2d42;
+  --shadow:       0 1px 3px rgba(0,0,0,.35);
+  --shadow-md:    0 4px 6px rgba(0,0,0,.40);
+  --shadow-lg:    0 10px 25px rgba(0,0,0,.45);
+
+  --success-bg:   #14532d;
+  --danger-bg:    #450a0a;
+  --info-bg:      #1e3a5f;
+  --warning-bg:   #451a03;
+}
+
+/* =========================================================
+   RESET
+   ========================================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Elementos <a> que actúan como botones de navegación heredan el estilo
+   del componente y no muestran el subrayado/color azul de los enlaces. */
+a.hp-sidebar__item,
+a.he-card,
+a.utr__dropdown-item,
+a.nbell__item-btn,
+a.me-card,
+a.ecard {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* "Ver todas" mantiene su color rojo de marca — no hereda el texto */
+a.nbell__ver-todas {
+  text-decoration: none;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;      /* evita scroll horizontal que descentra la topbar en móvil */
+  scrollbar-width: none;   /* Firefox: oculta scrollbar nativo */
+  -ms-overflow-style: none; /* IE / Edge legacy */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.25s, color 0.25s;
+}
+
+/* Pantalla de carga inicial */
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+/* =========================================================
+   SPINNER
+   ========================================================= */
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin .75s linear infinite;
+}
+
+.spinner-sm {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s, transform 0.1s;
+  width: 100%;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:active  { transform: scale(0.98); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--brand-dark); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--brand);
+  border: 2px solid var(--brand);
+}
+.btn-secondary:hover:not(:disabled) { background: rgba(229, 57, 53, .08); }
+
+.btn-danger { background: var(--brand); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: var(--brand-dark); }
+
+.btn-green { background: #16a34a; color: #fff; border: none; }
+.btn-green:hover:not(:disabled) { opacity: .88; }
+[data-theme="dark"] .btn-green { background: #15803d; }
+
+.btn-indigo { background: #4f46e5; color: #fff; border: none; }
+.btn-indigo:hover:not(:disabled) { opacity: .88; }
+[data-theme="dark"] .btn-indigo { background: #818cf8; }
+
+.btn-orange { background: #ea580c; color: #fff; border: none; }
+.btn-orange:hover:not(:disabled) { opacity: .88; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+}
+.btn-ghost:hover:not(:disabled) { background: var(--bg-alt); }
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.btn-icon:hover { background: var(--bg-alt); }
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  height: 46px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--card-bg);
+  transition: border-color 0.2s;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: var(--brand); }
+
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: var(--text-muted); }
+
+.form-group input:disabled,
+.form-group select:disabled { background: var(--bg-alt); color: var(--text-muted); cursor: not-allowed; }
+
+.form-group input.error,
+.form-group select.error { border-color: var(--danger); }
+
+/* CustomSelect dentro de form-group: ocupa todo el ancho como un input normal */
+.form-group .cselect { display: block; }
+
+/* CustomSelect dentro de form-group: mismo aspecto que inputs */
+.form-group .cselect__trigger {
+  height: 46px;
+  box-sizing: border-box;
+  font-size: 15px;
+  padding: 0 10px 0 14px;
+  border-radius: 8px;
+  background: var(--card-bg);
+}
+.form-group .cselect__trigger--disabled {
+  background: var(--bg-alt);
+}
+
+.form-error {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+
+/* ── Autocompletado de dirección (compartido entre formularios) ── */
+.addr-autocomplete-wrapper { position: relative; }
+
+.addr-autocomplete {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: var(--shadow-lg);
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.addr-autocomplete__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.1s;
+  line-height: 1.3;
+}
+.addr-autocomplete__item:hover { background: var(--bg-alt); }
+
+.addr-autocomplete__icon {
+  flex-shrink: 0;
+  color: var(--brand);
+}
+
+
+/* =========================================================
+   BADGE DE ESTADO — formato base compartido por todos los badges de estado/rol
+   ========================================================= */
+.svc-badge,
+.cli-card__badge,
+.miem-card__badge,
+.tcard__badge,
+.tdmodal__badge,
+.me-card__rol {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+.empty-state {
+  text-align: center;
+  padding: 56px 24px;
+  color: var(--text-muted);
+}
+.empty-state-icon { font-size: 52px; margin-bottom: 16px; }
+.empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.empty-state p  { font-size: 14px; }
+
+/* =========================================================
+   LOADING INLINE
+   ========================================================= */
+.loading-inline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+}
+
+/* =========================================================
+   TOGGLE DE TEMA
+   ========================================================= */
+.theme-toggle {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.theme-toggle:hover { background: var(--bg-alt); border-color: var(--brand); }
+
+/* =========================================================
+   CAMPO CONTRASEÑA CON OJO
+   ========================================================= */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 44px; /* espacio para el botón ojo */
+}
+
+.eye-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-btn:hover { color: var(--text); }

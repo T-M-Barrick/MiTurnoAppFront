@@ -1,0 +1,261 @@
+/* ============================================================
+   NOTIFICATION BELL — campana con dropdown de notificaciones
+   ============================================================ */
+
+.nbell {
+  position: relative;
+}
+
+/* ── Botón campana ── */
+.nbell__btn {
+  position: relative;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+.nbell__btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.nbell__icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Badge de conteo de no leídas */
+.nbell__badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: #fff;
+  color: var(--brand);
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ── Dropdown ── */
+.nbell__dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -8px;
+  width: 320px;
+  max-height: 460px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  z-index: 600;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: nbell-in 0.15s ease;
+}
+
+@keyframes nbell-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* Cabecera del dropdown */
+.nbell__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.nbell__head-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.nbell__head-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand);
+  background: var(--brand-light);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Estado vacío */
+.nbell__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.nbell__empty-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+/* Lista de notificaciones */
+.nbell__list {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  padding: 4px 0;
+}
+
+/* ── Item individual ── */
+.nbell__item {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.nbell__item:last-child {
+  border-bottom: none;
+}
+
+/* No leída: fondo levemente distinto */
+.nbell__item:not(.nbell__item--read) {
+  background: color-mix(in srgb, var(--brand) 4%, var(--card-bg));
+}
+.nbell__item:not(.nbell__item--read):hover {
+  background: color-mix(in srgb, var(--brand) 8%, var(--card-bg));
+}
+.nbell__item--read:hover {
+  background: var(--bg-alt);
+}
+
+/* Botón principal del item (ocupa todo el ancho) */
+.nbell__item-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  width: 100%;
+  padding: 10px 12px 10px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* Columna izquierda: punto indicador */
+.nbell__item-dot-wrap {
+  width: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 5px;
+}
+
+.nbell__item-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--brand);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Columna derecha: contenido */
+.nbell__item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nbell__item-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nbell__item-icon {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.nbell__item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nbell__item-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Cuerpo: máximo 2 líneas con elipsis */
+.nbell__item-body {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+/* ── Botón "Ver todas" ── */
+.nbell__ver-todas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 16px;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+.nbell__ver-todas:hover {
+  background: var(--brand-light);
+}
+
+.nbell__ver-todas-count {
+  background: var(--brand);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+/* ── Responsive: en mobile el dropdown ocupa casi todo el ancho ── */
+@media (max-width: 400px) {
+  .nbell__dropdown {
+    width: calc(100vw - 24px);
+    right: -40px;
+  }
+}

@@ -1,0 +1,913 @@
+/* ============================================================
+   SERVICIO MODAL — overlay grande centrado
+   (unifica estilos de creación y edición)
+   ============================================================ */
+
+/* Título del header */
+.csm-title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Asterisco de campo requerido */
+.csm-required {
+  color: var(--brand);
+  margin-left: 2px;
+  font-size: 16px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* Botón de ayuda en el header */
+.csm-btn-help {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+  flex-shrink: 0;
+}
+
+.csm-btn-help:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* Ícono de interrogación con CSS puro */
+.csm-btn-help__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Panel de ayuda desplegable */
+.csm-help {
+  padding: 14px 24px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: 220px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.csm-help__section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin: 0 0 -12px;
+}
+
+.csm-help__text {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Separador de sección dentro del body */
+.csm-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 4px 0 2px;
+  border-bottom: 1px solid var(--border);
+  margin: 0;
+}
+
+/* Contador de franjas junto al botón de horarios */
+.csm-horarios-count {
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Overlay que cubre toda la pantalla */
+.sm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+  overflow-y: auto;
+  animation: sm-fade-in .18s ease;
+}
+
+@keyframes sm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Tarjeta central del modal */
+.sm-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+  animation: sm-slide-in .2s ease;
+  overflow: hidden;
+}
+
+@keyframes sm-slide-in {
+  from { opacity: 0; transform: translateY(-16px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Header del modal ── */
+.sm-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sm-header__name-input {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  outline: none;
+  padding: 4px 0;
+  transition: border-color .2s;
+  min-width: 0;
+}
+
+.sm-header__name-input:focus {
+  border-bottom-color: var(--brand);
+}
+
+.sm-header__name-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.sm-header__close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--text-muted);
+  transition: background .15s, color .15s;
+}
+
+.sm-header__close:hover {
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+/* ── Cuerpo del modal (scrollable) ── */
+.sm-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Grid de 2 columnas para campos simples ── */
+.sm-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── Campo de formulario ── */
+.sm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sm-field--full {
+  grid-column: 1 / -1;
+}
+
+.sm-field__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+/* Texto aclaratorio entre paréntesis dentro de un label */
+.sm-hint {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sm-field__input,
+.sm-field__textarea {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.sm-field__input:focus,
+.sm-field__textarea:focus {
+  border-color: var(--brand);
+}
+
+.sm-field__input:disabled {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
+  opacity: 1;
+  cursor: not-allowed;
+}
+.sm-field__input::placeholder,
+.sm-field__textarea::placeholder { color: var(--text-muted); }
+
+/* CustomSelect de profesional dentro del modal de servicio */
+.sm-field .cselect__trigger {
+  border-radius: 10px;
+  background: var(--card-bg) !important;
+}
+.sm-field .cselect__trigger--open {
+  background: var(--card-bg) !important;
+}
+
+/* Elimina las flechas de incremento en inputs numéricos */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
+.sm-field__textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Contador de caracteres de textarea */
+.sm-field__char-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.sm-field__char-count--warn {
+  color: var(--brand);
+}
+
+/* ── Inputs dobles (ej: horas + minutos) ── */
+.sm-dual-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sm-dual-input__field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sm-dual-input__field .sm-field__input {
+  width: 74px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+/* Campo de horas: exactamente 3 dígitos, padding reducido */
+.sm-dual-input__field--hours .sm-field__input {
+  width: 52px;
+  padding-left: 8px;
+  padding-right: 8px;
+  text-align: center;
+}
+
+/* Campo de minutos: exactamente 2 dígitos (00-59), padding reducido */
+.sm-dual-input__field--mins .sm-field__input {
+  width: 42px;
+  padding-left: 8px;
+  padding-right: 8px;
+  text-align: center;
+}
+
+.sm-dual-input__unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Toggle de cancelación limitada ── */
+.sm-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+}
+
+/* Variantes compactas para cancelación limitada */
+.sm-field__label--sm  { font-size: 11px; }
+.sm-toggle-desc--sm   { font-size: 11px; }
+.sm-toggle--sm        { width: 34px; height: 20px; }
+.sm-toggle--sm .sm-toggle__track { border-radius: 10px; }
+.sm-toggle--sm .sm-toggle__track::after { width: 14px; height: 14px; top: 3px; left: 3px; }
+.sm-toggle--sm .sm-toggle__input:checked + .sm-toggle__track::after { transform: translateX(14px); }
+
+.sm-toggle {
+  position: relative;
+  display: inline-flex;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.sm-toggle__input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.sm-toggle__track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 12px;
+  transition: background .2s;
+  cursor: pointer;
+}
+
+.sm-toggle__input:checked + .sm-toggle__track {
+  background: var(--brand);
+}
+
+.sm-toggle__track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .2s;
+}
+
+.sm-toggle__input:checked + .sm-toggle__track::after {
+  transform: translateX(18px);
+}
+
+.sm-toggle__label {
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Toggle deshabilitado cuando no hay profesional */
+.sm-toggle--disabled {
+  cursor: not-allowed;
+}
+
+.sm-toggle__input:disabled + .sm-toggle__track,
+.recfield__toggle-input:disabled + .recfield__toggle-track {
+  background: var(--bg-alt);
+  cursor: not-allowed;
+}
+
+.sm-toggle__input:disabled + .sm-toggle__track::after,
+.recfield__toggle-input:disabled + .recfield__toggle-track::after {
+  background: var(--border);
+  box-shadow: none;
+}
+
+/* Descripción gris junto al toggle */
+.sm-toggle-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ── Error de validación ── */
+.sm-field__error {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 2px;
+}
+
+/* ── Botón de configurar horarios ── */
+.sm-btn-horarios {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--brand-light);
+  border: 1.5px solid var(--brand);
+  border-radius: 10px;
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, opacity .15s;
+  align-self: flex-start;
+}
+
+.sm-btn-horarios:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+[data-theme="dark"] .sm-btn-horarios {
+  background: rgba(229, 57, 53, .15);
+}
+
+[data-theme="dark"] .sm-btn-horarios:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.sm-btn-horarios__icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Fila que agrupa Configurar + Ver horarios */
+.sm-horarios-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Botón secundario "Ver horarios" */
+.sm-btn-ver-horarios {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+
+.sm-btn-ver-horarios:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* ── Ver horarios (colapsable, solo lectura) ── */
+.sm-ver-horarios {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sm-ver-horarios__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  transition: color .15s;
+}
+
+.sm-ver-horarios__toggle:hover {
+  color: var(--brand);
+}
+
+.sm-ver-horarios__chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.sm-ver-horarios__count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  background: var(--brand-light);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+.sm-ver-horarios__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.sm-ver-horarios__day {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sm-ver-horarios__day-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+}
+
+.sm-ver-horarios__slot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sm-ver-horarios__time {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.sm-ver-horarios__pill {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.sm-ver-horarios__empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Footer del modal — 3 botones centrados de ancho fijo ── */
+.sm-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sm-footer--create { justify-content: center; }
+.sm-footer--edit   { justify-content: center; }
+
+/* Botones del footer: tamaño base flex para crear (2 botones), override para editar (4 botones) */
+.sm-footer__btn {
+  width: 140px;
+  flex-shrink: 0;
+  padding: 11px 8px;
+  font-size: 13px;
+  transition: opacity .15s, background .15s;
+  gap: 5px;
+}
+
+/* En modo create (2 botones) los botones son más anchos */
+.sm-footer--create .sm-footer__btn {
+  width: 152px;
+}
+
+.sm-footer__btn--cancel {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+}
+
+.sm-footer__btn--cancel:hover {
+  background: var(--bg-alt);
+}
+
+.sm-footer__btn--delete {
+  background: #fff0f0;
+  color: var(--brand);
+  border: 1px solid var(--brand);
+}
+
+[data-theme="dark"] .sm-footer__btn--delete {
+  background: rgba(229, 57, 53, .12);
+}
+
+.sm-footer__btn--delete:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.sm-footer__btn--confirm {
+  background: var(--brand);
+  color: #fff;
+}
+
+.sm-footer__btn--confirm:hover {
+  opacity: .88;
+}
+
+/* Botón "Bloqueos" — indigo, solo en modo edición */
+.sm-footer__btn--bloqueos {
+  background: #4f46e5;
+  color: #fff;
+  position: relative;
+}
+
+.sm-footer__btn--bloqueos:hover {
+  opacity: .88;
+}
+
+/* Badge de cantidad de bloqueos sobre el botón */
+.sm-footer__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  background: #fff;
+  color: #4f46e5;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  margin-left: 2px;
+}
+
+/* Cuando el badge está visible, achica la letra del botón para que todo entre */
+.sm-footer__btn--bloqueos:has(.sm-footer__badge) {
+  font-size: 11px;
+  gap: 2px;
+}
+
+.sm-footer__btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* ── Confirmación de eliminación ── */
+.sm-confirm-delete {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  margin-bottom: 4px;
+}
+
+.sm-confirm-delete__text {
+  font-size: 14px;
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.sm-confirm-delete__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sm-confirm-delete__yes {
+  padding: 7px 14px;
+  background: var(--danger);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.sm-confirm-delete__no {
+  padding: 7px 14px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Atenúa la tarjeta cuando hay un modal superpuesto encima */
+.sm-card--dimmed {
+  filter: brightness(0.5);
+  pointer-events: none;
+}
+
+/* ── Versiones del servicio ── */
+.sm-versiones {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Fila del estado vacío: botón + descripción en línea */
+.sm-versiones__add-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sm-versiones__empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.sm-version-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--brand-light);
+  border: 1.5px solid rgba(229, 57, 53, .4);
+  border-radius: 10px;
+  transition: background .15s, border-color .15s;
+  cursor: pointer;
+}
+
+.sm-version-card:hover {
+  background: #FFD7D7;
+  border-color: rgba(229, 57, 53, .6);
+}
+
+[data-theme="dark"] .sm-version-card {
+  background: rgba(229, 57, 53, .12);
+  border-color: rgba(229, 57, 53, .3);
+}
+
+
+.sm-version-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+
+/* Chip individual */
+.sm-version-card__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: transparent;
+  border: 1px solid rgba(229, 57, 53, .35);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand);
+  white-space: nowrap;
+}
+
+/* Chip de "sin fecha de fin" */
+.sm-version-card__chip--muted {
+  color: var(--brand-dark);
+  font-style: italic;
+  border-style: dashed;
+}
+
+.sm-btn-add-version {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--brand-light);
+  border: 1.5px solid var(--brand);
+  border-radius: 10px;
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s;
+  align-self: flex-start;
+}
+
+.sm-btn-add-version:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+[data-theme="dark"] .sm-btn-add-version {
+  background: rgba(229, 57, 53, .15);
+}
+
+[data-theme="dark"] .sm-btn-add-version:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .sm-card {
+    border-radius: 12px;
+    max-height: 95vh;
+  }
+
+  .sm-header {
+    padding: 16px 16px 12px;
+  }
+
+  .sm-body {
+    padding: 16px;
+  }
+
+  .sm-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sm-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding: 12px 16px 16px;
+  }
+
+  .sm-footer__btn {
+    max-width: unset;
+    width: 100%;
+  }
+
+  .sm-footer--create .sm-footer__btn {
+    width: 100%;
+  }
+}

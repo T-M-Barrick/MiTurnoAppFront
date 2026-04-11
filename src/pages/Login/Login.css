@@ -1,0 +1,164 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  background: var(--bg);
+  position: relative;
+}
+
+/* Botón de tema — esquina superior derecha, mismo estilo que en Registro */
+.login-page__theme {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s;
+}
+.login-page__theme:hover { background: var(--bg-alt); }
+
+/* ==========================================
+   PANEL IZQUIERDO
+   ========================================== */
+.login-left {
+  flex: 1;
+  background: var(--brand);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.login-left__logo {
+  width: 150px;
+  height: 150px;
+  border-radius: 28px;
+  object-fit: contain;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25);
+}
+
+.login-left__tagline {
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  min-height: 1.4em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* Cursor parpadeante del typewriter */
+.login-left__cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: rgba(255,255,255,.85);
+  animation: blink 1s step-end infinite;
+}
+
+.login-left__sub {
+  margin-top: 20px;
+  font-size: 15px;
+  color: rgba(255,255,255,.80);
+  text-align: center;
+  max-width: 300px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   PANEL DERECHO
+   ========================================== */
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.login-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 36px 28px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid var(--border);
+}
+
+.login-card__title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.login-card__divider {
+  text-align: center;
+  margin: 20px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.login-card__divider::before,
+.login-card__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+@keyframes blink { 50% { opacity: 0 } }
+
+.login-card__forgot {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color .15s;
+}
+
+.login-card__forgot:hover {
+  color: var(--brand);
+}
+
+/* ==========================================
+   RESPONSIVE — tablet y mobile
+   ========================================== */
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-left {
+    min-height: auto;
+    padding: 40px 24px 32px;
+  }
+
+  .login-left__logo { width: 100px; height: 100px; border-radius: 20px; margin-bottom: 20px; }
+  .login-left__tagline { font-size: 17px; white-space: normal; }
+  .login-left__sub { display: none; }
+
+  .login-right { padding: 28px 16px 40px; }
+}
+
+@media (max-width: 400px) {
+  .login-card { padding: 24px 16px; }
+}

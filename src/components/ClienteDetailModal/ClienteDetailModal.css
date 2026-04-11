@@ -1,0 +1,59 @@
+/* Reutiliza los estilos base de todos los modales de detalle */
+@import '../../styles/DetailModal.css';
+
+/* ── Emoji teléfono: 1px arriba ── */
+.cdmodal__tel-icon { position: relative; top: -1px; }
+
+/* ── Contenedor de badges apilados ── */
+.cdmodal__badge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* ── Badges de estado ── */
+.cdmodal__badge--activo {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.cdmodal__badge--inactivo {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.cdmodal__badge--bloqueado {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+[data-theme="dark"] .cdmodal__badge--activo {
+  background: rgba(34, 197, 94, .15);
+  color: #4ade80;
+}
+
+[data-theme="dark"] .cdmodal__badge--inactivo {
+  background: rgba(100, 116, 139, .18);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .cdmodal__badge--bloqueado {
+  background: rgba(239, 68, 68, .18);
+  color: #f87171;
+}
+
+/* ── Observación: permite múltiples líneas ── */
+.cdmodal__observacion {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Fila de 4 botones: tamaño reducido para que entren en hilera ── */
+/* Los botones heredan todo el formato de .btn global (igual que detalle turno),
+   solo se fuerza flex para que los 4 entren en fila */
+.cdmodal__actions.tdmodal__actions .btn {
+  flex: 1;
+  min-width: 0;
+}
+

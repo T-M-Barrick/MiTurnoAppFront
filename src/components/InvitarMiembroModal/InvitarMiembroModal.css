@@ -1,0 +1,22 @@
+/* Reutiliza la base visual de ClienteFormModal */
+@import '../ClienteFormModal/ClienteFormModal.css';
+
+/* Ancho y alto específicos del modal de invitación (menos campos que el de cliente).
+   Se usa doble clase para ganar especificidad sobre .cfmodal. */
+.tdmodal.immodal {
+  max-width: 380px;
+  height: auto;
+}
+
+/* Botones del footer: cada uno ocupa la mitad del ancho disponible */
+.tdmodal.immodal .tdmodal__actions .btn {
+  flex: 1;
+}
+
+/* Cuerpo más compacto */
+.tdmodal.immodal .immodal__body {
+  gap: 14px;
+  justify-content: flex-start;
+  padding-top: 16px;
+  padding-bottom: 8px;
+}

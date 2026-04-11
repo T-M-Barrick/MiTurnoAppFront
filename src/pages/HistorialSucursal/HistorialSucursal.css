@@ -1,0 +1,29 @@
+/* Reutiliza el layout de TurnosSucursal y los estados de Historial */
+@import '../TurnosSucursal/TurnosSucursal.css';
+@import '../Historial/Historial.css';
+
+/* Página raíz */
+.hsuc-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.hsuc-page .hp-main {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Área de contenido — mismo padding que tsuc-content */
+.hsuc-content {
+  padding: 24px 20px 48px;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+  .hsuc-content { padding: 24px 14px 40px; }
+}

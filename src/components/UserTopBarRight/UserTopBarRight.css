@@ -1,0 +1,112 @@
+/* ============================================================
+   USER TOP BAR RIGHT — campana + avatar + dropdown
+   Reutilizable en todas las páginas de usuario logueado.
+   ============================================================ */
+
+.utr {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* ── Avatar + dropdown ── */
+.utr__profile {
+  position: relative;
+}
+
+.utr__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.utr__avatar:hover { background: rgba(255, 255, 255, 0.3); }
+
+/* Logo de empresa dentro del avatar */
+.utr__avatar-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* ── Dropdown ── */
+.utr__dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 230px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 500;
+  overflow: hidden;
+  animation: utr-dropdown-in 0.15s ease;
+}
+
+@keyframes utr-dropdown-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.utr__dropdown-user {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.utr__dropdown-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.utr__dropdown-email {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.utr__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: left;
+  transition: background 0.12s;
+}
+.utr__dropdown-item:hover { background: var(--bg-alt); }
+.utr__dropdown-item svg   { flex-shrink: 0; color: var(--text-muted); }
+
+.utr__dropdown-item--danger       { color: var(--danger); }
+.utr__dropdown-item--danger svg   { color: var(--danger); }
+.utr__dropdown-item--danger:hover { background: var(--danger-bg); }
+
+.utr__dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}

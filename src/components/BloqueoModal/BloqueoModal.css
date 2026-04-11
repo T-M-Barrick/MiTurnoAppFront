@@ -1,0 +1,339 @@
+/* ============================================================
+   BLOQUEO MODAL — lista y creación de bloqueos de servicio
+   ============================================================ */
+
+/* Overlay — mismo z-index que otros modales secundarios */
+.blq-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+  animation: blq-fade-in .18s ease;
+}
+
+@keyframes blq-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Tarjeta del modal — lista */
+.blq-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+  animation: blq-slide-in .2s ease;
+  overflow: hidden;
+}
+
+/* Atenúa la lista cuando el formulario está abierto encima */
+.blq-card--dimmed {
+  filter: brightness(0.5);
+  pointer-events: none;
+}
+
+/* Overlay del formulario — z-index superior al de lista */
+.blq-overlay--form {
+  z-index: 1300;
+  background: transparent;
+}
+
+/* Tarjeta del formulario — más compacta */
+.blq-card--form {
+  max-width: 500px;
+}
+
+@keyframes blq-slide-in {
+  from { opacity: 0; transform: translateY(-12px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Header ── */
+.blq-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.blq-header__title {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.blq-header__back,
+.blq-header__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--text-muted);
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+}
+
+.blq-header__back:hover,
+.blq-header__close:hover {
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+/* ── Cuerpo ── */
+.blq-body {
+  /* Alto fijo para mostrar exactamente 3 ítems sin scroll */
+  height: 230px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.blq-body--form {
+  height: auto;
+  flex: 1;
+  gap: 16px;
+}
+
+/* Estado vacío */
+.blq-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.blq-empty__icon {
+  font-size: 34px;
+  opacity: .5;
+}
+
+.blq-empty__text {
+  font-size: 14px;
+}
+
+/* ── Lista de bloqueos ── */
+.blq-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.blq-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+
+.blq-item:hover {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+}
+
+[data-theme="dark"] .blq-item {
+  background: rgba(79, 70, 229, .12);
+  border-color: rgba(79, 70, 229, .3);
+}
+
+.blq-item__dates {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.blq-item__range {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3730a3;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme="dark"] .blq-item__range {
+  color: #a5b4fc;
+}
+
+.blq-item__motivo {
+  font-size: 12px;
+  color: #6366f1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .blq-item__motivo {
+  color: #818cf8;
+}
+
+
+/* ── Formulario de creación ── */
+.blq-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.blq-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.blq-field__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+
+.blq-field__input,
+.blq-field__textarea {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.blq-field__input:focus,
+.blq-field__textarea:focus {
+  border-color: var(--brand);
+}
+
+.blq-field__input:disabled,
+.blq-field__textarea:disabled {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.blq-field__input::placeholder,
+.blq-field__textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.blq-field__textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.blq-field__error {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 1px;
+}
+
+/* ── Footer ── */
+.blq-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.blq-footer__btn {
+  width: 148px;
+  flex-shrink: 0;
+  padding: 11px 12px;
+  font-size: 13px;
+  transition: opacity .15s, background .15s;
+  gap: 6px;
+}
+
+.blq-footer__btn--cancel {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+}
+
+.blq-footer__btn--cancel:hover {
+  background: var(--bg-alt);
+}
+
+.blq-footer__btn--delete {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.blq-footer__btn--delete:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+[data-theme="dark"] .blq-footer__btn--delete {
+  background: rgba(37, 99, 235, .12);
+}
+
+.blq-footer__btn--create {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.blq-footer__btn--create:hover {
+  opacity: .88;
+}
+
+.blq-footer__btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .blq-form-row {
+    grid-template-columns: 1fr;
+  }
+  .blq-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .blq-footer__btn {
+    width: 100%;
+  }
+}

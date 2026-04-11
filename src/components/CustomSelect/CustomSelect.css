@@ -1,0 +1,84 @@
+/* ============================================================
+   CUSTOM SELECT — dropdown totalmente controlado
+   ============================================================ */
+
+.cselect {
+  position: relative;
+  display: inline-block;
+}
+
+/* ── Botón trigger ── */
+.cselect__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 0 4px 0 6px;
+  align-self: stretch;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color .2s;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+.cselect__trigger:focus,
+.cselect__trigger--open { border-color: var(--brand); }
+
+.cselect__trigger.error { border-color: var(--danger); }
+
+.cselect--disabled {
+  cursor: not-allowed;
+}
+.cselect__trigger--disabled {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.cselect__value {
+  flex: 1;
+  text-align: left;
+  line-height: 1;
+}
+
+.cselect__arrow {
+  flex-shrink: 0;
+  margin-left: 0;
+  color: var(--text);
+  transition: transform .15s;
+}
+.cselect__trigger--open .cselect__arrow { transform: rotate(180deg); }
+
+/* ── Dropdown (posicionado via fixed en JS para escapar overflow:hidden) ── */
+.cselect__dropdown {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+}
+
+/* ── Opción ── */
+.cselect__option {
+  padding: 7px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: background .12s;
+}
+.cselect__option:hover { background: var(--bg-alt); }
+.cselect__option--selected {
+  color: var(--brand);
+  font-weight: 600;
+}

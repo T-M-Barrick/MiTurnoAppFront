@@ -1,0 +1,20 @@
+/* Estado de resultado (éxito / token inválido) */
+.reset-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.reset-state__icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.reset-state__text {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}

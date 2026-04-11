@@ -1,0 +1,177 @@
+/* Reutiliza los estilos base de todos los modales de detalle */
+@import '../../styles/DetailModal.css';
+
+/* ── Card más ancha para el formulario; alto fijo para que ambos modos
+   (nuevo y modificar) tengan la misma altura ── */
+.cfmodal {
+  max-width: 500px;
+  height: 570px;
+  max-height: 96vh;
+  overflow: hidden;       /* el modal no scrollea; solo lo hace el body */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Cuerpo scrollable entre las dos líneas divisoras ── */
+.cfmodal__body {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;          /* necesario para que flex + overflow funcionen */
+  padding: 10px 24px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Último campo del formulario: sin margen inferior para que el espacio
+   hasta la línea divisoria quede controlado solo por el padding del body */
+.cfmodal__body .form-group:last-child {
+  margin-bottom: 4px;
+}
+
+/* ── Footer: menos espacio respecto a la línea divisoria ── */
+.cfmodal .tdmodal__actions {
+  padding: 10px 20px 16px;
+  margin-top: 0;
+}
+
+/* ── Aclaración no obligatoria junto a un label (ej: "(SIN PUNTOS)") ── */
+.cfmodal__hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 2px;
+  margin-right: 1px;
+}
+
+/* ── Ancho relativo de DNI (estrecho) y Email (amplio) en su fila ── */
+.cfmodal__col-dni   { flex: 0 0 33% !important; }
+.cfmodal__col-email { flex: 1 !important; }
+
+/* ── Asterisco obligatorio — mismo tamaño que csm-required en ServicioModal ── */
+.cfmodal__req {
+  color: var(--brand);
+  font-size: 16px;
+  font-weight: 700;
+  margin-left: 2px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* ── Botones del footer: mismo alto que ServicioModal (padding 11px, font 13px) ── */
+.cfmodal .tdmodal__actions .btn {
+  padding: 11px 8px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+/* ── Botón guardar ── */
+.cfmodal__btn-guardar {
+  min-width: 100px;
+}
+
+/* ── Inputs/textarea: fondo blanco del modal ── */
+.cfmodal .form-group input,
+.cfmodal .form-group textarea {
+  background: var(--card-bg) !important;
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+.cfmodal .form-group input:disabled,
+.cfmodal .form-group textarea:disabled {
+  background: var(--bg-alt) !important;
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+.cfmodal .form-group input::placeholder,
+.cfmodal .form-group textarea::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ── CustomSelect: fondo blanco del modal ── */
+.cfmodal .cselect__trigger,
+.immodal .cselect__trigger {
+  background: var(--card-bg) !important;
+}
+
+/* ── Textarea: hereda fuente del modal (browsers no lo hacen por defecto) ── */
+.cfmodal__body textarea {
+  resize: vertical;
+  min-height: 72px;
+  font-family: inherit;
+}
+
+/* ── Teléfonos con selector de código de país ── */
+.cfmodal__phone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cfmodal__phone-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cfmodal__phone-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* Input del número */
+.cfmodal__phone-numero {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--card-bg);
+  outline: none;
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
+.cfmodal__phone-numero:focus { border-color: var(--brand); }
+.cfmodal__phone-numero::placeholder { color: var(--text-muted); }
+.cfmodal__phone-numero:disabled { background: var(--bg-alt); color: var(--text-muted); cursor: not-allowed; }
+.cfmodal__phone-numero.error { border-color: var(--danger); }
+
+/* Botón eliminar teléfono */
+.cfmodal__phone-remove {
+  padding: 12px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--card-bg);
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.cfmodal__phone-remove:hover { background: var(--danger-bg); }
+
+/* Botón agregar teléfono */
+.cfmodal__phone-add {
+  background: var(--brand-light);
+  color: var(--brand);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  width: auto;
+  display: block;
+  margin: 6px auto 0;
+  transition: filter .15s;
+}
+.cfmodal__phone-add:hover { filter: brightness(.93); }
+.cfmodal__phone-add:disabled { opacity: .5; cursor: not-allowed; }

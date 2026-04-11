@@ -1,0 +1,48 @@
+/* ── Página de favoritos ── */
+.fav-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.fav-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
+  padding: 20px 24px 48px;
+}
+
+.fav-center {
+  width: 100%;
+  max-width: 1054px;
+  margin: 0 auto;
+}
+
+.fav-title {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+/* 2 columnas en escritorio — max 520px cada una */
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+/* 1 columna en móvil */
+@media (max-width: 600px) {
+  .fav-body {
+    padding: 20px 14px 48px;
+  }
+
+  .fav-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,72 @@
+/* ============================================================
+   HISTORIAL — estilos de contenido
+   (layout base: hp-body, hp-sidebar*, hp-main de HomeUsuario.css)
+   ============================================================ */
+@import '../HomeUsuario/HomeUsuario.css';
+
+/* Página raíz */
+.hist-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* El área principal es la zona de scroll (topbar queda fija arriba) */
+.hist-page .hp-main {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* ── Área de contenido ── */
+.hist-content {
+  padding: 24px 20px 48px;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Loading ── */
+.hist-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+/* ── Grid de turnos — igual que en HomeUsuario ── */
+.hist-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* ── Botón cargar más ── */
+.hist-btn-mas {
+  grid-column: 1 / -1;
+  width: fit-content;
+  margin: 8px auto 0;
+  padding: 10px 28px;
+  background: var(--brand);
+  color: #fff;
+  transition: opacity .2s;
+}
+
+.hist-btn-mas:hover:not(:disabled) {
+  opacity: .88;
+}
+
+.hist-btn-mas:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  .hist-content { padding: 24px 14px 40px; }
+}
+
+@media (max-width: 599px) {
+  .hist-list { grid-template-columns: 1fr; }
+}

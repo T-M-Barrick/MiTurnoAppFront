@@ -1,0 +1,166 @@
+/* ── Tarjeta de empresa ── */
+.ecard {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  padding: 7px 10px;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  outline: none;
+  width: 100%;
+  max-width: 520px;
+  /* Alto fijo: mismo para todas las tarjetas (con o sin calificación) */
+  min-height: 84px;
+}
+.ecard:hover         { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.ecard:active        { transform: translateY(0); }
+.ecard:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* ── Columna izquierda: solo logo ── */
+.ecard__left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 60px;
+}
+
+/* ── Logo — crece con el alto de la tarjeta ── */
+.ecard__logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 11px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--brand);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.ecard__logo img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 11px;
+}
+
+/* ── Rating (estrellas + número) en la columna info, bajo el nombre ── */
+.ecard__rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ecard__stars {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.ecard__star {
+  width: 12px;
+  height: 12px;
+  color: var(--warning);
+  flex-shrink: 0;
+}
+
+.ecard__stars-num {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--warning);
+  font-family: inherit;
+  line-height: 1;
+}
+
+/* ── Columna derecha: info — distribuye verticalmente para ocupar todo el alto ── */
+.ecard__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.ecard__nombre {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ecard__rubro {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Dirección ── */
+.ecard__dir {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.ecard__dir-icon {
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* El texto se encoge cuando es largo y el pin queda pegado a él */
+.ecard__dir-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.ecard__maps-link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: opacity .15s;
+  text-decoration: none;
+}
+.ecard__maps-link:hover { opacity: 0.75; }
+
+.ecard__maps-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Favorito ── */
+.ecard__fav {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: flex-start;
+  font-family: inherit;
+  transition: color .15s, background .15s;
+}
+.ecard__fav:hover { background: var(--bg-alt); color: var(--warning); }
+.ecard__fav--on   { color: var(--warning); }

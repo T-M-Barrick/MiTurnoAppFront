@@ -1,0 +1,108 @@
+/* ── RecordatorioField — bloque toggle + horas + minutos ── */
+
+.recfield__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Toggle switch */
+.recfield__toggle {
+  position: relative;
+  display: inline-flex;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.recfield__toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+.recfield__toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 24px;
+  transition: background .2s;
+  cursor: pointer;
+}
+.recfield__toggle-input:checked + .recfield__toggle-track { background: var(--brand); }
+.recfield__toggle-input:disabled + .recfield__toggle-track {
+  background: var(--bg-alt);
+  cursor: not-allowed;
+}
+.recfield__toggle-input:disabled + .recfield__toggle-track::after {
+  background: var(--border);
+  box-shadow: none;
+}
+.recfield__toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .2s;
+}
+.recfield__toggle-input:checked + .recfield__toggle-track::after { transform: translateX(18px); }
+
+/* Campo hora / minutos */
+.recfield__field {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.recfield__input {
+  width: 42px;
+  min-width: 42px;
+  height: 37px;
+  box-sizing: border-box;
+  padding: 8px 6px;
+  text-align: center;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s;
+  -moz-appearance: textfield;
+}
+.recfield__input::-webkit-outer-spin-button,
+.recfield__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.recfield__input:focus   { border-color: var(--brand); }
+.recfield__input:disabled { background: var(--bg-alt); color: var(--text-muted); cursor: not-allowed; }
+.recfield__input--error  { border-color: var(--danger); }
+
+.recfield__unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.recfield__desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.recfield__error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--danger);
+}
+
+/* CustomSelect de minutos: blanco cuando habilitado, gris cuando deshabilitado */
+.recfield__field .cselect__trigger {
+  background: var(--card-bg);
+}
+.recfield__field .cselect__trigger--disabled {
+  background: var(--bg-alt);
+}

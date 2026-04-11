@@ -1,0 +1,81 @@
+/* Estilos del ítem de dirección en el formulario de perfil */
+
+.dir-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  background: var(--bg-alt);
+}
+
+.dir-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.dir-item__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dir-item__remove {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background .15s;
+}
+.dir-item__remove:hover { background: var(--danger-bg); }
+
+/* ── Variante sin borde/fondo (embebida en otra sección) ── */
+.dir-item--plain {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+/* ── Fila calle (ancha) + altura+botón (compacta) ── */
+.dir-item__calle-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.dir-item__calle-group { flex: 2; }   /* calle ocupa ~65% */
+.dir-item__altura-group { flex: 1; }  /* altura+botón ~35% */
+
+/* ── Subrow: input de altura + botón buscar ── */
+.dir-item__altura-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.dir-item__altura-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Botón lupa — cuadrado 44px, solo ícono, sin texto; hereda layout de .btn */
+.dir-item__btn-buscar {
+  flex-shrink: 0;
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  background: #16a34a;
+  color: #fff;
+  transition: opacity 0.2s;
+  align-self: stretch;
+}
+
+.dir-item__btn-buscar:hover:not(:disabled) { opacity: 0.88; }
+.dir-item__btn-buscar:disabled { opacity: 0.5; cursor: not-allowed; }
+[data-theme="dark"] .dir-item__btn-buscar { background: #15803d; }

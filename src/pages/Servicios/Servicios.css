@@ -1,0 +1,276 @@
+/* ============================================================
+   SERVICIOS — estilos de contenido
+   (layout base: hp-body, hp-sidebar*, hp-main de HomeUsuario.css)
+   ============================================================ */
+@import '../HomeUsuario/HomeUsuario.css';
+
+/* Página raíz */
+.svc-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* El área principal es la zona de scroll (topbar queda fija arriba) */
+.svc-page .hp-main {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* ── Cabecera de la sección servicios ── */
+.svc-header {
+  padding: 20px 24px 0;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svc-header__title {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ── Botón agregar servicio ── */
+.svc-btn-add-wrap {
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto 16px;
+}
+
+.svc-btn-add {
+  width: fit-content;
+  gap: 6px;
+  padding: 9px 16px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 13px;
+  transition: opacity .15s;
+}
+
+.svc-btn-add:hover {
+  opacity: .88;
+}
+
+.svc-btn-add:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* ── Selector de sucursal ── */
+.svc-sucursal-wrap {
+  padding: 12px 24px 0;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.svc-sucursal-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* CustomSelect dentro del selector de sucursal */
+.svc-sucursal-wrap .cselect {
+  flex: 1;
+  max-width: 320px;
+}
+.svc-sucursal-wrap .cselect__trigger {
+  background: var(--card-bg);
+}
+
+/* ── Área de contenido de servicios ── */
+.svc-content {
+  padding: 24px 24px 48px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Loading spinner ── */
+.svc-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+/* ── Grid de tarjetas de servicio ── */
+.svc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  /* ancho = 50ch del nombre (16px bold) + padding de la card */
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Tarjeta de servicio ── */
+.svc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 17px 20px;
+  height: 110px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--text);
+  transition: box-shadow .2s, transform .2s, border-color .2s;
+}
+
+.svc-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .12);
+  transform: translateY(-2px);
+  border-color: var(--brand);
+}
+
+.svc-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.svc-card__name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badge de cancelación limitada */
+.svc-badge {
+  flex-shrink: 0;
+}
+
+.svc-badge--cancel {
+  background: var(--brand-light);
+  color: var(--brand);
+}
+
+[data-theme="dark"] .svc-badge--cancel {
+  background: rgba(229, 57, 53, .18);
+}
+
+/* Variante junto al profesional */
+.svc-badge--sm {
+  margin-left: 6px;
+}
+
+.svc-card__pro {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  color: var(--text-muted);
+  min-width: 0;
+  overflow: visible;
+}
+
+.svc-card__pro-icon {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.svc-card__meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: nowrap;
+  margin-top: 2px;
+  align-items: center;
+  min-width: 0;
+}
+
+.svc-badge--bloqueo {
+  margin-left: auto;
+  align-self: center;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+[data-theme="dark"] .svc-badge--bloqueo {
+  background: rgba(3, 105, 161, .18);
+  color: #38bdf8;
+}
+
+.svc-card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.svc-card__meta-icon {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.svc-card__meta-icon--precio {
+  margin-right: -3px;
+}
+
+.svc-card__meta-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.svc-card__meta-value {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Nombre del profesional — trunca si no entra */
+.svc-card__pro-nombre {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* «—» cuando no hay profesional */
+.svc-card__pro--none {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  .svc-header        { padding: 16px 14px 0; }
+  .svc-btn-add       { font-size: 12px; padding: 8px 12px; }
+  .svc-sucursal-wrap { padding: 12px 14px 0; }
+  .svc-content       { padding: 20px 14px 40px; }
+}
