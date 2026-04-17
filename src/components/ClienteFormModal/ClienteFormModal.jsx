@@ -302,6 +302,9 @@ export default function ClienteFormModal({ sucursalId, cliente, onClose, onCreat
               className={errors.observacion ? 'error' : ''}
               disabled={loading}
             />
+            <span className={`cfmodal__char-count${observacion.length > 450 ? ' cfmodal__char-count--warn' : ''}`}>
+              {observacion.length}/500
+            </span>
             {errors.observacion && <p className="form-error">{errors.observacion}</p>}
           </div>
 

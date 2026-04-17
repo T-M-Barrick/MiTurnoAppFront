@@ -101,7 +101,7 @@ export default function TurnoCard({ turno, onSelect }) {
             : <span>{turno.sucursal.charAt(0)}</span>}
         </div>
         <div className="tcard__info">
-          <span className="tcard__nombre">{turno.sucursal}</span>
+          <span className="tcard__nombre"><span>{turno.sucursal}</span></span>
           <span className="tcard__servicio">
             <span className="tcard__servicio-emoji">✂️</span>
             <span className="tcard__servicio-nombre">{turno.nombre_de_servicio}</span>

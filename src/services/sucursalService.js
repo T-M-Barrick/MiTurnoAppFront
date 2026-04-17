@@ -1,6 +1,9 @@
 import { api } from './api'
 
 export const sucursalService = {
+  // POST /sucursales/ — crea una nueva sucursal para la empresa del usuario
+  createSucursal: (data) => api.post('/sucursales/', data),
+
   // GET /sucursales/{id}/servicios — lista de servicios de una sucursal
   getServicios: (sucursalId) => api.get(`/sucursales/${sucursalId}/servicios`),
 
@@ -30,20 +33,26 @@ export const sucursalService = {
   deleteVersion: (sucursalId, servicioBaseId, servicioId) =>
     api.delete(`/sucursales/${sucursalId}/servicios/${servicioBaseId}/versiones/${servicioId}`),
 
-  // POST /sucursales/{id}/servicios/{servicioBaseId}/excepcion — crea una excepción de fecha (bloqueo)
+  // POST /sucursales/{id}/servicios/{servicioBaseId}/excepciones — crea una excepción de fecha (bloqueo)
   createExcepcion: (sucursalId, servicioBaseId, data) =>
-    api.post(`/sucursales/${sucursalId}/servicios/${servicioBaseId}/excepcion`, data),
+    api.post(`/sucursales/${sucursalId}/servicios/${servicioBaseId}/excepciones`, data),
 
-  // PATCH /sucursales/{id}/servicios/{servicioBaseId}/excepcion/{excepcionId} — edita un bloqueo
+  // PATCH /sucursales/{id}/servicios/{servicioBaseId}/excepciones/{excepcionId} — edita un bloqueo
   updateExcepcion: (sucursalId, servicioBaseId, excepcionId, data) =>
-    api.patch(`/sucursales/${sucursalId}/servicios/${servicioBaseId}/excepcion/${excepcionId}`, data),
+    api.patch(`/sucursales/${sucursalId}/servicios/${servicioBaseId}/excepciones/${excepcionId}`, data),
 
-  // DELETE /sucursales/{id}/servicios/{servicioBaseId}/excepcion/{excepcionId} — elimina un bloqueo
+  // DELETE /sucursales/{id}/servicios/{servicioBaseId}/excepciones/{excepcionId} — elimina un bloqueo
   deleteExcepcion: (sucursalId, servicioBaseId, excepcionId) =>
-    api.delete(`/sucursales/${sucursalId}/servicios/${servicioBaseId}/excepcion/${excepcionId}`),
+    api.delete(`/sucursales/${sucursalId}/servicios/${servicioBaseId}/excepciones/${excepcionId}`),
 
   // PATCH /sucursales/{id} — actualiza datos de la sucursal (nombre, reserva, telefonos, direccion)
   updatePerfil: (sucursalId, data) => api.patch(`/sucursales/${sucursalId}`, data),
+
+  // PATCH /sucursales/{id}/desactivar — desactiva la sucursal (solo propietario)
+  desactivarSucursal: (sucursalId) => api.patch(`/sucursales/${sucursalId}/desactivar`),
+
+  // PATCH /sucursales/{id}/reactivar — reactiva la sucursal (solo propietario)
+  reactivarSucursal: (sucursalId) => api.patch(`/sucursales/${sucursalId}/reactivar`),
 
   // GET /sucursales/{id}/turnos → lista de turnos activos de la sucursal
   getTurnos: (sucursalId) =>
@@ -57,9 +66,9 @@ export const sucursalService = {
   updateEstadoTurno: (sucursalId, turnoId, data) =>
     api.patch(`/sucursales/${sucursalId}/turnos/${turnoId}/estado`, data),
 
-  // DELETE /sucursales/{id}/turnos/{turnoId} → mueve al historial
-  deleteTurno: (sucursalId, turnoId) =>
-    api.delete(`/sucursales/${sucursalId}/turnos/${turnoId}`),
+  // DELETE /sucursales/{id}/turnos → mueve al historial los turnos indicados
+  deleteTurnos: (sucursalId, turnoIds) =>
+    api.delete(`/sucursales/${sucursalId}/turnos`, { turnos: turnoIds }),
 
   // GET /sucursales/{id}/turnos/historial — historial paginado por cursor
   getHistorial: (sucursalId, { fechaHoraUltima, idUltimo, limite = 50 } = {}) => {
@@ -113,6 +122,18 @@ export const sucursalService = {
   // POST /sucursales/{id}/turnos — reserva un turno para un cliente desde la empresa
   reservarTurnoCliente: (sucursalId, data) =>
     api.post(`/sucursales/${sucursalId}/turnos`, data),
+
+  // GET /sucursales/{id}/bloqueos — lista de clientes bloqueados
+  getBloqueos: (sucursalId) =>
+    api.get(`/sucursales/${sucursalId}/bloqueos`),
+
+  // POST /sucursales/{id}/bloqueos/{clienteId} — bloquea un cliente, body: { motivo }
+  bloquearCliente: (sucursalId, clienteId, data) =>
+    api.post(`/sucursales/${sucursalId}/bloqueos/${clienteId}`, data),
+
+  // DELETE /sucursales/{id}/bloqueos/{clienteId} — desbloquea un cliente (204)
+  desbloquearCliente: (sucursalId, clienteId) =>
+    api.delete(`/sucursales/${sucursalId}/bloqueos/${clienteId}`),
 
   // GET /sucursales/{id}/notificaciones → lista paginada por cursor (leidas=bool, id_ultimo, limite 1-100)
   getNotificaciones: (sucursalId, { leidas, idUltimo, limite = 20 } = {}) => {

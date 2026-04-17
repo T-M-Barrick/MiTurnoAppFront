@@ -5,7 +5,7 @@
    (nuevo y modificar) tengan la misma altura ── */
 .cfmodal {
   max-width: 500px;
-  height: 570px;
+  height: auto;
   max-height: 96vh;
   overflow: hidden;       /* el modal no scrollea; solo lo hace el body */
   display: flex;
@@ -17,21 +17,21 @@
   overflow-y: auto;
   flex: 1;
   min-height: 0;          /* necesario para que flex + overflow funcionen */
-  padding: 10px 24px 0;
+  padding: 16px 24px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 /* Último campo del formulario: sin margen inferior para que el espacio
    hasta la línea divisoria quede controlado solo por el padding del body */
 .cfmodal__body .form-group:last-child {
-  margin-bottom: 4px;
+  margin-bottom: 0;
 }
 
 /* ── Footer: menos espacio respecto a la línea divisoria ── */
 .cfmodal .tdmodal__actions {
-  padding: 10px 20px 16px;
+  padding: 20px;
   margin-top: 0;
 }
 
@@ -78,6 +78,13 @@
   font-size: 14px;
   color: var(--text);
 }
+
+/* Corrige el height fijo del global para el textarea */
+.cfmodal .form-group textarea {
+  height: auto;
+  min-height: 80px;
+  padding: 10px 14px;
+}
 .cfmodal .form-group input:disabled,
 .cfmodal .form-group textarea:disabled {
   background: var(--bg-alt) !important;
@@ -96,11 +103,23 @@
   background: var(--card-bg) !important;
 }
 
-/* ── Textarea: hereda fuente del modal (browsers no lo hacen por defecto) ── */
+/* ── Textarea: hereda fuente del modal y corrige el height fijo del global ── */
 .cfmodal__body textarea {
   resize: vertical;
-  min-height: 72px;
+  height: auto;
+  min-height: 80px;
   font-family: inherit;
+}
+
+/* Contador de caracteres — igual al de ServicioModal */
+.cfmodal__char-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  display: block;
+}
+.cfmodal__char-count--warn {
+  color: var(--brand);
 }
 
 /* ── Teléfonos con selector de código de país ── */

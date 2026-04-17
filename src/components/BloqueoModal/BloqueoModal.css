@@ -37,14 +37,13 @@
 
 /* Atenúa la lista cuando el formulario está abierto encima */
 .blq-card--dimmed {
-  filter: brightness(0.5);
   pointer-events: none;
 }
 
 /* Overlay del formulario — z-index superior al de lista */
 .blq-overlay--form {
   z-index: 1300;
-  background: transparent;
+  background: rgba(0, 0, 0, .5);
 }
 
 /* Tarjeta del formulario — más compacta */
@@ -62,7 +61,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 18px 20px 14px;
+  padding: 10px 20px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -74,27 +73,6 @@
   color: var(--text);
 }
 
-.blq-header__back,
-.blq-header__close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  border-radius: 8px;
-  color: var(--text-muted);
-  transition: background .15s, color .15s;
-  flex-shrink: 0;
-}
-
-.blq-header__back:hover,
-.blq-header__close:hover {
-  background: var(--bg-alt);
-  color: var(--text);
-}
 
 /* ── Cuerpo ── */
 .blq-body {
@@ -259,6 +237,16 @@
   min-height: 80px;
 }
 
+.blq-field__char-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  display: block;
+}
+.blq-field__char-count--warn {
+  color: var(--brand);
+}
+
 .blq-field__error {
   font-size: 12px;
   color: var(--danger);
@@ -277,9 +265,13 @@
 }
 
 .blq-footer__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 148px;
+  height: 40px;
   flex-shrink: 0;
-  padding: 11px 12px;
+  padding: 0 12px;
   font-size: 13px;
   transition: opacity .15s, background .15s;
   gap: 6px;

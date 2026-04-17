@@ -36,10 +36,12 @@
 .miem-action-btn {
   min-width: 152px;
   width: fit-content;
-  padding: 9px 16px;
+  height: 36px;
+  padding: 0 16px;
   background: var(--brand);
   color: #fff;
   font-size: 13px;
+  font-family: inherit;
   transition: opacity .15s;
 }
 
@@ -57,27 +59,19 @@
   min-width: 0;
 }
 
-/* ── Fila: buscador + selector de sucursal ── */
+/* ── Fila: buscador centrado, ancho acotado ── */
 .miem-search-row {
   display: flex;
-  gap: 12px;
   align-items: center;
-  justify-content: center;
-  max-width: 770px;
-  width: 100%;
+  width: 480px;
+  max-width: 100%;
   margin: 0 auto 16px;
 }
 
-/* Barra buscadora centrada, ancho fijo */
+/* La barra ocupa todo el espacio del contenedor */
 .miem-search-row__input {
   width: 100%;
-  max-width: 450px;
   min-width: 0;
-}
-
-/* Sin selector al lado, la fila queda centrada por justify-content: center */
-.miem-search-row {
-  justify-content: center;
 }
 
 /* Fondo blanco (override del var(--bg) de HomeUsuario) */

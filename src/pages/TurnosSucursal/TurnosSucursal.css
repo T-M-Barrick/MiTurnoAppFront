@@ -27,6 +27,23 @@
   margin: 0 auto;
 }
 
+/* ── Fila superior: botón eliminar + selector de sucursal ── */
+.tsuc-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── Filtro de profesional: centrado bajo la barra superior ── */
+.tsuc-profesional-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
 /* ── Responsive ── */
 @media (max-width: 767px) {
   .tsuc-content { padding: 24px 14px 40px; }

@@ -5,7 +5,7 @@
 .rturno-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .45);
+  background: rgba(0, 0, 0, .5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,7 +123,7 @@
 
 /* ── Footer centrado ── */
 .rturno-footer {
-  padding: 12px 20px 16px;
+  padding: 12px 20px 20px;
   display: flex;
   justify-content: center;
   border-top: 1px solid var(--border);

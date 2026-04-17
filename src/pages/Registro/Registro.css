@@ -151,10 +151,13 @@
 .btn-remove-phone:hover { background: var(--danger-bg); }
 
 .btn-agregar {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--brand-light);
   color: var(--brand);
-  padding: 10px 20px;
+  height: 40px;
+  padding: 0 20px;
   width: fit-content;
   margin: 8px auto 0;
   transition: filter .15s;
@@ -277,7 +280,7 @@
 
 
 /* Botón final */
-.reg-submit { margin-top: 8px; height: 46px; }
+.reg-submit { margin-top: 8px; height: 46px; font-size: 15px; }
 
 /* Responsive */
 @media (max-width: 400px) {

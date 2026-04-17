@@ -535,6 +535,26 @@
    PASO 2 — SELECCIÓN DE PROFESIONAL
    ════════════════════════════════════════════════════════════ */
 
+/* ── Botón "Cualquier profesional" ── */
+.ps-cualquiera-wrap {
+  margin-bottom: 12px;
+}
+
+.ps-body .svc-btn-add {
+  width: fit-content;
+  height: 36px;
+  gap: 6px;
+  padding: 0 16px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  transition: opacity .15s;
+}
+
+.ps-body .svc-btn-add:hover    { opacity: .88; }
+.ps-body .svc-btn-add:disabled { opacity: .5; cursor: not-allowed; }
+
 .ps-profesionales {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -949,11 +969,11 @@
 .ps-exc-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .55);
+  background: rgba(0, 0, 0, .5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 900;
+  z-index: 1100;
   padding: 16px;
   animation: ps-fade-in .15s ease;
 }
@@ -1026,11 +1046,11 @@
 .ps-booking-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .55);
+  background: rgba(0, 0, 0, .5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 900;
+  z-index: 1100;
   padding: 16px;
   animation: ps-fade-in .15s ease;
 }

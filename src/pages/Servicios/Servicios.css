@@ -38,6 +38,16 @@
 }
 
 /* ── Botón agregar servicio ── */
+/* Fila: botón izquierda + selector derecha (compartida entre páginas de empresa) */
+.svc-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
 .svc-btn-add-wrap {
   max-width: 560px;
   width: 100%;
@@ -46,11 +56,13 @@
 
 .svc-btn-add {
   width: fit-content;
+  height: 36px;
   gap: 6px;
-  padding: 9px 16px;
+  padding: 0 16px;
   background: var(--brand);
   color: #fff;
   font-size: 13px;
+  font-family: inherit;
   transition: opacity .15s;
 }
 
@@ -63,31 +75,28 @@
   cursor: not-allowed;
 }
 
-/* ── Selector de sucursal ── */
+/* ── Selector de sucursal (global: layout base) ── */
 .svc-sucursal-wrap {
-  padding: 12px 24px 0;
-  max-width: 960px;
-  width: 100%;
-  margin: 0 auto;
   display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.svc-sucursal-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-/* CustomSelect dentro del selector de sucursal */
-.svc-sucursal-wrap .cselect {
-  flex: 1;
-  max-width: 320px;
+  justify-content: flex-end;
+  margin-bottom: 16px;
 }
 .svc-sucursal-wrap .cselect__trigger {
   background: var(--card-bg);
+}
+
+/* ── En svc-content (Servicios): alineado con la grilla de 560px ── */
+.svc-content .svc-sucursal-wrap {
+  max-width: 560px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.svc-content .svc-top-bar {
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ── Área de contenido de servicios ── */
@@ -223,6 +232,7 @@
   align-items: center;
   gap: 3px;
   font-size: 13px;
+  line-height: 1.5;
   color: var(--text-muted);
   flex-shrink: 0;
 }
@@ -271,6 +281,5 @@
 @media (max-width: 767px) {
   .svc-header        { padding: 16px 14px 0; }
   .svc-btn-add       { font-size: 12px; padding: 8px 12px; }
-  .svc-sucursal-wrap { padding: 12px 14px 0; }
   .svc-content       { padding: 20px 14px 40px; }
 }

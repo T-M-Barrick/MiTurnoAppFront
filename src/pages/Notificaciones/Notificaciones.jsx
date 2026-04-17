@@ -29,7 +29,7 @@ export default function Notificaciones() {
   const location = useLocation()
   const params   = useParams()
   const navigate = useNavigate()
-  const { markNotifLeida, markEmpresaNotifLeida } = useAuth()
+  const { markNotifLeida, markEmpresaNotifLeida, empresaPanel } = useAuth()
 
   // Determina el contexto desde el state de navegación o desde la URL
   const stateContext = location.state?.notifContext
@@ -116,15 +116,27 @@ export default function Notificaciones() {
     }
   }
 
-  // Click en item: marcar leída y navegar si tiene turno_id
+  // Click en item: marcar leída y navegar al turno o miembro correspondiente.
+  // Si el ítem ya no existe en el destino, la página simplemente no abre nada.
   const handleNotifClick = async (notif) => {
     await handleMarkLeida(notif)
-    const turnoId = notif.extra_data?.turno_id
-    if (!turnoId) return
+    const turnoId   = notif.extra_data?.turno_id
+    const usuarioId = notif.extra_data?.usuario_id
+    const tipo      = notif.tipo
     const { type, id } = notifContext
-    if (type === 'usuario')       navigate('/home')
-    else if (type === 'empresa')  navigate(`/empresa/${id}/turnos`)
-    else if (type === 'sucursal') navigate(`/sucursal/${id}`)
+
+    // Notificaciones de turno
+    if (turnoId) {
+      if (type === 'usuario')       navigate('/home',                 { state: { openTurnoId: turnoId } })
+      else if (type === 'empresa')  navigate(`/empresa/${id}/turnos`, { state: { openTurnoId: turnoId } })
+      else if (type === 'sucursal') navigate(`/sucursal/${id}`,       { state: { openTurnoId: turnoId } })
+      return
+    }
+
+    // Notificaciones de miembro
+    if (usuarioId && (tipo === 'MIEMBRO_NUEVO_EMPRESA' || tipo === 'MIEMBRO_NUEVO_SUCURSAL')) {
+      if (type === 'empresa') navigate(`/empresa/${id}/miembros`, { state: { openUsuarioId: usuarioId } })
+    }
   }
 
   // Botón de volver según el contexto
@@ -149,6 +161,9 @@ export default function Notificaciones() {
 
   const unreadCount = notificaciones.filter((n) => !n.leida).length
   const { type: ctxType, id: ctxId } = notifContext
+
+  // Cantidad de sucursales del panel de empresa — para mapear el rol de GERENTE_EMPRESA correctamente
+  const cantidadSucursales = empresaPanel?.panel?.sucursales?.length ?? undefined
 
   return (
     <div className="notif-page">
@@ -217,7 +232,7 @@ export default function Notificaciones() {
                         </span>
                       </span>
                       <p className="notif-item__body">
-                        {getNotifBody(notif.tipo, notif.extra_data)}
+                        {getNotifBody(notif.tipo, notif.extra_data, cantidadSucursales)}
                       </p>
                     </span>
                   </button>

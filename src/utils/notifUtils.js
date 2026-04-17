@@ -1,6 +1,18 @@
 // Utilidades para notificaciones: generación de texto y formato de tiempo.
 // Los tipos y mensajes replican la lógica de constantes.py del back.
 
+// Mapeo de roles a texto legible — mismo criterio que AceptarInvitacion
+function getRolLabel(rol, cantidadSucursales) {
+  if (rol === 'GERENTE_EMPRESA' && cantidadSucursales === 1) return 'Gerente'
+  const labels = {
+    PROPIETARIO:      'Propietario',
+    GERENTE_EMPRESA:  'Gerente de Empresa',
+    GERENTE_SUCURSAL: 'Gerente de Sucursal',
+    EMPLEADO:         'Empleado',
+  }
+  return labels[rol] ?? rol
+}
+
 // Devuelve el título visible de una notificación según su tipo
 export function getNotifTitle(tipo) {
   const titles = {
@@ -17,7 +29,8 @@ export function getNotifTitle(tipo) {
 
 // Devuelve el cuerpo de texto de una notificación según tipo + extra_data.
 // Replica la lógica de templates de constantes.py para determinar la variante correcta.
-export function getNotifBody(tipo, extraData) {
+// cantidadSucursales: se pasa desde el contexto para mapear correctamente el rol de GERENTE_EMPRESA.
+export function getNotifBody(tipo, extraData, cantidadSucursales) {
   const ed = extraData ?? {}
 
   switch (tipo) {
@@ -31,7 +44,7 @@ export function getNotifBody(tipo, extraData) {
       return `Recordatorio: tenés un turno en ${ed.nombre_empresa ?? '?'} para ${ed.cuando ?? '?'}`
 
     case 'MIEMBRO_NUEVO_EMPRESA':
-      return `${ed.usuario_apellido ?? '?'}, ${ed.usuario_nombre ?? '?'} se unió a la empresa como ${ed.rol ?? '?'}`
+      return `${ed.usuario_apellido ?? '?'}, ${ed.usuario_nombre ?? '?'} se unió a la empresa como ${getRolLabel(ed.rol, cantidadSucursales)}`
 
     case 'TURNO_NUEVO_SUCURSAL': {
       const hasNombreSucursal = !!ed.nombre_sucursal
@@ -61,9 +74,10 @@ export function getNotifBody(tipo, extraData) {
 
     case 'MIEMBRO_NUEVO_SUCURSAL': {
       const miembro = `${ed.usuario_apellido ?? '?'}, ${ed.usuario_nombre ?? '?'}`
+      const rolLabel = getRolLabel(ed.rol, cantidadSucursales)
       if (ed.nombre_sucursal)
-        return `${miembro} se unió a la sucursal ${ed.nombre_sucursal} como ${ed.rol ?? '?'}`
-      return `${miembro} se unió a la sucursal como ${ed.rol ?? '?'}`
+        return `${miembro} se unió a la sucursal ${ed.nombre_sucursal} como ${rolLabel}`
+      return `${miembro} se unió a la sucursal como ${rolLabel}`
     }
 
     default:

@@ -25,6 +25,7 @@ export default function HomeUsuario() {
   const [loadingTurnos]         = useState(false)
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null)
 
+
   // ---- Búsqueda (se restaura si se vuelve desde PerfilSucursal) ----
   const [search, setSearch]             = useState(location.state?.search    ?? '')
   const [buscando, setBuscando]         = useState(!!location.state?.resultados)
@@ -63,6 +64,18 @@ export default function HomeUsuario() {
     }
     refresh()
   }, []) // eslint-disable-line
+
+  // Abre el modal de detalle si se llegó (o ya estaba) en la página con openTurnoId en el state.
+  // Limpia el state tras consumirlo para no retriggear si se actualizan los turnos.
+  useEffect(() => {
+    const openId = location.state?.openTurnoId
+    if (!openId || turnos.length === 0) return
+    const found = turnos.find((t) => t.id === openId)
+    if (found) {
+      setTurnoSeleccionado(found)
+      navigate(location.pathname, { replace: true, state: { ...location.state, openTurnoId: undefined } })
+    }
+  }, [turnos, location.state?.openTurnoId]) // eslint-disable-line
 
   // Polling de estados cada 5 min
   useEffect(() => {

@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { sucursalService } from '../../services/sucursalService'
 import { empresaService } from '../../services/empresaService'
 import { useAuth } from '../../context/AuthContext'
@@ -8,6 +8,7 @@ import AppTopBar from '../../components/AppTopBar/AppTopBar'
 import UserTopBarRight from '../../components/UserTopBarRight/UserTopBarRight'
 import EmpresaSidebar from '../../components/EmpresaSidebar/EmpresaSidebar'
 import TurnoDetalleSucursalModal from '../../components/TurnoDetalleSucursalModal/TurnoDetalleSucursalModal'
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ErrorModal from '../../components/ErrorModal/ErrorModal'
 import CustomSelect from '../../components/CustomSelect/CustomSelect'
 import '../../components/TurnoCard/TurnoCard.css'
@@ -129,7 +130,9 @@ export function TurnoCardSucursal({ turno, onSelect }) {
  */
 export default function TurnosSucursal() {
   const { id: empresaId } = useParams()
-  const { empresaPanel }  = useAuth()
+  const { empresaPanel, setEmpresaPanel } = useAuth()
+  const location          = useLocation()
+  const navigate          = useNavigate()
 
   // Sucursales disponibles (cargadas del panel)
   const [sucursales,        setSucursales]        = useState([])
@@ -140,9 +143,14 @@ export default function TurnosSucursal() {
   const [turnos,            setTurnos]            = useState([])
   const [loadingTurnos,     setLoadingTurnos]     = useState(false)
 
-  const [turnoSeleccionado, setTurnoSeleccionado] = useState(null)
-  const [sidebarOpen,       setSidebarOpen]       = useState(false)
-  const [backError,         setBackError]         = useState(null)
+  const [turnoSeleccionado,   setTurnoSeleccionado]   = useState(null)
+  const [sidebarOpen,         setSidebarOpen]         = useState(false)
+  const [backError,           setBackError]           = useState(null)
+  const [confirmEliminar,     setConfirmEliminar]     = useState(false)
+  const [loadingEliminar,     setLoadingEliminar]     = useState(false)
+  const [profesionalFilter,   setProfesionalFilter]   = useState('') // '' = Todos
+
+
 
   // Cierra sidebar al pasar a desktop
   useEffect(() => {
@@ -159,8 +167,9 @@ export default function TurnosSucursal() {
       : null
 
     if (cached !== null) {
-      setSucursales(cached)
-      if (cached.length === 1) setSelectedSucursal(cached[0])
+      const sorted = [...cached].filter(s => s.activa !== false).sort((a, b) => a.id - b.id)
+      setSucursales(sorted)
+      if (sorted.length >= 1) setSelectedSucursal(sorted[0])
       setLoadingInit(false)
       return
     }
@@ -169,9 +178,11 @@ export default function TurnosSucursal() {
       setLoadingInit(true)
       try {
         const panelData      = await empresaService.getPanel(empresaId)
+        setEmpresaPanel(empresaId, panelData)
         const sucursalesList = panelData.sucursales ?? []
-        setSucursales(sucursalesList)
-        if (sucursalesList.length === 1) setSelectedSucursal(sucursalesList[0])
+        const sorted = [...sucursalesList].filter(s => s.activa !== false).sort((a, b) => a.id - b.id)
+        setSucursales(sorted)
+        if (sorted.length >= 1) setSelectedSucursal(sorted[0])
       } catch (err) {
         setBackError(err)
       } finally {
@@ -185,6 +196,7 @@ export default function TurnosSucursal() {
   // Carga turnos cuando cambia la sucursal seleccionada
   useEffect(() => {
     if (!selectedSucursal) return
+    setProfesionalFilter('')
     const fetchTurnos = async () => {
       setLoadingTurnos(true)
       try {
@@ -198,6 +210,18 @@ export default function TurnosSucursal() {
     }
     fetchTurnos()
   }, [selectedSucursal])
+
+  // Abre el modal de detalle si se llegó (o ya estaba) en la página con openTurnoId en el state.
+  // Limpia el state tras consumirlo para no retriggear si se actualizan los turnos.
+  useEffect(() => {
+    const openId = location.state?.openTurnoId
+    if (!openId || turnos.length === 0) return
+    const found = turnos.find((t) => t.id === openId)
+    if (found) {
+      setTurnoSeleccionado(found)
+      navigate(location.pathname, { replace: true, state: { ...location.state, openTurnoId: undefined } })
+    }
+  }, [turnos, location.state?.openTurnoId]) // eslint-disable-line
 
   // Polling de estados cada 5 min — actualiza el estado de cada turno sin recargar todo
   useEffect(() => {
@@ -228,6 +252,46 @@ export default function TurnosSucursal() {
     setTurnoSeleccionado(null)
   }
 
+  // Opciones del filtro de profesional: Todos + Sin profesional + uno por cada profesional único
+  const profesionalOptions = useMemo(() => {
+    const seen = new Set()
+    const opts = [
+      { value: '',                label: 'Todos' },
+      { value: 'SIN_PROFESIONAL', label: 'Sin profesional' },
+    ]
+    turnos.forEach((t) => {
+      if (t.profesional_dni != null && !seen.has(t.profesional_dni)) {
+        seen.add(t.profesional_dni)
+        opts.push({
+          value: t.profesional_dni,
+          label: `${t.profesional_apellido}, ${t.profesional_nombre}`,
+        })
+      }
+    })
+    return opts
+  }, [turnos])
+
+  // Estados que pueden eliminarse en masa (no activos ni vencidos)
+  const ESTADOS_ELIMINABLES = ['CANCELADO_POR_USUARIO', 'CANCELADO_POR_EMPRESA', 'CUMPLIDO', 'NO_CUMPLIDO']
+
+  // IDs de turnos eliminables en la lista actual
+  const turnosEliminables = turnos
+    .filter((t) => ESTADOS_ELIMINABLES.includes(t.estado_turno))
+    .map((t) => t.id)
+
+  const handleEliminarTurnos = async () => {
+    setLoadingEliminar(true)
+    try {
+      await sucursalService.deleteTurnos(selectedSucursal.id, turnosEliminables)
+      setTurnos((prev) => prev.filter((t) => !turnosEliminables.includes(t.id)))
+    } catch (err) {
+      setBackError(err)
+    } finally {
+      setConfirmEliminar(false)
+      setLoadingEliminar(false)
+    }
+  }
+
   // Ordena: CONFIRMADO y EN_HORA primero, luego por fecha ascendente
   const turnosOrdenados = [...turnos].sort((a, b) => {
     const aConf = a.estado_turno === 'CONFIRMADO'
@@ -236,6 +300,13 @@ export default function TurnosSucursal() {
     if (!aConf && bConf) return 1
     return new Date(a.fecha_hora) - new Date(b.fecha_hora)
   })
+
+  // Aplica filtro de profesional
+  const turnosFiltrados = profesionalFilter === ''
+    ? turnosOrdenados
+    : profesionalFilter === 'SIN_PROFESIONAL'
+      ? turnosOrdenados.filter((t) => t.profesional_dni == null)
+      : turnosOrdenados.filter((t) => t.profesional_dni === profesionalFilter)
 
   const loading = loadingInit || loadingTurnos
 
@@ -275,23 +346,42 @@ export default function TurnosSucursal() {
           {/* Contenido: selector + tarjetas, con 24px de distancia al título */}
           <div className="tsuc-content">
 
-            {/* Selector de sucursal (solo si hay más de una) */}
-            {!loadingInit && sucursales.length > 1 && (
-              <div className="svc-sucursal-wrap">
-                <span className="svc-sucursal-label">Sucursal:</span>
+            {/* Fila superior: botón eliminar + selector de sucursal */}
+            {!loadingInit && selectedSucursal && (
+              <div className="tsuc-top-bar">
+                <button
+                  className="btn svc-btn-add btn-danger"
+                  onClick={() => setConfirmEliminar(true)}
+                  disabled={loading || turnosEliminables.length === 0}
+                  type="button"
+                >
+                  🗑️ Eliminar turnos
+                </button>
+
+                {sucursales.length > 1 && (
+                  <CustomSelect
+                    options={sucursales.map((s, idx) => ({ value: String(s.id), label: s.nombre?.trim() || `Sucursal ${idx + 1}` }))}
+                    value={String(selectedSucursal?.id ?? '')}
+                    onChange={(val) => {
+                      const found = sucursales.find((s) => String(s.id) === val)
+                      if (found) { setSelectedSucursal(found); setTurnos([]) }
+                    }}
+                    width={285}
+                    height={36}
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Filtro por profesional */}
+            {!loading && selectedSucursal && (
+              <div className="tsuc-profesional-wrap">
                 <CustomSelect
-                  options={[
-                    { value: '', label: 'Seleccioná una sucursal' },
-                    ...sucursales.map((s) => ({ value: String(s.id), label: s.nombre })),
-                  ]}
-                  value={String(selectedSucursal?.id ?? '')}
-                  onChange={(val) => {
-                    const found = sucursales.find((s) => String(s.id) === val)
-                    setSelectedSucursal(found ?? null)
-                    setTurnos([])
-                  }}
-                  width="100%"
-                  height={37}
+                  options={profesionalOptions}
+                  value={profesionalFilter}
+                  onChange={setProfesionalFilter}
+                  width={500}
+                  height={36}
                 />
               </div>
             )}
@@ -307,17 +397,17 @@ export default function TurnosSucursal() {
               </div>
             )}
 
-            {!loading && selectedSucursal && turnosOrdenados.length === 0 && (
+            {!loading && selectedSucursal && turnosFiltrados.length === 0 && (
               <div className="empty-state">
                 <div className="empty-state-icon">📅</div>
                 <h3>Sin turnos</h3>
-                <p>No hay turnos activos para esta sucursal.</p>
+                <p>{profesionalFilter ? 'No hay turnos para el profesional seleccionado.' : 'No hay turnos activos para esta sucursal.'}</p>
               </div>
             )}
 
-            {!loading && selectedSucursal && turnosOrdenados.length > 0 && (
+            {!loading && selectedSucursal && turnosFiltrados.length > 0 && (
               <div className="hp-turnos-grid">
-                {turnosOrdenados.map((turno) => (
+                {turnosFiltrados.map((turno) => (
                   <TurnoCardSucursal
                     key={turno.id}
                     turno={turno}
@@ -330,6 +420,19 @@ export default function TurnosSucursal() {
           </div>
         </main>
       </div>
+
+      {/* ─── Modal confirmar eliminación masiva ─── */}
+      {confirmEliminar && (
+        <ConfirmModal
+          icon="🗑️"
+          message={`¿Deseás eliminar todos los turnos de estado cancelado, cumplido o no cumplido? (${turnosEliminables.length})`}
+          confirmText="Eliminar"
+          confirmVariant="btn-danger"
+          loading={loadingEliminar}
+          onConfirm={handleEliminarTurnos}
+          onCancel={() => setConfirmEliminar(false)}
+        />
+      )}
 
       {/* ─── Modales ─── */}
       <TurnoDetalleSucursalModal

@@ -7,9 +7,9 @@
 /* ── Contenedor de badges apilados ── */
 .cdmodal__badge-wrap {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
 }
 
 /* ── Badges de estado ── */

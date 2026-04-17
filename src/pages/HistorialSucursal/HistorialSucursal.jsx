@@ -20,7 +20,7 @@ import './HistorialSucursal.css'
  */
 export default function HistorialSucursal() {
   const { id: empresaId } = useParams()
-  const { empresaPanel }  = useAuth()
+  const { empresaPanel, setEmpresaPanel } = useAuth()
 
   // Sucursales disponibles
   const [sucursales,       setSucursales]       = useState([])
@@ -53,8 +53,9 @@ export default function HistorialSucursal() {
       : null
 
     if (cached !== null) {
-      setSucursales(cached)
-      if (cached.length === 1) setSelectedSucursal(cached[0])
+      const sorted = [...cached].filter(s => s.activa !== false).sort((a, b) => a.id - b.id)
+      setSucursales(sorted)
+      if (sorted.length >= 1) setSelectedSucursal(sorted[0])
       setLoadingInit(false)
       return
     }
@@ -63,9 +64,11 @@ export default function HistorialSucursal() {
       setLoadingInit(true)
       try {
         const panelData      = await empresaService.getPanel(empresaId)
+        setEmpresaPanel(empresaId, panelData)
         const sucursalesList = panelData.sucursales ?? []
-        setSucursales(sucursalesList)
-        if (sucursalesList.length === 1) setSelectedSucursal(sucursalesList[0])
+        const sorted = [...sucursalesList].filter(s => s.activa !== false).sort((a, b) => a.id - b.id)
+        setSucursales(sorted)
+        if (sorted.length >= 1) setSelectedSucursal(sorted[0])
       } catch (err) {
         setBackError(err)
       } finally {
@@ -164,19 +167,15 @@ export default function HistorialSucursal() {
             {/* Selector de sucursal (solo si hay más de una) */}
             {!loadingInit && sucursales.length > 1 && (
               <div className="svc-sucursal-wrap">
-                <span className="svc-sucursal-label">Sucursal:</span>
                 <CustomSelect
-                  options={[
-                    { value: '', label: 'Seleccioná una sucursal' },
-                    ...sucursales.map((s) => ({ value: String(s.id), label: s.nombre })),
-                  ]}
+                  options={sucursales.map((s, idx) => ({ value: String(s.id), label: s.nombre?.trim() || `Sucursal ${idx + 1}` }))}
                   value={String(selectedSucursal?.id ?? '')}
                   onChange={(val) => {
                     const found = sucursales.find((s) => String(s.id) === val)
-                    setSelectedSucursal(found ?? null)
+                    if (found) setSelectedSucursal(found)
                   }}
-                  width="100%"
-                  height={37}
+                  width={285}
+                  height={36}
                 />
               </div>
             )}

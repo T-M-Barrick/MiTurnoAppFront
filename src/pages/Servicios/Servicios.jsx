@@ -76,7 +76,7 @@ function ServicioCard({ servicio, onClick }) {
 export default function Servicios() {
   const { id: empresaId } = useParams()
   const navigate          = useNavigate()
-  const { empresaPanel }  = useAuth()
+  const { empresaPanel, setEmpresaPanel } = useAuth()
 
   // Estado de UI
   const [sidebarOpen,    setSidebarOpen]    = useState(false)
@@ -113,13 +113,14 @@ export default function Servicios() {
         const [sucursalesList, miembrosData] = cached !== null
           ? [cached, await empresaService.getMiembros(empresaId)]
           : await Promise.all([
-              empresaService.getPanel(empresaId).then(d => d.sucursales ?? []),
+              empresaService.getPanel(empresaId).then(d => { setEmpresaPanel(empresaId, d); return d.sucursales ?? [] }),
               empresaService.getMiembros(empresaId),
             ])
 
-        setSucursales(sucursalesList)
+        const sorted = [...sucursalesList].filter(s => s.activa !== false).sort((a, b) => a.id - b.id)
+        setSucursales(sorted)
         setMiembros(miembrosData)
-        if (sucursalesList.length === 1) setSelectedSucursal(sucursalesList[0])
+        if (sorted.length >= 1) setSelectedSucursal(sorted[0])
       } catch (err) {
         setBackError(err)
       } finally {
@@ -211,33 +212,12 @@ export default function Servicios() {
             <h1 className="svc-header__title">✂️ Servicios</h1>
           </div>
 
-          {/* Selector de sucursal (solo si hay más de una) */}
-          {!loadingInit && sucursales.length > 1 && (
-            <div className="svc-sucursal-wrap">
-              <span className="svc-sucursal-label">Sucursal:</span>
-              <CustomSelect
-                options={[
-                  { value: '', label: 'Seleccioná una sucursal' },
-                  ...sucursales.map((s) => ({ value: String(s.id), label: s.nombre })),
-                ]}
-                value={String(selectedSucursal?.id ?? '')}
-                onChange={(val) => {
-                  const found = sucursales.find((s) => String(s.id) === val)
-                  setSelectedSucursal(found ?? null)
-                  setServicios([])
-                }}
-                width="100%"
-                height={37}
-              />
-            </div>
-          )}
-
           {/* Área de contenido */}
           <div className="svc-content">
 
-            {/* Botón agregar servicio — alineado con las tarjetas */}
-            {selectedSucursal && (
-              <div className="svc-btn-add-wrap">
+            {/* Fila: botón agregar + selector de sucursal */}
+            {!loadingInit && selectedSucursal && (
+              <div className="svc-top-bar">
                 <button
                   className="btn svc-btn-add"
                   onClick={() => setCrearOpen(true)}
@@ -250,6 +230,19 @@ export default function Servicios() {
                   </svg>
                   Agregar servicio
                 </button>
+
+                {sucursales.length > 1 && (
+                  <CustomSelect
+                    options={sucursales.map((s, idx) => ({ value: String(s.id), label: s.nombre?.trim() || `Sucursal ${idx + 1}` }))}
+                    value={String(selectedSucursal?.id ?? '')}
+                    onChange={(val) => {
+                      const found = sucursales.find((s) => String(s.id) === val)
+                      if (found) { setSelectedSucursal(found); setServicios([]) }
+                    }}
+                    width={285}
+                    height={36}
+                  />
+                )}
               </div>
             )}
 

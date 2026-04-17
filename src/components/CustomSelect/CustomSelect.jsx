@@ -96,7 +96,7 @@ export default function CustomSelect({ options = [], value, onChange, width = 42
               role="option"
               aria-selected={opt.value === value}
               className={`cselect__option${opt.value === value ? ' cselect__option--selected' : ''}`}
-              onMouseDown={() => handleSelect(opt.value)}
+              onMouseDown={(e) => { e.stopPropagation(); handleSelect(opt.value) }}
             >
               {opt.label}
             </li>

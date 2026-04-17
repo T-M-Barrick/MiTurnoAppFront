@@ -1,0 +1,11 @@
+/* Reutiliza todos los estilos de la página de clientes */
+@import '../Clientes/Clientes.css';
+
+/* Barra de búsqueda propia: más angosta y centrada */
+.cb-search-bar {
+  display: flex;
+  align-items: center;
+  width: 480px;
+  max-width: 100%;
+  margin: 0 auto 16px;
+}

@@ -18,10 +18,13 @@ import Notificaciones from './pages/Notificaciones/Notificaciones'
 import TurnosSucursal from './pages/TurnosSucursal/TurnosSucursal'
 import HistorialSucursal from './pages/HistorialSucursal/HistorialSucursal'
 import Clientes from './pages/Clientes/Clientes'
+import ClientesBloqueados from './pages/ClientesBloqueados/ClientesBloqueados'
 import Miembros from './pages/Miembros/Miembros'
 import OlvideContrasena from './pages/OlvideContrasena/OlvideContrasena'
 import ResetearContrasena from './pages/ResetearContrasena/ResetearContrasena'
 import AceptarInvitacion from './pages/AceptarInvitacion/AceptarInvitacion'
+import CrearSucursal from './pages/CrearSucursal/CrearSucursal'
+import PerfilesSucursales from './pages/PerfilesSucursales/PerfilesSucursales'
 
 // Ruta protegida: redirige al login si no hay sesión activa
 function ProtectedRoute({ children }) {
@@ -65,7 +68,10 @@ export default function App() {
             <Route path="/empresa/:id/turnos" element={<ProtectedRoute><TurnosSucursal /></ProtectedRoute>} />
             <Route path="/empresa/:id/historial" element={<ProtectedRoute><HistorialSucursal /></ProtectedRoute>} />
             <Route path="/empresa/:id/clientes" element={<ProtectedRoute><Clientes /></ProtectedRoute>} />
+            <Route path="/empresa/:id/clientes-bloqueados" element={<ProtectedRoute><ClientesBloqueados /></ProtectedRoute>} />
             <Route path="/empresa/:id/miembros" element={<ProtectedRoute><Miembros /></ProtectedRoute>} />
+            <Route path="/empresa/:id/crear-sucursal" element={<ProtectedRoute><CrearSucursal /></ProtectedRoute>} />
+            <Route path="/empresa/:id/perfiles-sucursales" element={<ProtectedRoute><PerfilesSucursales /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </HashRouter>

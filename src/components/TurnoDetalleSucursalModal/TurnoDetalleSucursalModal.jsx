@@ -86,7 +86,7 @@ export default function TurnoDetalleSucursalModal({ turno, sucursalId, onClose, 
   const handleDelete = async () => {
     setLoadingAction(true)
     try {
-      await sucursalService.deleteTurno(sucursalId, turno.id)
+      await sucursalService.deleteTurnos(sucursalId, [turno.id])
       onDeleted?.(turno.id)
     } catch (err) {
       onError(err)
@@ -122,10 +122,10 @@ export default function TurnoDetalleSucursalModal({ turno, sucursalId, onClose, 
         })
         onUpdated?.(updated)
       }
-      setConfirmAction(null)
     } catch (err) {
       onError(err)
     } finally {
+      setConfirmAction(null)
       setLoadingAction(false)
     }
   }
@@ -319,14 +319,14 @@ export default function TurnoDetalleSucursalModal({ turno, sucursalId, onClose, 
         </ConfirmModal>
       )}
       {confirmAction === 'cumplido' && (
-        <ConfirmModal icon="✅" message="¿Marcar este turno como cumplido?"
+        <ConfirmModal icon="✅" message="¿Deseás marcar este turno como cumplido?"
           confirmText="Confirmar" confirmVariant="btn-orange"
           loading={loadingAction} onConfirm={handleConfirmAction}
           onCancel={() => setConfirmAction(null)}
         />
       )}
       {confirmAction === 'no_cumplido' && (
-        <ConfirmModal icon="❌" message="¿Marcar este turno como no cumplido?"
+        <ConfirmModal icon="❌" message="¿Deseás marcar este turno como no cumplido?"
           confirmText="Confirmar" confirmVariant="btn-indigo"
           loading={loadingAction} onConfirm={handleConfirmAction}
           onCancel={() => setConfirmAction(null)}

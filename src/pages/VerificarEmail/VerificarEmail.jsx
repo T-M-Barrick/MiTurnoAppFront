@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../services/api'
+import { parseBackendError } from '../../utils/errorMessages'
 import '../../styles/ve-card.css'
 
 export default function VerificarEmail() {
@@ -39,11 +40,7 @@ export default function VerificarEmail() {
       })
       .catch((err) => {
         setStatus('error')
-        setMensaje(
-          err?.detail?.[0]?.msg ||
-          err?.message ||
-          'El enlace de verificación es inválido o expiró.'
-        )
+        setMensaje(parseBackendError(err))
       })
   }, [])
 

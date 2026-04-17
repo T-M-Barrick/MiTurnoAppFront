@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { geoService } from '../../services/geoService'
 import { empresaService } from '../../services/empresaService'
 import { sucursalService } from '../../services/sucursalService'
+import { useAuth } from '../../context/AuthContext'
 import {
   validateCuit, validateNombre, validateTelefono, validateTexto, scrollToFirstError
 } from '../../utils/validation'
@@ -37,8 +38,13 @@ function extractCodigo(numero) {
 }
 
 export default function PerfilEmpresa() {
-  const { id: empresaId } = useParams()
-  const navigate = useNavigate()
+  const { id: empresaId }              = useParams()
+  const navigate                       = useNavigate()
+  const { empresaPanel, setEmpresaPanel } = useAuth()
+
+  // Modo multi-sucursal: 2+ sucursales activas → solo se editan datos de empresa aquí
+  const sucursalesPanel = empresaPanel?.panel?.sucursales ?? []
+  const modoMulti       = sucursalesPanel.length >= 2
 
   // ---- Datos de la empresa ----
   const [nombre, setNombre]         = useState('')
@@ -75,6 +81,16 @@ export default function PerfilEmpresa() {
     geoService.getProvincias().then(setProvincias).catch((err) => setBackError(err))
   }, [])
 
+  // Si el panel no está en contexto (acceso directo por URL), lo fetcha para que
+  // UserTopBarRight y modoMulti tengan los datos correctos desde el inicio.
+  useEffect(() => {
+    if (empresaPanel?.empresaId === String(empresaId)) return
+    empresaService.getPanel(empresaId)
+      .then((data) => setEmpresaPanel(empresaId, data))
+      .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [empresaId])
+
   // Carga el perfil y pre-rellena todos los campos
   useEffect(() => {
     const fetchPerfil = async () => {
@@ -89,9 +105,9 @@ export default function PerfilEmpresa() {
         setRubro(data.rubro ?? '')
         setRubro2(data.rubro2 ?? '')
 
-        // Sucursal principal
-        const suc = data.sucursales?.[0]
-        if (suc) {
+        // Sucursal principal — en modo single siempre hay 1 activa; se toma la activa
+        const suc = (data.sucursales ?? []).find((s) => s.activa !== false) ?? data.sucursales?.[0]
+        if (suc && !modoMulti) {
           setSucursalId(suc.id)
           setReservaPublica(suc.reserva_publica_habilitada ?? true)
 
@@ -140,14 +156,17 @@ export default function PerfilEmpresa() {
     if (rubroErr)  e.rubro  = rubroErr
     if (rubro2Err) e.rubro2 = rubro2Err
 
-    telefonos.forEach((t, i) => {
-      if (!t.numero.trim()) return
-      const err = validateTelefono(t.codigo + t.numero.trim())
-      if (err) e[`tel_${i}`] = err
-    })
+    // Telefonos y dirección solo se validan en modo single (1 sucursal activa)
+    if (!modoMulti) {
+      telefonos.forEach((t, i) => {
+        if (!t.numero.trim()) return
+        const err = validateTelefono(t.codigo + t.numero.trim())
+        if (err) e[`tel_${i}`] = err
+      })
+    }
 
     setErrors(e)
-    const dirValid = dirRef.current?.validate() ?? false
+    const dirValid = modoMulti ? true : (dirRef.current?.validate() ?? false)
     if (Object.keys(e).length > 0 || !dirValid) { scrollToFirstError(); return false }
     return true
   }
@@ -167,19 +186,37 @@ export default function PerfilEmpresa() {
       rubro2:  rubro2.trim() || null,
     }
 
-    const sucPayload = {
-      reserva_publica_habilitada: reservaPublica,
-      telefonos: telefonos
-        .filter((t) => t.numero.trim())
-        .map((t) => ({ id: t.id, numero: t.codigo + t.numero.trim() })),
-      direccion: dirRef.current.getData(),
-    }
-
     try {
-      await Promise.all([
-        empresaService.update(empresaId, empresaPayload),
-        sucursalService.updatePerfil(sucursalId, sucPayload),
-      ])
+      if (modoMulti) {
+        // Modo multi: solo se actualiza la empresa (sucursales se editan en PerfilesSucursales)
+        const empRes = await empresaService.update(empresaId, empresaPayload)
+        if (empresaPanel?.empresaId === String(empresaId)) {
+          setEmpresaPanel(empresaId, { ...empresaPanel.panel, nombre: empRes.nombre })
+        }
+      } else {
+        // Modo single: actualiza empresa + sucursal en paralelo
+        const sucPayload = {
+          reserva_publica_habilitada: reservaPublica,
+          telefonos: telefonos
+            .filter((t) => t.numero.trim())
+            .map((t) => ({ id: t.id, numero: t.codigo + t.numero.trim() })),
+          direccion: dirRef.current.getData(),
+        }
+        const [empRes, sucRes] = await Promise.all([
+          empresaService.update(empresaId, empresaPayload),
+          sucursalService.updatePerfil(sucursalId, sucPayload),
+        ])
+        if (empresaPanel?.empresaId === String(empresaId)) {
+          setEmpresaPanel(empresaId, {
+            ...empresaPanel.panel,
+            nombre: empRes.nombre,
+            sucursales: empresaPanel.panel.sucursales.map((s) =>
+              s.id === sucRes.id ? sucRes : s
+            ),
+          })
+        }
+      }
+
       setSuccess('Los datos de la empresa fueron actualizados correctamente.')
     } catch (err) {
       setBackError(err)
@@ -234,7 +271,7 @@ export default function PerfilEmpresa() {
           {/* ── Sección 1: Datos de la empresa ── */}
           <section className="reg-section">
             <h2 className="reg-section__title">
-              <span className="reg-section__num">1</span>
+              {!modoMulti && <span className="reg-section__num">1</span>}
               Datos de la empresa
             </h2>
 
@@ -282,83 +319,89 @@ export default function PerfilEmpresa() {
               </div>
             </div>
 
-            {/* Toggle: reserva pública habilitada */}
-            <div className="ce-toggle-row">
-              <div className="ce-toggle-info">
-                <span className="ce-toggle-label">Reserva pública habilitada</span>
-                <span className="ce-toggle-desc">Permite que cualquier persona reserve turnos sin invitación.</span>
-              </div>
-              <button
-                type="button"
-                className={`ce-toggle${reservaPublica ? ' ce-toggle--on' : ''}`}
-                onClick={() => setReservaPublica((v) => !v)}
-                aria-pressed={reservaPublica}
-                disabled={loading}
-              >
-                <span className="ce-toggle__thumb" />
-              </button>
-            </div>
-          </section>
-
-          {/* ── Sección 2: Teléfonos ── */}
-          <section className="reg-section">
-            <h2 className="reg-section__title">
-              <span className="reg-section__num">2</span>
-              Teléfonos
-            </h2>
-            <div className="phone-list">
-              {telefonos.map((tel, idx) => (
-                <div key={tel.id || idx} className="phone-item">
-                  <div className="phone-input-row">
-                    <CustomSelect
-                      options={CODIGOS_PAIS.map((cp) => ({ value: cp.codigo, label: cp.label }))}
-                      value={tel.codigo}
-                      onChange={(val) => updateTelefonoCodigo(idx, val)}
-                      width={200}
-                      height={44}
-                      disabled={loading}
-                    />
-                    <input
-                      type="tel"
-                      placeholder="1112345678"
-                      value={tel.numero}
-                      onChange={(e) => { updateTelefonoNumero(idx, e.target.value); clearError(`tel_${idx}`) }}
-                      className={errors[`tel_${idx}`] ? 'error phone-numero-input' : 'phone-numero-input'}
-                      disabled={loading}
-                      inputMode="numeric"
-                    />
-                    {telefonos.length > 1 && (
-                      <button type="button" className="btn-remove-phone"
-                        onClick={() => removeTelefono(idx)} aria-label="Eliminar teléfono" disabled={loading}>
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                  {errors[`tel_${idx}`] && <p className="form-error">{errors[`tel_${idx}`]}</p>}
+            {/* Toggle: reserva pública habilitada — solo en modo single */}
+            {!modoMulti && (
+              <div className="ce-toggle-row">
+                <div className="ce-toggle-info">
+                  <span className="ce-toggle-label">Reserva pública habilitada</span>
+                  <span className="ce-toggle-desc">Permite que cualquier persona reserve turnos sin invitación.</span>
                 </div>
-              ))}
-            </div>
-            <button type="button" className="btn btn-agregar" onClick={addTelefono} disabled={loading}>
-              + Agregar teléfono
-            </button>
+                <button
+                  type="button"
+                  className={`ce-toggle${reservaPublica ? ' ce-toggle--on' : ''}`}
+                  onClick={() => setReservaPublica((v) => !v)}
+                  aria-pressed={reservaPublica}
+                  disabled={loading}
+                >
+                  <span className="ce-toggle__thumb" />
+                </button>
+              </div>
+            )}
           </section>
 
-          {/* ── Sección 3: Dirección ── */}
-          <section className="reg-section">
-            <h2 className="reg-section__title">
-              <span className="reg-section__num">3</span>
-              Dirección
-            </h2>
-            <DireccionFormItem
-              ref={dirRef}
-              initial={dirInicial}
-              provincias={provincias}
-              index={0}
-              canRemove={false}
-              showHeader={false}
-              disabled={loading}
-            />
-          </section>
+          {/* ── Sección 2: Teléfonos — solo en modo single ── */}
+          {!modoMulti && (
+            <section className="reg-section">
+              <h2 className="reg-section__title">
+                <span className="reg-section__num">2</span>
+                Teléfonos
+              </h2>
+              <div className="phone-list">
+                {telefonos.map((tel, idx) => (
+                  <div key={tel.id || idx} className="phone-item">
+                    <div className="phone-input-row">
+                      <CustomSelect
+                        options={CODIGOS_PAIS.map((cp) => ({ value: cp.codigo, label: cp.label }))}
+                        value={tel.codigo}
+                        onChange={(val) => updateTelefonoCodigo(idx, val)}
+                        width={200}
+                        height={44}
+                        disabled={loading}
+                      />
+                      <input
+                        type="tel"
+                        placeholder="1112345678"
+                        value={tel.numero}
+                        onChange={(e) => { updateTelefonoNumero(idx, e.target.value); clearError(`tel_${idx}`) }}
+                        className={errors[`tel_${idx}`] ? 'error phone-numero-input' : 'phone-numero-input'}
+                        disabled={loading}
+                        inputMode="numeric"
+                      />
+                      {telefonos.length > 1 && (
+                        <button type="button" className="btn-remove-phone"
+                          onClick={() => removeTelefono(idx)} aria-label="Eliminar teléfono" disabled={loading}>
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                    {errors[`tel_${idx}`] && <p className="form-error">{errors[`tel_${idx}`]}</p>}
+                  </div>
+                ))}
+              </div>
+              <button type="button" className="btn btn-agregar" onClick={addTelefono} disabled={loading}>
+                + Agregar teléfono
+              </button>
+            </section>
+          )}
+
+          {/* ── Sección 3: Dirección — solo en modo single ── */}
+          {!modoMulti && (
+            <section className="reg-section">
+              <h2 className="reg-section__title">
+                <span className="reg-section__num">3</span>
+                Dirección
+              </h2>
+              <DireccionFormItem
+                ref={dirRef}
+                initial={dirInicial}
+                provincias={provincias}
+                index={0}
+                canRemove={false}
+                showHeader={false}
+                disabled={loading}
+              />
+            </section>
+          )}
 
           {/* ── Botón enviar ── */}
           <button type="submit" className="btn btn-primary reg-submit" disabled={loading}>

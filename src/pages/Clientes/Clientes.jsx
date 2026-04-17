@@ -41,7 +41,7 @@ function ClienteCard({ cliente, onSelect }) {
       {/* Fila 1: nombre + badge bloqueado (si aplica) */}
       <div className="cli-card__top">
         <span className="cli-card__nombre" ref={nombreRef}>{texto}</span>
-        {cliente.bloqueo && (
+        {cliente.bloqueado && (
           <span className="cli-card__badge cli-card__badge--bloqueado">Bloqueado</span>
         )}
       </div>
@@ -74,7 +74,7 @@ function ClienteCard({ cliente, onSelect }) {
  */
 export default function Clientes() {
   const { id: empresaId }  = useParams()
-  const { empresaPanel }   = useAuth()
+  const { empresaPanel, setEmpresaPanel } = useAuth()
 
   // Sucursales
   const [sucursales,       setSucursales]       = useState([])
@@ -113,8 +113,9 @@ export default function Clientes() {
       : null
 
     if (cached !== null) {
-      setSucursales(cached)
-      if (cached.length === 1) setSelectedSucursal(cached[0])
+      const sorted = [...cached].filter(s => s.activa !== false).sort((a, b) => a.id - b.id)
+      setSucursales(sorted)
+      if (sorted.length >= 1) setSelectedSucursal(sorted[0])
       setLoadingInit(false)
       return
     }
@@ -123,9 +124,11 @@ export default function Clientes() {
       setLoadingInit(true)
       try {
         const panelData      = await empresaService.getPanel(empresaId)
+        setEmpresaPanel(empresaId, panelData)
         const sucursalesList = panelData.sucursales ?? []
-        setSucursales(sucursalesList)
-        if (sucursalesList.length === 1) setSelectedSucursal(sucursalesList[0])
+        const sorted = [...sucursalesList].filter(s => s.activa !== false).sort((a, b) => a.id - b.id)
+        setSucursales(sorted)
+        if (sorted.length >= 1) setSelectedSucursal(sorted[0])
       } catch (err) {
         setBackError(err)
       } finally {
@@ -241,36 +244,27 @@ export default function Clientes() {
             <h1 className="svc-header__title">👤 Clientes</h1>
           </div>
 
-          {/* Selector de sucursal (solo si hay más de una) */}
-          {!loadingInit && sucursales.length > 1 && (
-            <div className="svc-sucursal-wrap">
-              <span className="svc-sucursal-label">Sucursal:</span>
-              <CustomSelect
-                options={[
-                  { value: '', label: 'Seleccioná una sucursal' },
-                  ...sucursales.map((s) => ({ value: String(s.id), label: s.nombre })),
-                ]}
-                value={String(selectedSucursal?.id ?? '')}
-                onChange={(val) => {
-                  const found = sucursales.find((s) => String(s.id) === val)
-                  setSelectedSucursal(found ?? null)
-                  setSearchInput('')
-                  setSearchQuery('')
-                }}
-                width="100%"
-                height={37}
-              />
-            </div>
-          )}
-
           <div className="cli-content">
 
-            {/* ── Botón agregar ── */}
-            {selectedSucursal && (
-              <div className="svc-btn-add-wrap">
+            {/* Fila: botón agregar + selector de sucursal */}
+            {!loadingInit && selectedSucursal && (
+              <div className="svc-top-bar">
                 <button className="btn svc-btn-add" onClick={() => setFormOpen(true)} disabled={loading}>
                   + Agregar cliente
                 </button>
+
+                {sucursales.length > 1 && (
+                  <CustomSelect
+                    options={sucursales.map((s, idx) => ({ value: String(s.id), label: s.nombre?.trim() || `Sucursal ${idx + 1}` }))}
+                    value={String(selectedSucursal?.id ?? '')}
+                    onChange={(val) => {
+                      const found = sucursales.find((s) => String(s.id) === val)
+                      if (found) { setSelectedSucursal(found); setSearchInput('') }
+                    }}
+                    width={285}
+                    height={36}
+                  />
+                )}
               </div>
             )}
 
@@ -283,7 +277,7 @@ export default function Clientes() {
                   <input
                     type="search"
                     className="hp-search__input"
-                    placeholder="Buscar por DNI, apellido, nombre, email, teléfono u observación…"
+                    placeholder="Buscar por nombre, apellido, DNI, email, teléfono u observación…"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyDown={handleSearchKeyDown}

@@ -202,8 +202,12 @@
 
 /* Columna central: botón perfectamente centrado */
 .notif-page__load-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: fit-content;
-  padding: 10px 28px;
+  height: 39px;
+  padding: 0 28px;
   background: var(--brand);
   color: #fff;
   transition: opacity .2s;

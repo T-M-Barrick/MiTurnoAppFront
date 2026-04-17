@@ -67,13 +67,13 @@
 /* Botón lupa — cuadrado 44px, solo ícono, sin texto; hereda layout de .btn */
 .dir-item__btn-buscar {
   flex-shrink: 0;
-  width: 44px;
-  min-width: 44px;
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
   padding: 0;
   background: #16a34a;
   color: #fff;
   transition: opacity 0.2s;
-  align-self: stretch;
 }
 
 .dir-item__btn-buscar:hover:not(:disabled) { opacity: 0.88; }

@@ -135,7 +135,7 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   width: 100%;
-  max-width: 640px;
+  max-width: 680px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -153,8 +153,8 @@
 .sm-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 20px 24px 16px;
+  gap: 8px;
+  padding: 10px 20px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -183,25 +183,7 @@
   font-weight: 400;
 }
 
-.sm-header__close {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  border-radius: 8px;
-  color: var(--text-muted);
-  transition: background .15s, color .15s;
-}
 
-.sm-header__close:hover {
-  background: var(--bg-alt);
-  color: var(--text);
-}
 
 /* ── Cuerpo del modal (scrollable) ── */
 .sm-body {
@@ -627,7 +609,7 @@ input[type="number"] {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 16px 24px 20px;
+  padding: 20px 24px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -636,9 +618,13 @@ input[type="number"] {
 
 /* Botones del footer: tamaño base flex para crear (2 botones), override para editar (4 botones) */
 .sm-footer__btn {
-  width: 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 158px;
+  height: 40px;
   flex-shrink: 0;
-  padding: 11px 8px;
+  padding: 0 8px;
   font-size: 13px;
   transition: opacity .15s, background .15s;
   gap: 5px;
@@ -646,7 +632,7 @@ input[type="number"] {
 
 /* En modo create (2 botones) los botones son más anchos */
 .sm-footer--create .sm-footer__btn {
-  width: 152px;
+  width: 170px;
 }
 
 .sm-footer__btn--cancel {
@@ -711,11 +697,6 @@ input[type="number"] {
   margin-left: 2px;
 }
 
-/* Cuando el badge está visible, achica la letra del botón para que todo entre */
-.sm-footer__btn--bloqueos:has(.sm-footer__badge) {
-  font-size: 11px;
-  gap: 2px;
-}
 
 .sm-footer__btn:disabled {
   opacity: .5;
@@ -770,11 +751,14 @@ input[type="number"] {
 
 /* Atenúa la tarjeta cuando hay un modal superpuesto encima */
 .sm-card--dimmed {
-  filter: brightness(0.5);
   pointer-events: none;
 }
 
 /* ── Versiones del servicio ── */
+.csm-section-label--versiones {
+  margin-top: -12px;
+}
+
 .sm-versiones {
   display: flex;
   flex-direction: column;
@@ -851,6 +835,7 @@ input[type="number"] {
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
+  border-radius: 8px;
   background: var(--brand-light);
   border: 1.5px solid var(--brand);
   border-radius: 10px;

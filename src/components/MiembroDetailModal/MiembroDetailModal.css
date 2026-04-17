@@ -6,6 +6,28 @@
   max-width: 480px;
 }
 
+/* ── Atenúa el modal de detalle cuando el formulario está abierto encima ── */
+.mmdetail--dimmed {
+  pointer-events: none;
+}
+
+/* ── Overlay del formulario — oscurece lo que hay detrás igual que cualquier modal ── */
+.mmdetail-form-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+}
+
+/* Bordes redondeados completos en el form (no es bottom-sheet) */
+.mmdetail-form-overlay .tdmodal {
+  border-radius: 20px;
+}
+
 /* ── Campos requeridos: mismo tamaño que cfmodal__req ── */
 .mmdetail__req {
   color: var(--brand);
@@ -28,6 +50,15 @@
 .tdmodal.mmdetail.mmdetail--form-view {
   max-width: 380px;
   height: auto;
+}
+
+/* Contenido desde arriba con padding simétrico entre líneas divisorias */
+.tdmodal.mmdetail.mmdetail--form-view .tdmodal__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 /* ── CustomSelect blanco dentro del formulario ── */

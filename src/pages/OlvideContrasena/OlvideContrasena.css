@@ -10,7 +10,8 @@
 
 /* Estilo base compartido por ambos botones — igual a sm-footer__btn */
 .olvide-actions__btn {
-  padding: 11px 8px;
+  height: 40px;
+  padding: 0 8px;
   gap: 5px;
 }
 
@@ -67,7 +68,8 @@
 /* Botón "Volver al inicio" del estado de éxito — igual a sm-footer__btn--confirm */
 .olvide-sent__btn {
   width: fit-content;
-  padding: 11px 28px;
+  height: 40px;
+  padding: 0 28px;
   background: var(--brand);
   color: #fff;
   margin-top: 8px;

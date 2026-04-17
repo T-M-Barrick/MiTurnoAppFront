@@ -149,7 +149,7 @@ export default function EmpresaCard({ sucursal, onClick, isFavorito = false, onT
       </div>
 
       {/* Columna derecha: datos principales */}
-      <div className="ecard__info">
+      <div className={`ecard__info${cal5 == null ? ' ecard__info--sin-cal' : ''}`}>
         <div className="ecard__nombre">{sucursal.nombre}</div>
 
         {cal5 != null && <StarRating value={cal5} cardId={sucursal.id} />}

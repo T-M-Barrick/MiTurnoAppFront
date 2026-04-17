@@ -1,0 +1,58 @@
+/* ─── Selector de sucursal (alineado a la derecha) ─── */
+.psuc-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+/* El trigger del selector usa el mismo fondo que los otros selectores de sucursal */
+.psuc-header .cselect__trigger {
+  background: var(--card-bg);
+}
+
+/* Margen inferior del toggle de activación igual al de reg-section */
+.psuc-toggle-activacion {
+  margin-bottom: 28px;
+}
+
+/* ─── Toggle activar/desactivar sucursal ─── */
+/* Idéntico a ce-toggle pero verde cuando está activa */
+/* Base = INACTIVA: gris, círculo a la IZQUIERDA */
+.psuc-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  padding: 0;
+}
+
+.psuc-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.psuc-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+  pointer-events: none;
+}
+
+/* Activa: verde, círculo a la DERECHA */
+.psuc-toggle--active {
+  background: #22c55e;
+}
+
+.psuc-toggle--active .psuc-toggle__thumb {
+  transform: translateX(20px);
+}

@@ -214,10 +214,9 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
           ),
         }
       }
-      setVersionModalOpen(false)
       setBackSuccess({
         message: 'Versión guardada exitosamente.',
-        onAccept: () => onVersionUpdated(updated),
+        onAccept: () => { setVersionModalOpen(false); onVersionUpdated(updated) },
       })
     } catch (err) {
       setBackError(err)
@@ -339,8 +338,8 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
       onDeleted(servicio.id)
     } catch (err) {
       setBackError(err)
-      setConfirmDelete(false)
     } finally {
+      setConfirmDelete(false)
       setDeleting(false)
     }
   }
@@ -366,12 +365,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
               <span className="csm-btn-help__icon">?</span>
               Ayuda
             </button>
-            <button className="sm-header__close" onClick={onClose} aria-label="Cerrar modal" type="button">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="18" y1="6"  x2="6"  y2="18"/>
-                <line x1="6"  y1="6"  x2="18" y2="18"/>
-              </svg>
-            </button>
+            <button className="btn-icon" onClick={onClose} aria-label="Cerrar modal" type="button">✕</button>
           </div>
 
           {/* ── Panel de ayuda ── */}
@@ -560,7 +554,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
             </div>
 
             {/* ── SECCIÓN: Versiones del servicio ── */}
-            <div className="csm-section-label">Versiones del servicio</div>
+            <div className="csm-section-label csm-section-label--versiones">Versiones del servicio</div>
 
             <div className="sm-versiones">
               {isCreate ? (
@@ -624,7 +618,6 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
                 </>
               )}
             </div>
-
 
           </div>
 
@@ -741,7 +734,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
                       servicios: versionesExistentes.filter((v) => v.id !== editingVersion.id),
                     }
                     setVersionModalOpen(false)
-                    setBackSuccess({ message: 'Versión eliminada.', onAccept: () => onVersionUpdated(updated) })
+                    onVersionUpdated(updated)
                   } catch (err) {
                     setBackError(err)
                   }
@@ -784,7 +777,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
       {confirmDelete && (
         <ConfirmModal
           icon="🗑️"
-          message="¿Estás seguro de que querés eliminar este servicio? Esta acción no se puede deshacer."
+          message="¿Deseás eliminar este servicio? Esta acción no se puede deshacer."
           confirmText="Sí, eliminar"
           confirmVariant="btn-danger"
           loading={deleting}

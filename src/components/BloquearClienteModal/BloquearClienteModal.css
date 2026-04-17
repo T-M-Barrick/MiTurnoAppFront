@@ -1,0 +1,172 @@
+/* Reutiliza base de modales de detalle */
+@import '../../styles/DetailModal.css';
+
+/* ── Modal más angosto que el resto ── */
+.tdmodal.blkmodal { max-width: 600px; }
+
+/* ── Barra de búsqueda: centrada y con ancho acotado ── */
+.blkmodal__search { margin-bottom: 12px; }
+
+.blkmodal__search .hp-search__bar {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.blkmodal__hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 6px 0 0;
+}
+
+.blkmodal__empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 16px 0 8px;
+}
+
+.blkmodal__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: min(320px, 50vh);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.blkmodal__item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 14px 6px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background .12s;
+}
+
+.blkmodal__item:last-child { border-bottom: none; }
+
+.blkmodal__item:hover {
+  background: var(--bg-alt);
+}
+
+.blkmodal__item--ya-bloqueado {
+  cursor: pointer;
+}
+
+/* Columna izquierda: nombre + DNI + email */
+.blkmodal__item-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+}
+
+.blkmodal__item-nombre {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Filas inferiores: DNI y email */
+.blkmodal__item-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Emoji del DNI: 2px arriba */
+.blkmodal__item-dni-icon { position: relative; top: -2px; }
+
+
+/* Mismo color que cli-card__badge--bloqueado; forma y tamaño vienen de main.css */
+.blkmodal__item-badge {
+  flex-shrink: 0;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+[data-theme="dark"] .blkmodal__item-badge {
+  background: rgba(239, 68, 68, .18);
+  color: #f87171;
+}
+
+/* ── Cliente seleccionado ── */
+.blkmodal__selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.blkmodal__selected-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.blkmodal__selected-nombre {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.blkmodal__cambiar {
+  background: none;
+  border: none;
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.blkmodal__cambiar:hover { opacity: .8; }
+
+/* ── Contador de caracteres ── */
+.blkmodal__chars {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+  margin: 4px 0 0;
+}
+
+/* ── Sub-modal de motivo ── */
+
+/* Overlay encima del modal de búsqueda */
+.blksumodal-overlay { z-index: 1200; }
+
+/* Datos del cliente dentro del sub-modal */
+.blksumodal__cliente {
+  font-size: 14px; /* el JS puede bajarlo hasta 11px */
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Separa el label del textarea */
+.blksumodal__body .tdsumodal__motivo-label { display: block; margin-bottom: 4px; }

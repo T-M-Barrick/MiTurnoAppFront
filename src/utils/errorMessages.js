@@ -129,6 +129,8 @@ const ERROR_MAP = {
     'Tu email no fue verificado aún. Revisá tu casilla de correo para confirmar tu cuenta.',
   USER_ALREADY_EXISTS:
     'Ya existe una cuenta registrada con ese email.',
+  USER_EMPRESA_MIEMBRO_ALREADY_EXISTS:
+    'Ya poseés un rol en esta empresa.',
   USER_BLOCKED_BY_SUCURSAL:
     'Fuiste bloqueado por {nombre_empresa}.',
 
@@ -158,9 +160,7 @@ const ERROR_MAP = {
   EMPRESA_MIEMBRO_NOT_FOUND:
     'El usuario no pertenece a esta empresa.',
   EMPRESA_MIEMBRO_ALREADY_EXISTS:
-    'El usuario ya es miembro de la empresa.',
-  EMPRESA_MIEMBRO_ALREADY_EXISTS_IN_ANY_SUCURSAL:
-    'No se puede agregar al usuario con un rol global porque ya es miembro de la sucursal {nombre_sucursal}.',
+    'No se puede invitar otra vez a un usuario que ya posee un rol en esta empresa.',
   EMPRESA_PROPIETARIO_OUT:
     'La empresa no puede quedar sin propietarios.',
   EMPRESA_PROFESIONAL_CON_TURNOS_CONFIRMADOS_OUT:
@@ -203,18 +203,18 @@ const ERROR_MAP = {
     '{nombre} no permite reserva de turnos online por el momento.',
   SUCURSAL_RESERVA_EXCEPTION_DATE_SERVICE:
     'La reserva para este servicio en esta fecha está inhabilitada: {motivo}.',
-  SUCURSAL_CLIENTE_BLOCKED:
-    'Este cliente se encuentra bloqueado.',
+  SUCURSAL_DEACTIVATE_WITH_ONE_SUCURSAL_IN_EMPRESA:
+    'Una empresa no puede quedar sin sucursales activas.',
   SUCURSAL_DEACTIVATE_WITH_TURNOS_CONFIRMADOS:
     'No se puede desactivar una sucursal que posee turnos confirmados.',
   SUCURSAL_MIEMBRO_NOT_FOUND:
     'El usuario no pertenece a esta sucursal.',
   SUCURSAL_MIEMBRO_ALREADY_EXISTS:
-    'El usuario ya es miembro de esta sucursal.',
-  SUCURSAL_PROFESIONAL_CON_TURNOS_CONFIRMADOS_OUT:
-    'No se puede dejar la sucursal mientras tenés turnos confirmados como profesional.',
+    'El usuario ya pertenece a esta sucursal.',
+  SUCURSAL_PROFESIONAL_WITH_TURNOS_CONFIRMADOS_OUT:
+    'No se puede abandonar la sucursal mientras tengas turnos confirmados como profesional.',
   SUCURSAL_MIEMBRO_DELETE_WITH_TURNOS_CONFIRMADOS:
-    'No se puede eliminar a un miembro de la sucursal que aún tiene turnos confirmados como profesional.',
+    'No se puede eliminar a un miembro de una sucursal que aún tiene turnos confirmados como profesional.',
   SUCURSAL_MIEMBRO_ADD:
     'No se puede agregar a este miembro a la sucursal desde este flujo.',
   SUCURSAL_INVALID_SELF_REMOVAL:
@@ -290,6 +290,10 @@ const ERROR_MAP = {
     'Ya existe un cliente registrado con ese email en esta sucursal.',
   CLIENTE_DEACTIVATE_WITH_TURNOS_CONFIRMADOS:
     'No se puede desactivar a un cliente que tiene turnos confirmados.',
+  CLIENTE_BLOCKED:
+    'Este cliente se encuentra bloqueado.',
+  CLIENTE_ALREADY_BLOCKED:
+    'Este cliente ya se encuentra bloqueado.',
 
   // ── Roles ─────────────────────────────────────────────────────────────────────
   ROL_INVALID:

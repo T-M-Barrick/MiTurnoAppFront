@@ -13,8 +13,8 @@
   outline: none;
   width: 100%;
   max-width: 520px;
-  /* Alto fijo: mismo para todas las tarjetas (con o sin calificación) */
-  min-height: 84px;
+  /* Alto fijo: igual para todas las tarjetas, holgado para 4 filas con calificación */
+  height: 96px;
 }
 .ecard:hover         { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .ecard:active        { transform: translateY(0); }
@@ -88,6 +88,12 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 2px 0;
+}
+
+/* Sin calificación: 3 filas centradas con gap fijo en vez de space-between */
+.ecard__info--sin-cal {
+  justify-content: center;
+  gap: 2px;
 }
 
 .ecard__nombre {

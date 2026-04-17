@@ -10,7 +10,7 @@
   outline: none;
   display: flex;
   flex-direction: column;
-  padding: 11px 13px;
+  padding: 13px 13px 10px;
   gap: 10px;
   height: 91px;
   box-sizing: border-box;
@@ -24,6 +24,7 @@
 .tcard__top {
   display: flex;
   align-items: center;
+  margin-top: -3px;
 }
 
 /* Día + fecha/hora en línea horizontal */
@@ -87,7 +88,7 @@
   align-items: stretch; /* info se estira hasta la altura del logo */
   gap: 8px;
   min-width: 0;
-  margin-top: -3px;
+  margin-top: -4px;
 }
 
 /* Logo empresa — marca el alto del bloque inferior */
@@ -99,7 +100,7 @@
   border: none;
   flex-shrink: 0;
   align-self: center;
-  margin-top: 4px;
+  margin-top: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,10 +134,17 @@
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
-  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* El texto del nombre trunca con ellipsis (funciona en flex container) */
+.tcard__nombre span:not(.tcard__servicio-emoji) {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0;
+  white-space: nowrap;
 }
 
 .tcard__servicio {

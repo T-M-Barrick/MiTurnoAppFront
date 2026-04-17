@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { empresaService } from '../../services/empresaService'
 import { useAuth } from '../../context/AuthContext'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
@@ -100,8 +100,10 @@ function MiembroCard({ norm, rolActual, esSelf, numSucursales, miRol, onSelect }
 export default function Miembros() {
   const { id: empresaId }      = useParams()
   const navigate               = useNavigate()
-  const { empresaPanel, user, clearEmpresaNotifs } = useAuth()
+  const location               = useLocation()
+  const { empresaPanel, setEmpresaPanel, user, clearEmpresaNotifs } = useAuth()
   const userId = user?.id
+
 
   const [miembros,             setMiembros]             = useState([])
   const [sucursales,           setSucursales]           = useState([])
@@ -116,6 +118,18 @@ export default function Miembros() {
   const [abandonarOpen,        setAbandonarOpen]        = useState(false)
   const [actionLoading,        setActionLoading]        = useState(false)
   const [backError,            setBackError]            = useState(null)
+
+  // Si la empresa tiene una sola sucursal Y el rol del usuario es de nivel empresa,
+  // el error "miembro no encontrado en sucursal" se muestra como error de empresa.
+  // Los gerentes de sucursal operan en contexto de sucursal, así que ven el mensaje original.
+  const handleError = (err) => {
+    const esRolEmpresa = miRol === 'PROPIETARIO' || miRol === 'GERENTE_EMPRESA'
+    if (err?.code === 'SUCURSAL_MIEMBRO_NOT_FOUND' && sucursales.length === 1 && esRolEmpresa) {
+      setBackError({ ...err, code: 'EMPRESA_MIEMBRO_NOT_FOUND' })
+    } else {
+      setBackError(err)
+    }
+  }
 
   // Cierra sidebar al pasar a desktop
   useEffect(() => {
@@ -134,7 +148,7 @@ export default function Miembros() {
       return
     }
     empresaService.getPanel(empresaId)
-      .then(data => { setSucursales(data.sucursales ?? []); setMiRol(data.rol) })
+      .then(data => { setEmpresaPanel(empresaId, data); setSucursales(data.sucursales ?? []); setMiRol(data.rol) })
       .catch(err => setBackError(err))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaId])
@@ -154,6 +168,18 @@ export default function Miembros() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  // Abre el modal de detalle si se llegó (o ya estaba) en la página con openUsuarioId en el state.
+  // Limpia el state tras consumirlo para no retriggear si se recarga la lista.
+  useEffect(() => {
+    const openId = location.state?.openUsuarioId
+    if (!openId || miembros.length === 0) return
+    const found = miembros.find((norm) => norm.miembro.id === openId)
+    if (found) {
+      setMiembroSeleccionado(found)
+      navigate(location.pathname, { replace: true, state: { ...location.state, openUsuarioId: undefined } })
+    }
+  }, [miembros, location.state?.openUsuarioId]) // eslint-disable-line
+
   // Filtra la lista según sucursal seleccionada y término de búsqueda
   const miembrosFiltrados = useMemo(() => {
     let lista = miembros
@@ -163,7 +189,7 @@ export default function Miembros() {
     if (selectedSucursal) {
       lista = lista.filter(norm =>
         norm.tipo === 'empresa' ||
-        norm.sucursales.some(s => s.id === selectedSucursal.id)
+        norm.sucursales.some(s => String(s.id) === String(selectedSucursal.id))
       )
     }
 
@@ -190,14 +216,28 @@ export default function Miembros() {
   const getRolCard = (norm) => {
     if (norm.tipo === 'empresa') return norm.rolEmpresa
     if (selectedSucursal) {
-      const match = norm.sucursales.find(s => s.id === selectedSucursal.id)
+      const match = norm.sucursales.find(s => String(s.id) === String(selectedSucursal.id))
       return match?.rol ?? norm.sucursales[0]?.rol
     }
     return norm.sucursales[0]?.rol
   }
 
-  // Callbacks post-acción: recarga datos y cierra modales
-  const handleUpdated = () => { fetchData(); setMiembroSeleccionado(null) }
+  // Callbacks post-acción
+  const handleUpdated = (updatedData) => {
+    if (updatedData?.miembro) {
+      // MiembroSucursalOut devuelto por add_miembro — actualiza en-place sin refetch
+      const normed = {
+        miembro:    updatedData.miembro,
+        tipo:       'sucursal',
+        rolEmpresa: null,
+        sucursales: updatedData.sucursales,
+      }
+      setMiembros(prev => prev.map(m => m.miembro.id === normed.miembro.id ? normed : m))
+      setMiembroSeleccionado(normed)
+    } else {
+      fetchData()
+    }
+  }
   const handleDeleted = () => { fetchData(); setMiembroSeleccionado(null) }
   const handleInvited = () => { fetchData(); setInvitarOpen(false) }
 
@@ -281,13 +321,15 @@ export default function Miembros() {
                 </button>
               )}
 
-              {/* Selector de sucursal — a la derecha, ocupa el espacio restante */}
-              {!loading && sucursales.length > 1 && (
+              {/* Selector de sucursal — solo sucursales activas, a la derecha */}
+              {!loading && sucursales.filter(s => s.activa !== false).length > 1 && (
                 <div className="miem-actions-row__sucursal">
                   <CustomSelect
                     options={[
                       { value: '', label: 'Todas' },
-                      ...sucursales.map(s => ({ value: String(s.id), label: s.nombre ?? `Sucursal ${s.id}` })),
+                      ...sucursales
+                        .filter(s => s.activa !== false)
+                        .map(s => ({ value: String(s.id), label: s.nombre ?? `Sucursal ${s.id}` })),
                     ]}
                     value={String(selectedSucursal?.id ?? '')}
                     onChange={val => {
@@ -296,7 +338,7 @@ export default function Miembros() {
                       setSearch('')
                     }}
                     width="100%"
-                    height={38}
+                    height={36}
                   />
                 </div>
               )}
@@ -360,7 +402,7 @@ export default function Miembros() {
           onClose={() => setMiembroSeleccionado(null)}
           onUpdated={handleUpdated}
           onDeleted={handleDeleted}
-          onError={setBackError}
+          onError={handleError}
         />
       )}
 
@@ -378,7 +420,7 @@ export default function Miembros() {
       {modificarRolOpen && (
         <ConfirmModal
           icon="🔄"
-          message="¿Querés cambiar tu rol de Propietario a Gerente de empresa?"
+          message="¿Deseás cambiar tu rol de Propietario a Gerente de empresa?"
           confirmText="Confirmar"
           confirmVariant="btn-indigo"
           loading={actionLoading}

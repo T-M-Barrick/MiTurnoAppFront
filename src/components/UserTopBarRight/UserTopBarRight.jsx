@@ -14,7 +14,7 @@ import './UserTopBarRight.css'
  *               Las notificaciones NO se leen de esta prop — siempre vienen de AuthContext.
  */
 export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}) {
-  const { user, logout, markNotifLeida, empresaNotifs, markEmpresaNotifLeida, addEmpresaNuevasNotifs, clearEmpresaNotifs } = useAuth()
+  const { user, logout, markNotifLeida, empresaNotifs, markEmpresaNotifLeida, addEmpresaNuevasNotifs, clearEmpresaNotifs, empresaPanel } = useAuth()
   const navigate = useNavigate()
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
@@ -107,6 +107,7 @@ export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}
         notifContext={notifContext}
         onNotifLeida={handleNotifLeida}
         onNuevasNotifs={handleNuevasNotifs}
+        cantidadSucursales={empresaId ? (empresaPanel?.panel?.sucursales?.length ?? undefined) : undefined}
       />
 
       {/* ── Avatar + dropdown ── */}
@@ -150,19 +151,24 @@ export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}
                   onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); setProfileOpen(false); navigate(`/empresa/${empresaId}/perfil`) }}>
                   🏢 Perfil de empresa
                 </a>
-
-                <div className="utr__dropdown-divider" />
+                {(empresaPanel?.panel?.sucursales?.length ?? 0) >= 2 && (
+                  <a className="utr__dropdown-item" role="menuitem"
+                    href={`#/empresa/${empresaId}/perfiles-sucursales`}
+                    onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); setProfileOpen(false); navigate(`/empresa/${empresaId}/perfiles-sucursales`) }}>
+                    🏪 Perfiles de sucursales
+                  </a>
+                )}
 
                 {/* ── Cabecera usuario (secundaria) ── */}
                 {user && (
-                  <div className="utr__dropdown-user">
+                  <div className="utr__dropdown-user utr__dropdown-user--secondary">
                     <span className="utr__dropdown-name">{user.nombre} {user.apellido}</span>
                     <span className="utr__dropdown-email">{user.email}</span>
                   </div>
                 )}
 
                 {/* ── Acciones usuario ── */}
-                <a className="utr__dropdown-item" role="menuitem"
+                <a className="utr__dropdown-item utr__dropdown-item--divided" role="menuitem"
                   href="#/mis-empresas"
                   onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); setProfileOpen(false); clearEmpresaNotifs(); navigate('/mis-empresas') }}>
                   🏠 Volver al menú de usuario
@@ -184,15 +190,13 @@ export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}
                   onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); setProfileOpen(false); navigate('/crear-empresa') }}>
                   🏢 Crear empresa
                 </a>
-                <a className="utr__dropdown-item" role="menuitem"
+                <a className="utr__dropdown-item utr__dropdown-item--divided" role="menuitem"
                   href="#/perfil"
                   onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); setProfileOpen(false); navigate('/perfil') }}>
                   👤 Perfil
                 </a>
               </>
             )}
-
-            <div className="utr__dropdown-divider" />
             <button className="utr__dropdown-item utr__dropdown-item--danger" role="menuitem"
               onClick={handleLogout}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

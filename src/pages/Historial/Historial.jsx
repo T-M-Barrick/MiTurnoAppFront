@@ -207,7 +207,7 @@ export default function Historial() {
           turno={selectedTurno}
           onClose={() => setSelectedTurno(null)}
           onDeleted={handleDeleted}
-          onError={(err) => { setSelectedTurno(null); setBackError(err) }}
+          onError={setBackError}
           readOnly={true}
         />
       )}

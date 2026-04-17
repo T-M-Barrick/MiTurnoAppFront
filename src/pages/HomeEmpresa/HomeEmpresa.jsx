@@ -53,7 +53,7 @@ const NAV_CARDS = [
   { key: 'historial',          label: 'Historial',          desc: 'Revisá el historial de turnos pasados',      icon: '📋' },
   { key: 'miembros',           label: 'Miembros',           desc: 'Administrá el equipo y sus roles',           icon: '👥' },
   { key: 'servicios',          label: 'Servicios',          desc: 'Configurá los servicios que ofrecés',        icon: '✂️' },
-  { key: 'clientes',           label: 'Clientes',           desc: 'Revisá y gestioná tu base de clientes',     icon: '👤' },
+  { key: 'clientes',           label: 'Clientes',           desc: 'Administrá tu base de clientes y asignación de turnos', icon: '👤' },
   { key: 'clientes-bloqueados', label: 'Clientes Bloqueados', desc: 'Administrá los clientes que bloqueaste',  icon: '🚫' },
 ]
 

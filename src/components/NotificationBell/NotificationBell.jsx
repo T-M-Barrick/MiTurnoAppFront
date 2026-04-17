@@ -24,8 +24,9 @@ export default function NotificationBell({
   notificaciones: notifProp = [],
   ultimoCursorId: cursorProp = null,
   notifContext = { type: 'usuario' },
-  onNotifLeida,     // callback(notifId) — actualiza la fuente de verdad en AuthContext
-  onNuevasNotifs,   // callback(nuevas[]) — notifica al padre cuando el polling encuentra nuevas
+  onNotifLeida,       // callback(notifId) — actualiza la fuente de verdad en AuthContext
+  onNuevasNotifs,     // callback(nuevas[]) — notifica al padre cuando el polling encuentra nuevas
+  cantidadSucursales, // número de sucursales — para mapear rol GERENTE_EMPRESA correctamente
 }) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -91,14 +92,26 @@ export default function NotificationBell({
     }
   }
 
-  // Devuelve la ruta a la que navega una notificación con turno_id
-  const getNotifRoute = (notif) => {
-    const turnoId = notif.extra_data?.turno_id
-    if (!turnoId) return null
+  // Devuelve { route, state } para navegar al hacer click en una notificación.
+  // Si el turno o miembro ya no existe en el destino, la página simplemente no abre nada.
+  const getNotifDest = (notif) => {
+    const turnoId   = notif.extra_data?.turno_id
+    const usuarioId = notif.extra_data?.usuario_id
+    const tipo      = notif.tipo
     const { type, id } = notifContext
-    if (type === 'usuario')       return '/home'
-    if (type === 'empresa')       return `/empresa/${id}/turnos`
-    if (type === 'sucursal')      return `/sucursal/${id}`
+
+    // Notificaciones de turno
+    if (turnoId) {
+      if (type === 'usuario') return { route: '/home',                    state: { openTurnoId: turnoId } }
+      if (type === 'empresa') return { route: `/empresa/${id}/turnos`,    state: { openTurnoId: turnoId } }
+      if (type === 'sucursal') return { route: `/sucursal/${id}`,         state: { openTurnoId: turnoId } }
+    }
+
+    // Notificaciones de miembro
+    if (usuarioId && (tipo === 'MIEMBRO_NUEVO_EMPRESA' || tipo === 'MIEMBRO_NUEVO_SUCURSAL')) {
+      if (type === 'empresa') return { route: `/empresa/${id}/miembros`, state: { openUsuarioId: usuarioId } }
+    }
+
     return null
   }
 
@@ -113,8 +126,8 @@ export default function NotificationBell({
     e.preventDefault()
     setOpen(false)
     await handleMarkLeida(notif)
-    const route = getNotifRoute(notif)
-    if (route) navigate(route)
+    const dest = getNotifDest(notif)
+    if (dest) navigate(dest.route, { state: dest.state })
   }
 
   // Al hacer click izquierdo en "Ver todas"
@@ -176,14 +189,14 @@ export default function NotificationBell({
             <>
               <ul className="nbell__list" role="list">
                 {preview.map((notif) => {
-                  const notifRoute = getNotifRoute(notif)
+                  const notifDest = getNotifDest(notif)
                   return (
                     <li
                       key={notif.id}
                       className={`nbell__item${notif.leida ? ' nbell__item--read' : ''}`}
                     >
                       <a
-                        href={notifRoute ? `#${notifRoute}` : undefined}
+                        href={notifDest ? `#${notifDest.route}` : undefined}
                         className="nbell__item-btn"
                         onClick={(e) => handleNotifClick(e, notif)}
                       >
@@ -206,7 +219,7 @@ export default function NotificationBell({
                             </span>
                           </span>
                           <p className="nbell__item-body">
-                            {getNotifBody(notif.tipo, notif.extra_data)}
+                            {getNotifBody(notif.tipo, notif.extra_data, cantidadSucursales)}
                           </p>
                         </span>
                       </a>

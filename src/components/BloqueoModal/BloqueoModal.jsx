@@ -44,10 +44,11 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
   const [motivo,      setMotivo]      = useState('')
   const [formErrors,  setFormErrors]  = useState({})
 
-  const [saving,     setSaving]     = useState(false)
-  const [deletingId, setDeletingId] = useState(null)
-  const [confirmId,  setConfirmId]  = useState(null)
-  const [backError,  setBackError]  = useState(null)
+  const [saving,       setSaving]       = useState(false)
+  const [deletingId,   setDeletingId]   = useState(null)
+  const [confirmId,    setConfirmId]    = useState(null)
+  const [backError,    setBackError]    = useState(null)
+  const [backSuccess,  setBackSuccess]  = useState(null)
 
   /** Abre el formulario para crear un nuevo bloqueo. */
   const openCreate = () => {
@@ -103,7 +104,7 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
 
       setBloqueos(updated)
       onChanged(updated)
-      closeForm()
+      setBackSuccess(editingBloqueo ? 'Bloqueo modificado correctamente.' : 'Bloqueo creado correctamente.')
     } catch (err) {
       setBackError(err)
     } finally {
@@ -137,12 +138,7 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
           {/* Header */}
           <div className="blq-header">
             <span className="blq-header__title">Bloqueos de fechas</span>
-            <button className="blq-header__close" type="button" onClick={onClose} aria-label="Cerrar">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="18" y1="6"  x2="6"  y2="18"/>
-                <line x1="6"  y1="6"  x2="18" y2="18"/>
-              </svg>
-            </button>
+            <button className="btn-icon" type="button" onClick={onClose} aria-label="Cerrar">✕</button>
           </div>
 
           {/* Cuerpo */}
@@ -200,12 +196,7 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
               <span className="blq-header__title">
                 {editingBloqueo ? 'Bloqueo' : 'Nuevo bloqueo'}
               </span>
-              <button className="blq-header__close" type="button" onClick={closeForm} aria-label="Cerrar">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <line x1="18" y1="6"  x2="6"  y2="18"/>
-                  <line x1="6"  y1="6"  x2="18" y2="18"/>
-                </svg>
-              </button>
+              <button className="btn-icon" type="button" onClick={closeForm} aria-label="Cerrar">✕</button>
             </div>
 
             {/* Cuerpo */}
@@ -246,6 +237,9 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
                   maxLength={255}
                   rows={3}
                 />
+                <span className={`blq-field__char-count${motivo.length > 230 ? ' blq-field__char-count--warn' : ''}`}>
+                  {motivo.length}/255
+                </span>
               </div>
 
             </div>
@@ -281,13 +275,21 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
       {confirmId !== null && (
         <ConfirmModal
           icon="🗑️"
-          message="¿Eliminar este bloqueo? Esta acción no se puede deshacer."
+          message="¿Deseás eliminar este bloqueo? Esta acción no se puede deshacer."
           confirmText="Sí, eliminar"
           confirmVariant="btn-indigo"
           loading={deletingId === confirmId}
           loadingText="Eliminando..."
           onConfirm={() => handleDelete(confirmId)}
           onCancel={() => setConfirmId(null)}
+        />
+      )}
+
+      {/* Éxito al guardar */}
+      {backSuccess && (
+        <ErrorModal
+          success={backSuccess}
+          onClose={() => { setBackSuccess(null); closeForm() }}
         />
       )}
 

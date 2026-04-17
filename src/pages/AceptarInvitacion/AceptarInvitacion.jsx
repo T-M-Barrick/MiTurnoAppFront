@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { invitacionesService } from '../../services/invitacionesService'
+import { parseBackendError } from '../../utils/errorMessages'
 import '../../styles/ve-card.css'
 
 // Mapeo de roles a texto legible en español
@@ -38,11 +39,7 @@ export default function AceptarInvitacion() {
       })
       .catch((err) => {
         setStatus('error')
-        setMensaje(
-          err?.detail?.[0]?.msg ||
-          err?.message ||
-          'El enlace de invitación es inválido o expiró.'
-        )
+        setMensaje(parseBackendError(err))
       })
   }, [])
 

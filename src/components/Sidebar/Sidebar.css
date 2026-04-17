@@ -1,7 +1,7 @@
 .sidebar-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .45);
+  background: rgba(0, 0, 0, .5);
   z-index: 200;
   opacity: 0;
   visibility: hidden;

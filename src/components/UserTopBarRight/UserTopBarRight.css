@@ -61,9 +61,16 @@
 }
 
 .utr__dropdown-user {
-  padding: 14px 16px 12px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border);
 }
+
+.utr__dropdown-user--secondary {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+
+
 
 .utr__dropdown-name {
   display: block;
@@ -105,8 +112,7 @@
 .utr__dropdown-item--danger svg   { color: var(--danger); }
 .utr__dropdown-item--danger:hover { background: var(--danger-bg); }
 
-.utr__dropdown-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 4px 0;
+/* Separador unificado: igual que el border-bottom de los headers */
+.utr__dropdown-item--divided {
+  border-bottom: 1px solid var(--border);
 }

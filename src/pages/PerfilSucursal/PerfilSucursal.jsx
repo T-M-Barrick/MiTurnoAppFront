@@ -199,11 +199,61 @@ function calcularSlots(servicio, fecha, allServicios = []) {
   return slots.sort((a, b) => a.fechaHora - b.fechaHora)
 }
 
+/** Verifica si todos los servicios del grupo son intercambiables (misma aclaracion, duración y precio activos) */
+function puedeElegirCualquiera(entries) {
+  if (entries.length <= 1) return false
+  const versionsHoy = entries.map(e => getVersionActiva(e.servicios))
+  if (versionsHoy.some(v => !v)) return false
+  const acl0    = entries[0].aclaracion ?? null
+  const dur0    = versionsHoy[0].duracion
+  const precio0 = Number(versionsHoy[0].precio)
+  return entries.every((e, i) => {
+    const v = versionsHoy[i]
+    return (e.aclaracion ?? null) === acl0 && v.duracion === dur0 && Number(v.precio) === precio0
+  })
+}
+
+/** Primer día disponible considerando la unión de disponibilidades de todos los servicios del grupo */
+function findFirstAvailableDateMulti(serviciosGrupo) {
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0)
+  const max = Math.max(...serviciosGrupo.map(s => s.limite_dias_reserva ?? 1460))
+  for (let i = 0; i <= max; i++) {
+    const d = new Date(hoy.getTime() + i * 86400000)
+    if (serviciosGrupo.some(s => getDayStatus(s, d) === 'disponible')) return d
+  }
+  return null
+}
+
+/**
+ * Slots unión: para cada horario, disponible si al menos un servicio del grupo lo tiene libre.
+ * Cada slot incluye `opciones`: array de versioned-service IDs disponibles para ese horario.
+ */
+function calcularSlotsUnion(serviciosGrupo, fecha, allServicios) {
+  const slotMap = new Map()
+  for (const servicio of serviciosGrupo) {
+    for (const slot of calcularSlots(servicio, fecha, allServicios)) {
+      if (!slotMap.has(slot.label)) {
+        slotMap.set(slot.label, {
+          ...slot,
+          opciones: slot.bloqueado ? [] : [slot.version.id],
+        })
+      } else {
+        const existing = slotMap.get(slot.label)
+        if (!slot.bloqueado) {
+          existing.bloqueado = false
+          if (!existing.opciones.includes(slot.version.id)) existing.opciones.push(slot.version.id)
+        }
+      }
+    }
+  }
+  return [...slotMap.values()].sort((a, b) => a.fechaHora - b.fechaHora)
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Sub-componente: franja horizontal de fechas (DateStrip)
 // ─────────────────────────────────────────────────────────────────
 
-function DateStrip({ servicio, selectedFecha, onSelectFecha, onExcepcion }) {
+function DateStrip({ servicio, serviciosGrupo, selectedFecha, onSelectFecha, onExcepcion }) {
   const stripRef  = useRef(null)
   const today     = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d }, [])
 
@@ -213,17 +263,27 @@ function DateStrip({ servicio, selectedFecha, onSelectFecha, onExcepcion }) {
   const [pickerYear,      setPickerYear]      = useState(today.getFullYear())
   const [tooltip,         setTooltip]         = useState(null)
 
-  // Genera todas las fechas de hoy hasta el límite de reserva
+  // Genera todas las fechas de hoy hasta el límite de reserva (o el máximo del grupo)
   const dates = useMemo(() => {
-    const max = servicio.limite_dias_reserva ?? 1460
+    const max = serviciosGrupo
+      ? Math.max(...serviciosGrupo.map(s => s.limite_dias_reserva ?? 1460))
+      : (servicio.limite_dias_reserva ?? 1460)
     return Array.from({ length: max + 1 }, (_, i) => new Date(today.getTime() + i * 86400000))
-  }, [servicio, today])
+  }, [servicio, serviciosGrupo, today])
 
-  // Estado calculado de cada fecha (memoizado para no recalcular en cada render)
-  const statuses = useMemo(
-    () => dates.map(d => getDayStatus(servicio, d)),
-    [dates, servicio]
-  )
+  // Estado calculado de cada fecha — en modo unión: disponible si algún servicio del grupo lo está
+  const statuses = useMemo(() => {
+    if (serviciosGrupo) {
+      return dates.map(d => {
+        const statusList = serviciosGrupo.map(s => getDayStatus(s, d))
+        if (statusList.some(s => (typeof s === 'string' ? s : s?.status) === 'disponible')) return 'disponible'
+        const exc = statusList.find(s => typeof s === 'object' && s?.status === 'excepcion')
+        if (exc) return exc
+        return statusList[0]
+      })
+    }
+    return dates.map(d => getDayStatus(servicio, d))
+  }, [dates, servicio, serviciosGrupo])
 
   // Meses disponibles en el strip para el picker
   const availableMonths = useMemo(() => {
@@ -607,11 +667,13 @@ export default function PerfilSucursal() {
   }, [isFavorito, sucursalId, user?.favoritos, updateUser])
 
   // ── Flujo de reserva
-  const [step,             setStep]             = useState('servicios')
-  const [selectedNombre,   setSelectedNombre]   = useState(null)
-  const [selectedServicio, setSelectedServicio] = useState(null)
-  const [selectedFecha,    setSelectedFecha]    = useState(null)
-  const [selectedSlot,     setSelectedSlot]     = useState(null)
+  const [step,                  setStep]                  = useState('servicios')
+  const [selectedNombre,        setSelectedNombre]        = useState(null)
+  const [selectedServicio,      setSelectedServicio]      = useState(null)
+  const [selectedFecha,         setSelectedFecha]         = useState(null)
+  const [selectedSlot,          setSelectedSlot]          = useState(null)
+  const [cualquieraProfesional, setCualquieraProfesional] = useState(false)
+  const [selectedGrupo,         setSelectedGrupo]         = useState([])
 
   // ── Modales
   const [excepcionInfo, setExcepcionInfo] = useState(null)
@@ -663,11 +725,13 @@ export default function PerfilSucursal() {
     return map
   }, [servicios])
 
-  // Slots calculados para la fecha seleccionada (incluye solapamiento inter-servicio)
+  // Slots calculados para la fecha seleccionada — unión si el usuario eligió cualquier profesional
   const slots = useMemo(() => {
     if (!selectedServicio || !selectedFecha) return []
+    if (cualquieraProfesional && selectedGrupo.length > 0)
+      return calcularSlotsUnion(selectedGrupo, selectedFecha, servicios)
     return calcularSlots(selectedServicio, selectedFecha, servicios)
-  }, [selectedServicio, selectedFecha, servicios])
+  }, [selectedServicio, selectedFecha, servicios, cualquieraProfesional, selectedGrupo])
 
   // ── Handlers de navegación del flujo ──
 
@@ -689,6 +753,15 @@ export default function PerfilSucursal() {
     setStep('reserva')
   }
 
+  const handleSelectCualquiera = () => {
+    const entries = serviciosByNombre[selectedNombre]
+    setCualquieraProfesional(true)
+    setSelectedGrupo(entries)
+    setSelectedServicio(entries[0])
+    setSelectedFecha(findFirstAvailableDateMulti(entries))
+    setStep('reserva')
+  }
+
   const handleSelectFecha = (fecha) => {
     setSelectedFecha(fecha)
     setSelectedSlot(null)
@@ -696,9 +769,10 @@ export default function PerfilSucursal() {
 
   const handleBack = () => {
     if (step === 'reserva') {
-      const multipleProf = (serviciosByNombre[selectedServicio?.nombre]?.length ?? 0) > 1
+      const multipleProf = cualquieraProfesional || (serviciosByNombre[selectedServicio?.nombre]?.length ?? 0) > 1
       setSelectedFecha(null)
       setSelectedSlot(null)
+      if (cualquieraProfesional) { setCualquieraProfesional(false); setSelectedGrupo([]) }
       if (multipleProf) {
         setStep('profesional')
       } else {
@@ -717,18 +791,36 @@ export default function PerfilSucursal() {
     if (!selectedSlot || reservando) return
     setReservando(true)
     try {
-      await usuarioService.reservarTurno([{
-        sucursal_id: Number(sucursalId),
-        servicio_id: selectedSlot.version.id,
-        fecha_hora:  selectedSlot.fechaHora.toISOString(),
-      }])
+      // En modo "cualquier profesional" se envían todas las versiones disponibles para ese slot
+      const opciones = cualquieraProfesional && selectedSlot.opciones?.length > 0
+        ? selectedSlot.opciones.map(id => ({
+            sucursal_id: Number(sucursalId),
+            servicio_id: id,
+            fecha_hora:  selectedSlot.fechaHora.toISOString(),
+          }))
+        : [{
+            sucursal_id: Number(sucursalId),
+            servicio_id: selectedSlot.version.id,
+            fecha_hora:  selectedSlot.fechaHora.toISOString(),
+          }]
+      await usuarioService.reservarTurno(opciones)
       // Inyectar el turno recién tomado para recalcular slots sin nuevo GET
       const nuevoTurno = { fecha_hora: selectedSlot.fechaHora.toISOString(), duracion: selectedSlot.version.duracion }
-      setServicios(prev => prev.map(s =>
-        s.id === selectedServicio.id
-          ? { ...s, turnos_actuales: [...s.turnos_actuales, nuevoTurno] }
-          : s
-      ))
+      if (cualquieraProfesional) {
+        // No sabemos cuál profesional tomó el turno: se bloquea el slot en todos del grupo
+        setServicios(prev => prev.map(s =>
+          selectedGrupo.some(g => g.id === s.id)
+            ? { ...s, turnos_actuales: [...s.turnos_actuales, nuevoTurno] }
+            : s
+        ))
+        setSelectedGrupo(prev => prev.map(g => ({ ...g, turnos_actuales: [...g.turnos_actuales, nuevoTurno] })))
+      } else {
+        setServicios(prev => prev.map(s =>
+          s.id === selectedServicio.id
+            ? { ...s, turnos_actuales: [...s.turnos_actuales, nuevoTurno] }
+            : s
+        ))
+      }
       setSelectedServicio(prev => ({ ...prev, turnos_actuales: [...prev.turnos_actuales, nuevoTurno] }))
       setExito(true)
     } catch (err) {
@@ -957,6 +1049,14 @@ export default function PerfilSucursal() {
               <div aria-hidden="true" />
             </div>
 
+            {puedeElegirCualquiera(serviciosByNombre[selectedNombre]) && (
+              <div className="ps-cualquiera-wrap">
+                <button className="btn svc-btn-add" onClick={handleSelectCualquiera}>
+                  Cualquier profesional
+                </button>
+              </div>
+            )}
+
             <div className="ps-profesionales">
               {serviciosByNombre[selectedNombre].map(s => {
                 const v = getVersionActiva(s.servicios)
@@ -1032,7 +1132,7 @@ export default function PerfilSucursal() {
                           <span className="ps-meta-value">${Number(v.precio).toLocaleString('es-AR')}</span>
                         </span>
                       </div>
-                      {selectedServicio.profesional_id && (
+                      {selectedServicio.profesional_id && !cualquieraProfesional && (
                         <ProfReservaLabel
                           nombre={selectedServicio.profesional_nombre}
                           apellido={selectedServicio.profesional_apellido}
@@ -1053,6 +1153,7 @@ export default function PerfilSucursal() {
             {/* ── Franja de fechas ── */}
             <DateStrip
               servicio={selectedServicio}
+              serviciosGrupo={cualquieraProfesional ? selectedGrupo : null}
               selectedFecha={selectedFecha}
               onSelectFecha={handleSelectFecha}
               onExcepcion={(motivo) => setExcepcionInfo(motivo ?? '')}
@@ -1194,8 +1295,8 @@ export default function PerfilSucursal() {
                   </div>
                 </BookingRow>
 
-                {/* Profesional (opcional) — madera */}
-                {selectedServicio.profesional_id && (
+                {/* Profesional (opcional) — madera; oculto si el usuario eligió indiferente */}
+                {selectedServicio.profesional_id && !cualquieraProfesional && (
                   <BookingRow
                     color="brown"
                     modifier="booking-row--professional-brown"

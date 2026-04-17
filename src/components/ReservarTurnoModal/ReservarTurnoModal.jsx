@@ -573,7 +573,6 @@ export default function ReservarTurnoModal({ sucursalId, cliente, onClose, onErr
           : s
       ))
       setSelectedServicio(prev => ({ ...prev, turnos_actuales: [...prev.turnos_actuales, nuevoTurno] }))
-      setBookingOpen(false)
       setExito(true)
     } catch (err) {
       setBackError(err)
@@ -584,8 +583,8 @@ export default function ReservarTurnoModal({ sucursalId, cliente, onClose, onErr
 
   const handleExitoClose = () => {
     setExito(false)
+    setBookingOpen(false)
     setSelectedSlot(null)
-    // No cierra el modal: el usuario puede seguir reservando
   }
 
   // ─────────────────────────────────────────────────────────────────

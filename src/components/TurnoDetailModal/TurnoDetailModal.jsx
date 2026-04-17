@@ -56,7 +56,6 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
   const [recM,         setRecM]         = useState('00')
   const [recError,     setRecError]     = useState(null)
   const [savingRec,    setSavingRec]    = useState(false)
-  const [recSuccess,   setRecSuccess]   = useState(false)
 
   // ── Confirmación de acción principal ──
   const [confirmAction, setConfirmAction] = useState(null) // 'cancel'|'delete'|'cumplido'|'no_cumplido'
@@ -72,7 +71,6 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
     setCalificacion('')
     setMotivo('')
     setRecModalOpen(false)
-    setRecSuccess(false)
   }, [turno])
 
   // Cierra con Escape (solo si no hay confirmación ni sub-modal abiertos)
@@ -155,7 +153,6 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
       setRecM('00')
     }
     setRecError(null)
-    setRecSuccess(false)
     setRecModalOpen(true)
   }
 
@@ -175,8 +172,8 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
     setSavingRec(true)
     try {
       await usuarioService.updateRecordatorioTurno(turno.id, minutosFinal)
-      setCurrentRec(minutosFinal)  // actualiza el valor mostrado en la fila
-      setRecSuccess(true)
+      setRecModalOpen(false)
+      onUpdated?.({ ...turno, recordatorio_minutos_antes: minutosFinal })
     } catch (err) {
       onError(err)
     } finally {
@@ -220,10 +217,10 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
         })
         onUpdated?.(updated)
       }
-      setConfirmAction(null)
     } catch (err) {
       onError(err)
     } finally {
+      setConfirmAction(null)
       setLoadingAction(false)
     }
   }
@@ -461,7 +458,7 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
       {confirmAction === 'no_cumplido' && (
         <ConfirmModal
           icon="❌"
-          message="¿Marcar este turno como no cumplido?"
+          message="¿Deseás marcar este turno como no cumplido?"
           confirmText="Confirmar"
           confirmVariant="btn-indigo"
           loading={loadingAction}
@@ -474,7 +471,7 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
       {confirmAction === 'cumplido' && (
         <ConfirmModal
           icon="✅"
-          message="¿Marcar este turno como cumplido?"
+          message="¿Deseás marcar este turno como cumplido?"
           confirmText="Enviar"
           confirmVariant="btn-orange"
           loading={loadingAction}
@@ -510,53 +507,33 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
               </svg>
             </button>
 
-            {!recSuccess ? (
-              <>
-                <h4 className="tdmodal-rec-modal__title">⏰ Recordatorio</h4>
-                <RecordatorioField
-                  enabled={recEnabled}
-                  hours={recH}
-                  minutes={recM}
-                  onEnabledChange={setRecEnabled}
-                  onHoursChange={setRecH}
-                  onMinutesChange={setRecM}
-                  disabled={savingRec}
-                  error={recError}
-                />
-                <div className="tdmodal-rec-modal__btns">
-                  <button
-                    className="btn btn-ghost"
-                    onClick={() => setRecModalOpen(false)}
-                    disabled={savingRec}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    onClick={handleGuardarRecordatorio}
-                    disabled={savingRec}
-                  >
-                    {savingRec ? <span className="spinner spinner-sm" /> : 'Guardar'}
-                  </button>
-                </div>
-              </>
-            ) : (
-              /* Mensaje de éxito */
-              <>
-                <div className="tdmodal-rec-modal__success">
-                  <span className="tdmodal-rec-modal__success-icon">✅</span>
-                  <p className="tdmodal-rec-modal__success-msg">Recordatorio guardado correctamente</p>
-                </div>
-                <div className="tdmodal-rec-modal__btns">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => { setRecModalOpen(false); setRecSuccess(false) }}
-                  >
-                    Aceptar
-                  </button>
-                </div>
-              </>
-            )}
+            <h4 className="tdmodal-rec-modal__title">⏰ Recordatorio</h4>
+            <RecordatorioField
+              enabled={recEnabled}
+              hours={recH}
+              minutes={recM}
+              onEnabledChange={setRecEnabled}
+              onHoursChange={setRecH}
+              onMinutesChange={setRecM}
+              disabled={savingRec}
+              error={recError}
+            />
+            <div className="tdmodal-rec-modal__btns">
+              <button
+                className="btn btn-ghost"
+                onClick={() => setRecModalOpen(false)}
+                disabled={savingRec}
+              >
+                Cancelar
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleGuardarRecordatorio}
+                disabled={savingRec}
+              >
+                {savingRec ? <span className="spinner spinner-sm" /> : 'Guardar'}
+              </button>
+            </div>
           </div>
         </div>
       )}

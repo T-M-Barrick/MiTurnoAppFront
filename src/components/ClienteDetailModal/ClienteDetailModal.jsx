@@ -63,10 +63,10 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
         await sucursalService.reactivarCliente(sucursalId, cliente.id)
         onUpdated?.({ ...cliente, activo: true })
       }
-      setConfirmAction(null)
     } catch (err) {
       onError?.(err)
     } finally {
+      setConfirmAction(null)
       setLoading(false)
     }
   }
@@ -98,7 +98,7 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
               </div>
             </div>
             <div className="tdsumodal__badge-wrap cdmodal__badge-wrap">
-              {cliente.bloqueo && (
+              {cliente.bloqueado && (
                 <span className="tdmodal__badge cdmodal__badge--bloqueado">Bloqueado</span>
               )}
               <span className={`tdmodal__badge ${cliente.activo ? 'cdmodal__badge--activo' : 'cdmodal__badge--inactivo'}`}>
@@ -210,7 +210,7 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
       {confirmAction === 'desactivar' && (
         <ConfirmModal
           icon="⚠️"
-          message="¿Desactivar este cliente?"
+          message="¿Deseás desactivar este cliente?"
           confirmText="Desactivar"
           confirmVariant="btn-orange"
           loading={loading}
@@ -223,7 +223,7 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
       {confirmAction === 'reactivar' && (
         <ConfirmModal
           icon="✅"
-          message="¿Reactivar este cliente?"
+          message="¿Deseás reactivar este cliente?"
           confirmText="Reactivar"
           confirmVariant="btn-orange"
           loading={loading}
