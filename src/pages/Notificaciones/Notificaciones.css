@@ -210,9 +210,9 @@
   padding: 0 28px;
   background: var(--brand);
   color: #fff;
-  transition: opacity .2s;
+  transition: background .2s;
 }
-.notif-page__load-btn:hover:not(:disabled) { opacity: .88; }
+.notif-page__load-btn:hover:not(:disabled) { background: var(--brand-dark); }
 .notif-page__load-btn:disabled { opacity: .6; cursor: not-allowed; }
 
 /* ── Responsive ── */

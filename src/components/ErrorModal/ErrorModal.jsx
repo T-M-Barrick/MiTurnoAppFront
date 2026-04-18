@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { parseBackendError } from '../../utils/errorMessages'
+import { parseBackendError, aplicarReemplazoSucursalEmpresa } from '../../utils/errorMessages'
+import { useAuth } from '../../context/AuthContext'
 import './ErrorModal.css'
 
 /**
@@ -11,6 +12,8 @@ import './ErrorModal.css'
  *   onClose — función que se llama al cerrar
  */
 export default function ErrorModal({ error, success, onClose }) {
+  const { cantidadSucursales } = useAuth()
+
   // Cierra con Escape
   useEffect(() => {
     if (!error && !success) return
@@ -22,7 +25,10 @@ export default function ErrorModal({ error, success, onClose }) {
   if (!error && !success) return null
 
   const isError = !!error
-  const message = isError ? parseBackendError(error) : success
+  const rawMessage = isError ? parseBackendError(error) : success
+  const message    = isError
+    ? aplicarReemplazoSucursalEmpresa(rawMessage, error.code, cantidadSucursales)
+    : rawMessage
 
   return (
     <div

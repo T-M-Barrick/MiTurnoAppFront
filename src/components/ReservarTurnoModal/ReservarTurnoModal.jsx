@@ -487,11 +487,11 @@ export default function ReservarTurnoModal({ sucursalId, cliente, onClose, onErr
     return () => window.removeEventListener('keydown', handler)
   }, [onClose, bookingOpen, excepcionInfo])
 
-  // Carga los servicios al montar — reutiliza el endpoint de usuario que retorna el mismo formato
+  // Carga los servicios al montar — modo empresa (usuario=false)
   useEffect(() => {
     if (!sucursalId) return
     setLoading(true)
-    usuarioService.getServiciosDeSucursal(sucursalId)
+    sucursalService.getServiciosParaReserva(sucursalId, false, cliente?.email ?? null)
       .then(data => setServicios(data))
       .catch(err  => setBackError(err))
       .finally(()  => setLoading(false))

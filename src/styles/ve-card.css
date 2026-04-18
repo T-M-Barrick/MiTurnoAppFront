@@ -81,10 +81,10 @@
   font-family: inherit;
   color: #fff;
   cursor: pointer;
-  transition: opacity .2s;
+  transition: background .2s;
   width: fit-content;
   min-width: 200px;
   text-decoration: none;
 }
 
-.ve-btn:hover { opacity: .88; }
+.ve-btn:hover { background: var(--brand-dark); }

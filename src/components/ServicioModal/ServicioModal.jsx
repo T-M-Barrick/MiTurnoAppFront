@@ -104,7 +104,7 @@ function VersionCard({ v, onEdit }) {
  * Modal unificado para crear y editar un servicio de sucursal.
  *
  * Props:
- *   servicio    — ServicioSucursalOut existente, o null para crear uno nuevo
+ *   servicio    — ServicioBaseOut existente, o null para crear uno nuevo
  *   sucursalId  — id de la sucursal
  *   miembros    — MiembrosEmpresaOut (puede ser null)
  *   onClose     — callback al cerrar sin cambios
@@ -184,7 +184,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
    * Guarda una versión desde el modal en edit mode.
    * editingVersion es null (nueva versión) o un objeto versión existente.
    *
-   * - createVersion  devuelve ServicioSucursalOut (servicio completo con versiones)
+   * - createVersion  devuelve ServicioBaseOut (servicio completo con versiones)
    * - updateServicioVersion devuelve ServicioOut (solo la versión actualizada),
    *   por lo que debemos reconstruir el objeto completo del servicio manualmente.
    */

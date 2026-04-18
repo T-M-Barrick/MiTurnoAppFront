@@ -63,11 +63,11 @@
   color: #fff;
   font-size: 13px;
   font-family: inherit;
-  transition: opacity .15s;
+  transition: background .15s;
 }
 
 .svc-btn-add:hover {
-  opacity: .88;
+  background: var(--brand-dark);
 }
 
 .svc-btn-add:disabled {

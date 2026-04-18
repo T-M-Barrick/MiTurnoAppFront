@@ -103,10 +103,10 @@
   border-color: var(--brand);
 }
 
-/* En hover el botón activo mantiene texto blanco con leve transparencia (igual que cargar más) */
 .cli-filter__btn--active:hover {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
   color: #fff;
-  opacity: .88;
 }
 
 /* ── Hint de búsqueda ── */

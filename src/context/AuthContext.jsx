@@ -2,14 +2,17 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { authService } from '../services/authService'
 import { usuarioService } from '../services/usuarioService'
 import { empresaService } from '../services/empresaService'
+import { sucursalService } from '../services/sucursalService'
 import { setAuthErrorHandler } from '../services/api'
 
 const AuthContext = createContext()
 
-const SESSION_KEY        = 'miturno_user'
-const EMPRESA_NOTIF_KEY  = 'miturno_empresa_notifs'
-const EMPRESA_PANEL_KEY  = 'miturno_empresa_panel'
-const POLL_INTERVAL      = 5 * 60 * 1000 // 5 minutos
+const SESSION_KEY          = 'miturno_user'
+const EMPRESA_NOTIF_KEY    = 'miturno_empresa_notifs'
+const EMPRESA_PANEL_KEY    = 'miturno_empresa_panel'
+const SUCURSAL_PANEL_KEY   = 'miturno_sucursal_panel'
+const SUCURSAL_NOTIF_KEY   = 'miturno_sucursal_notifs'
+const POLL_INTERVAL       = 5 * 60 * 1000 // 5 minutos
 
 /**
  * Mergea dos listas de notificaciones.
@@ -45,8 +48,16 @@ export function AuthProvider({ children }) {
     } catch { return null }
   })
 
+  // Panel de sucursal para GERENTE_SUCURSAL/EMPLEADO (SucursalHomeOut)
+  // Estructura: { sucursalId: string, panel: { cantidad_sucursales, ... } }
+  const [sucursalPanel, setSucursalPanelState] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem(SUCURSAL_PANEL_KEY)
+      return cached ? JSON.parse(cached) : null
+    } catch { return null }
+  })
+
   // ── Notificaciones de empresa ──────────────────────────────────────────────
-  // Se guardan en sessionStorage para sobrevivir a navegaciones entre páginas de empresa.
   // Estructura: { empresaId, notificaciones: [...], ultimo_cursor_id }
   const [empresaNotifs, setEmpresaNotifsState] = useState(() => {
     try {
@@ -56,10 +67,23 @@ export function AuthProvider({ children }) {
   })
   const empresaNotifsRef = useRef(empresaNotifs)
 
-  // Mantiene la ref sincronizada con el estado
   useEffect(() => {
     empresaNotifsRef.current = empresaNotifs
   }, [empresaNotifs])
+
+  // ── Notificaciones de sucursal ─────────────────────────────────────────────
+  // Estructura: { sucursalId, notificaciones: [...], ultimo_cursor_id }
+  const [sucursalNotifs, setSucursalNotifsState] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem(SUCURSAL_NOTIF_KEY)
+      return cached ? JSON.parse(cached) : null
+    } catch { return null }
+  })
+  const sucursalNotifsRef = useRef(sucursalNotifs)
+
+  useEffect(() => {
+    sucursalNotifsRef.current = sucursalNotifs
+  }, [sucursalNotifs])
 
   // Registra el handler global de AUTH_ERROR: limpia sesión.
   useEffect(() => {
@@ -172,6 +196,32 @@ export function AuthProvider({ children }) {
     return () => clearInterval(poll)
   }, [])
 
+  // Polling de notificaciones de sucursal cada 5 minutos (GERENTE_SUCURSAL/EMPLEADO).
+  useEffect(() => {
+    const poll = setInterval(async () => {
+      const current = sucursalNotifsRef.current
+      if (!current) return
+      const topId = current.notificaciones?.[0]?.id ?? null
+      if (!topId) return
+      try {
+        const { sucursalId } = current
+        const nuevas = await sucursalService.getNotificacionesNuevas(sucursalId, topId)
+        if (!nuevas || nuevas.length === 0) return
+
+        setSucursalNotifsState((prev) => {
+          if (!prev) return prev
+          const merged  = [...nuevas, ...(prev.notificaciones ?? [])]
+          const updated = { ...prev, notificaciones: merged }
+          sucursalNotifsRef.current = updated
+          sessionStorage.setItem(SUCURSAL_NOTIF_KEY, JSON.stringify(updated))
+          return updated
+        })
+      } catch { /* polling silencioso */ }
+    }, POLL_INTERVAL)
+
+    return () => clearInterval(poll)
+  }, [])
+
   // Login: POST /auth/login → luego GET /usuarios/me
   const login = async (email, password) => {
     await authService.login(email, password)
@@ -182,7 +232,7 @@ export function AuthProvider({ children }) {
     return userData
   }
 
-  // Logout: limpia sesión de usuario Y de empresa
+  // Logout: limpia sesión de usuario, empresa y sucursal
   const logout = async () => {
     try { await authService.logout() } catch { /* ignorar error de red */ }
     setUser(null)
@@ -193,6 +243,11 @@ export function AuthProvider({ children }) {
     sessionStorage.removeItem(EMPRESA_NOTIF_KEY)
     setEmpresaPanelState(null)
     sessionStorage.removeItem(EMPRESA_PANEL_KEY)
+    setSucursalPanelState(null)
+    sessionStorage.removeItem(SUCURSAL_PANEL_KEY)
+    setSucursalNotifsState(null)
+    sucursalNotifsRef.current = null
+    sessionStorage.removeItem(SUCURSAL_NOTIF_KEY)
   }
 
   // Actualiza el usuario en estado y sessionStorage.
@@ -240,6 +295,13 @@ export function AuthProvider({ children }) {
   }
 
   // ── Funciones para el modo empresa ────────────────────────────────────────
+
+  // Guarda el panel de sucursal al entrar al home de sucursal (GERENTE_SUCURSAL/EMPLEADO).
+  const setSucursalPanel = (sucursalId, panelData) => {
+    const data = { sucursalId: String(sucursalId), panel: panelData }
+    setSucursalPanelState(data)
+    sessionStorage.setItem(SUCURSAL_PANEL_KEY, JSON.stringify(data))
+  }
 
   // Guarda el panel completo de la empresa al entrar al home (o al fetchear).
   // El panel incluye sucursales, rol propio, nombre, etc.
@@ -297,6 +359,39 @@ export function AuthProvider({ children }) {
     })
   }
 
+  // Guarda las notificaciones de sucursal al entrar al home de sucursal.
+  const setSucursalNotifs = (sucursalId, notificacionesOut) => {
+    const incoming = notificacionesOut?.notificaciones ?? []
+    const existing = sucursalNotifsRef.current?.sucursalId === String(sucursalId)
+      ? sucursalNotifsRef.current?.notificaciones ?? []
+      : []
+    const merged = mergeNotificaciones(existing, incoming)
+    const data = {
+      sucursalId: String(sucursalId),
+      notificaciones: merged,
+      ultimo_cursor_id: notificacionesOut?.ultimo_cursor_id ?? null,
+    }
+    setSucursalNotifsState(data)
+    sucursalNotifsRef.current = data
+    sessionStorage.setItem(SUCURSAL_NOTIF_KEY, JSON.stringify(data))
+  }
+
+  // Marca una notificación de sucursal como leída en estado y sessionStorage.
+  const markSucursalNotifLeida = (notifId) => {
+    setSucursalNotifsState((prev) => {
+      if (!prev) return prev
+      const lista = prev.notificaciones ?? []
+      if (!lista.find((n) => n.id === notifId && !n.leida)) return prev
+      const updated = {
+        ...prev,
+        notificaciones: lista.map((n) => (n.id === notifId ? { ...n, leida: true } : n)),
+      }
+      sucursalNotifsRef.current = updated
+      sessionStorage.setItem(SUCURSAL_NOTIF_KEY, JSON.stringify(updated))
+      return updated
+    })
+  }
+
   // Descarta la sesión de empresa completa (notificaciones + panel) al salir.
   const clearEmpresaNotifs = () => {
     setEmpresaNotifsState(null)
@@ -304,7 +399,21 @@ export function AuthProvider({ children }) {
     sessionStorage.removeItem(EMPRESA_NOTIF_KEY)
     setEmpresaPanelState(null)
     sessionStorage.removeItem(EMPRESA_PANEL_KEY)
+    setSucursalPanelState(null)
+    sessionStorage.removeItem(SUCURSAL_PANEL_KEY)
+    setSucursalNotifsState(null)
+    sucursalNotifsRef.current = null
+    sessionStorage.removeItem(SUCURSAL_NOTIF_KEY)
   }
+
+  // Cantidad de sucursales activas de la empresa actual.
+  // GERENTE_SUCURSAL/EMPLEADO: viene de sucursalPanel (SucursalHomeOut.cantidad_sucursales).
+  // PROPIETARIO/GERENTE_EMPRESA: se cuenta desde empresaPanel.sucursales filtrando las activas.
+  // null si no hay sesión de empresa activa.
+  const cantidadSucursales = sucursalPanel?.panel?.cantidad_sucursales
+    ?? (empresaPanel?.panel?.sucursales
+      ? empresaPanel.panel.sucursales.filter(s => s.activa !== false).length
+      : null)
 
   return (
     <AuthContext.Provider value={{
@@ -314,6 +423,10 @@ export function AuthProvider({ children }) {
       addEmpresaNuevasNotifs, clearEmpresaNotifs,
       empresaNotifsRef,
       empresaPanel, setEmpresaPanel,
+      sucursalPanel, setSucursalPanel,
+      sucursalNotifs, setSucursalNotifs, markSucursalNotifLeida,
+      sucursalNotifsRef,
+      cantidadSucursales,
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,9 +1,9 @@
 /* Reutiliza los estilos base de todos los modales de detalle */
 @import '../../styles/DetailModal.css';
 
-/* ── Ancho máximo del modal ── */
+/* ── Ancho máximo del modal — ensanchado para 4 botones en fila ── */
 .mmdetail {
-  max-width: 480px;
+  max-width: 600px;
 }
 
 /* ── Atenúa el modal de detalle cuando el formulario está abierto encima ── */
@@ -66,10 +66,18 @@
   background: var(--card-bg) !important;
 }
 
-/* ── Acciones con wrapping ── */
+/* ── Acciones: flex: 1 para que los botones se distribuyan solos (3 o 4) ── */
 .mmdetail__actions {
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* 600px modal - 40px padding = 560px. 4 botones con 3 gaps de 8px: (560-24)/4 = 134px = calc(25% - 6px) */
+.mmdetail__actions .btn {
+  flex: 0 0 calc(25% - 6px);
+  min-width: 0;
+  font-size: 13px;
+  padding: 0 8px;
 }
 
 /* ── Botones en vista de formulario: igual que InvitarMiembroModal ── */
@@ -101,8 +109,32 @@
 [data-theme="dark"] .mmdetail__badge--gerente-sucursal { background: rgba(99,102,241,.18); color: #a5b4fc; }
 [data-theme="dark"] .mmdetail__badge--empleado         { background: rgba(234,179,8,.18);  color: #facc15; }
 
+/* ── Sucursales label + select en la misma fila ── */
+.mmdetail__suc-select-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.mmdetail__suc-select-row .tdmodal__row-label {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* ── Rol dentro de cada sucursal (texto secundario) ── */
 .mmdetail__suc-rol {
   color: var(--text-muted);
   font-size: 12px;
+}
+
+/* ── Vista de sucursal específica ── */
+.tdmodal.mmdetail.mmdetail--sucursal-view {
+  max-width: 520px;
+}
+
+/* Badge en vista de sucursal: no se encoge aunque el nombre sea largo */
+.mmdetail__badge--sucursal-view {
+  flex-shrink: 0;
+  margin-top: -4px;
 }

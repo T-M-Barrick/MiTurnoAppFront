@@ -201,5 +201,5 @@
 }
 
 .vm-footer__btn--confirm:hover {
-  opacity: .88;
+  background: var(--brand-dark);
 }

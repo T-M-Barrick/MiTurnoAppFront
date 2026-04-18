@@ -156,7 +156,7 @@ const ERROR_MAP = {
   EMPRESA_ALREADY_EXISTS:
     'Ya existe una empresa registrada con ese email.',
   EMPRESA_HAS_NO_SUCURSAL:
-    'La empresa no tiene sucursal asociada.',
+    'La sucursal no tiene domicilio asociado.',
   EMPRESA_MIEMBRO_NOT_FOUND:
     'El usuario no pertenece a esta empresa.',
   EMPRESA_MIEMBRO_ALREADY_EXISTS:
@@ -364,6 +364,31 @@ const ERROR_MAP = {
   // ── Invitaciones ──────────────────────────────────────────────────────────────
   INVITATION_TOKEN_INVALID_EXPIRED:
     'El enlace de invitación no es válido o ha expirado.',
+}
+
+/**
+ * Códigos cuyos mensajes contienen la palabra "sucursal" y deben mostrarse
+ * como "empresa" cuando la empresa tiene una única sucursal activa.
+ */
+const CODIGOS_REEMPLAZAR_SUCURSAL = new Set([
+  'EMPRESA_HAS_NO_SUCURSAL',
+  'SUCURSAL_PROFESIONAL_WITH_TURNOS_CONFIRMADOS_OUT',
+  'SUCURSAL_MIEMBRO_DELETE_WITH_TURNOS_CONFIRMADOS',
+  'SUCURSAL_INVALID_SELF_REMOVAL',
+  'SUCURSAL_ACCESS_RESOURCES_FORBIDDEN',
+  'CLIENTE_ALREADY_EXISTS',
+])
+
+/**
+ * Si el código está en CODIGOS_REEMPLAZAR_SUCURSAL y la empresa tiene una sola
+ * sucursal activa, reemplaza "sucursal" → "empresa" en el mensaje preservando mayúsculas.
+ */
+export function aplicarReemplazoSucursalEmpresa(mensaje, codigo, cantidadSucursales) {
+  if (!mensaje || cantidadSucursales !== 1) return mensaje
+  if (!CODIGOS_REEMPLAZAR_SUCURSAL.has(codigo)) return mensaje
+  return mensaje.replace(/sucursal/gi, (match) =>
+    match[0] === match[0].toUpperCase() ? 'Empresa' : 'empresa'
+  )
 }
 
 /**

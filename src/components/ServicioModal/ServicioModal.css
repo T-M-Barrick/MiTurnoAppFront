@@ -666,7 +666,7 @@ input[type="number"] {
 }
 
 .sm-footer__btn--confirm:hover {
-  opacity: .88;
+  background: var(--brand-dark);
 }
 
 /* Botón "Bloqueos" — indigo, solo en modo edición */
@@ -677,8 +677,10 @@ input[type="number"] {
 }
 
 .sm-footer__btn--bloqueos:hover {
-  opacity: .88;
+  background: #4338ca;
 }
+[data-theme="dark"] .sm-footer__btn--bloqueos { background: #818cf8; }
+[data-theme="dark"] .sm-footer__btn--bloqueos:hover { background: #6d6af0; }
 
 /* Badge de cantidad de bloqueos sobre el botón */
 .sm-footer__badge {

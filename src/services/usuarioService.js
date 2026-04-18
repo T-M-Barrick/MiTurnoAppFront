@@ -50,9 +50,6 @@ export const usuarioService = {
   // PATCH /usuarios/me → actualiza datos del usuario
   update: (data) => api.patch('/usuarios/me', data),
 
-  // GET /usuarios/sucursales/{id}/servicios → servicios con turnos actuales para reservar
-  getServiciosDeSucursal: (sucursalId) =>
-    api.get(`/usuarios/sucursales/${sucursalId}/servicios`),
 
   // POST /usuarios/turnos → reserva un turno (ReservaTurnoOpcionesUserIn)
   reservarTurno: (opciones) =>

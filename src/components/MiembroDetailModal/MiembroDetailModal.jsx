@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { empresaService } from '../../services/empresaService'
 import { sucursalService } from '../../services/sucursalService'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
+import ErrorModal from '../ErrorModal/ErrorModal'
 import CustomSelect from '../CustomSelect/CustomSelect'
+import SucursalMiembroDetailModal from '../SucursalMiembroDetailModal/SucursalMiembroDetailModal'
 import { getRolLabel as getRolLabelCtx } from '../../utils/rolUtils'
 import './MiembroDetailModal.css'
 
@@ -36,6 +38,9 @@ const ROLES_PROPIETARIO_SINGLE = ['PROPIETARIO', 'GERENTE_EMPRESA', 'EMPLEADO']
 const ROLES_GERENTE_EMPRESA_MULTI  = ['GERENTE_SUCURSAL', 'EMPLEADO']
 const ROLES_GERENTE_EMPRESA_SINGLE = ['EMPLEADO']
 const ROLES_SUCURSAL = ['GERENTE_SUCURSAL', 'EMPLEADO']
+// Cuando el miembro es de sucursal y la empresa tiene 2+ sucursales, solo el propietario
+// puede subirlo a un rol de empresa (PROPIETARIO o GERENTE_EMPRESA).
+const ROLES_PROPIETARIO_DESDE_MULTI_SUC = ['PROPIETARIO', 'GERENTE_EMPRESA']
 
 // Etiqueta para el selector de "modificar rol" (override simple por sucursal única)
 function getRolLabel(rol, esSucursalUnica) {
@@ -55,7 +60,7 @@ const formatDni = (dni) => dni?.replace(/\B(?=(\d{3})+(?!\d))/g, '.') ?? '—'
  *   sucursales     — lista de todas las sucursales de la empresa
  *   miRol          — rol del usuario logueado ('PROPIETARIO' | 'GERENTE_EMPRESA')
  *   onClose        — cierra el modal
- *   onUpdated      — callback() tras modificar (refetch en la página)
+ *   onUpdated      — callback(data) tras modificar
  *   onDeleted      — callback() tras eliminar
  *   onError        — callback(errorObj)
  */
@@ -63,9 +68,12 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
   const { miembro, tipo, rolEmpresa, sucursales: miSucursales } = miembroNorm
 
   // formView: null | 'modificar-rol' | 'agregar-sucursal'
-  const [formView,       setFormView]       = useState(null)
-  const [confirmDelete,  setConfirmDelete]  = useState(false)
-  const [loading,        setLoading]        = useState(false)
+  const [formView,             setFormView]             = useState(null)
+  const [confirmDelete,        setConfirmDelete]        = useState(false)
+  const [loading,              setLoading]              = useState(false)
+  const [successMsg,           setSuccessMsg]           = useState(null)
+  const [selectedSucursalModal, setSelectedSucursalModal] = useState(null) // sucursal elegida del dropdown multi-sucursal
+  const pendingUpdateRef = useRef(null) // guarda data del back hasta que el usuario acepta el success
 
   // Estado para "Modificar rol"
   const [nuevoRol,            setNuevoRol]            = useState('')
@@ -79,23 +87,49 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
   const [errSucursalParaAdd, setErrSucursalParaAdd] = useState(null)
   const [errRolParaAdd,      setErrRolParaAdd]      = useState(null)
 
-  // Roles disponibles según rol del solicitante y cantidad de sucursales
   const esSucursalUnica  = sucursales.length === 1
-  const rolesDisponibles = miRol === 'PROPIETARIO'
-    ? (esSucursalUnica ? ROLES_PROPIETARIO_SINGLE  : ROLES_PROPIETARIO_MULTI)
-    : (esSucursalUnica ? ROLES_GERENTE_EMPRESA_SINGLE : ROLES_GERENTE_EMPRESA_MULTI)
-  const esBranchRolNuevo = ROLES_SUCURSAL.includes(nuevoRol)
 
-  // Sucursales donde el miembro AÚN no está (para "Agregar a sucursal")
-  const sucursalesDisponiblesAdd = sucursales.filter(s =>
+  // Sucursales activas donde el miembro AÚN no está (para "Agregar a sucursal")
+  const sucursalesActivas        = sucursales.filter(s => s.activa !== false)
+  const sucursalesDisponiblesAdd = sucursalesActivas.filter(s =>
     !miSucursales.some(ms => ms.id === s.id)
   )
 
-  const rolActual = rolEmpresa ?? miSucursales?.[0]?.rol
+  // Multi-sucursal: miembro de sucursal en empresa con 2+ sucursales activas
+  const esMultiSucursal = tipo === 'sucursal' && sucursalesActivas.length > 1
+
+  // Roles candidatos según rango del solicitante y cantidad de sucursales
+  const rolesCandidatos = esMultiSucursal
+    ? ROLES_PROPIETARIO_DESDE_MULTI_SUC
+    : (miRol === 'PROPIETARIO'
+      ? (esSucursalUnica ? ROLES_PROPIETARIO_SINGLE  : ROLES_PROPIETARIO_MULTI)
+      : (esSucursalUnica ? ROLES_GERENTE_EMPRESA_SINGLE : ROLES_GERENTE_EMPRESA_MULTI))
+
+  // Rol actual del miembro a excluir del selector (no tiene sentido asignar el mismo que ya tiene)
+  const rolAExcluir = tipo === 'empresa' ? rolEmpresa : (esMultiSucursal ? null : miSucursales[0]?.rol)
+  const rolesDisponibles = rolesCandidatos.filter(r => r !== rolAExcluir)
+
+  const esBranchRolNuevo         = ROLES_SUCURSAL.includes(nuevoRol)
+  // Selector de sucursal solo cuando el nuevo rol es de sucursal y el miembro es de empresa
+  const necesitaSucursalSelector = esBranchRolNuevo && tipo === 'empresa'
+
+  // Rol para badge: null si el miembro tiene distintos roles en sus sucursales
+  const rolUnicoSucursal = miSucursales.length > 1
+    ? (miSucursales.every(s => s.rol === miSucursales[0]?.rol) ? miSucursales[0]?.rol : null)
+    : miSucursales[0]?.rol
+  const rolActual = rolEmpresa ?? rolUnicoSucursal
+
+  // Rol para permisos: el más alto entre todas sus sucursales (para no subestimar el rango)
+  const rolPermisos = rolEmpresa ?? (miSucursales.length > 0
+    ? miSucursales.reduce((max, s) => (ROL_RANK[s.rol] ?? 0) > (ROL_RANK[max] ?? 0) ? s.rol : max, miSucursales[0]?.rol)
+    : null)
 
   // Puede actuar sobre este miembro solo si no es uno mismo y tiene mayor rango
   const esSelf      = miembro.id === userId
-  const puedeActuar = !esSelf && (ROL_RANK[miRol] ?? 0) > (ROL_RANK[rolActual] ?? 0)
+  const puedeActuar = !esSelf && (ROL_RANK[miRol] ?? 0) > (ROL_RANK[rolPermisos] ?? 0)
+
+  // En modo multi-sucursal, solo el propietario puede modificar rol (para subir a empresa)
+  const puedeModificarRol = puedeActuar && (!esMultiSucursal || miRol === 'PROPIETARIO')
 
   /** Limpia el formulario y cierra el modal de form. */
   const resetForm = () => {
@@ -110,16 +144,24 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
   const handleModificarRol = async () => {
     let hasErr = false
     if (!nuevoRol) { setErrNuevoRol('Seleccioná un rol'); hasErr = true }
-    if (esBranchRolNuevo && !sucursalParaRol) { setErrSucursalParaRol('Seleccioná una sucursal'); hasErr = true }
+    if (necesitaSucursalSelector && !sucursalParaRol) { setErrSucursalParaRol('Seleccioná una sucursal'); hasErr = true }
     if (hasErr) return
 
     setLoading(true)
     try {
-      const payload = { nuevo_rol: nuevoRol }
-      if (esBranchRolNuevo) payload.sucursal_id = Number(sucursalParaRol)
-      await empresaService.updateMiembroRol(empresaId, miembro.id, payload)
-      resetForm()
-      onUpdated?.()
+      let data
+      if (tipo === 'sucursal') {
+        // El miembro es Miembro_Sucursal: endpoint de sucursal
+        const sucId = miSucursales[0].id
+        const payload = { nuevo_rol: nuevoRol, sucursal_id: esBranchRolNuevo ? sucId : null }
+        data = await sucursalService.updateMiembroRolSucursal(sucId, miembro.id, payload)
+      } else {
+        // El miembro es Miembro_Empresa: endpoint de empresa
+        const payload = { nuevo_rol: nuevoRol, sucursal_id: necesitaSucursalSelector ? Number(sucursalParaRol) : null }
+        data = await empresaService.updateMiembroRol(empresaId, miembro.id, payload)
+      }
+      pendingUpdateRef.current = data
+      setSuccessMsg('El rol fue modificado con éxito.')
     } catch (err) {
       onError?.(err)
     } finally {
@@ -127,7 +169,7 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
     }
   }
 
-  /* ── Eliminar de empresa ── */
+  /* ── Eliminar de empresa (solo modo non-multi) ── */
   const handleDelete = async () => {
     setLoading(true)
     try {
@@ -151,8 +193,8 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
     setLoading(true)
     try {
       const data = await sucursalService.addMiembroSucursal(Number(sucursalParaAdd), miembro.id, { rol: rolParaAdd })
-      resetForm()
-      onUpdated?.(data)
+      pendingUpdateRef.current = data
+      setSuccessMsg('El miembro fue agregado a la sucursal con éxito.')
     } catch (err) {
       onError?.(err)
     } finally {
@@ -164,7 +206,7 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
     <>
       {/* ── Modal de detalle — siempre visible ── */}
       <div className="tdmodal-overlay">
-        <div className={`tdmodal mmdetail${formView ? ' mmdetail--dimmed' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className={`tdmodal mmdetail${formView || selectedSucursalModal ? ' mmdetail--dimmed' : ''}`} onClick={e => e.stopPropagation()}>
           <div className="tdmodal__handle" />
 
           {/* ═══ CABECERA ═══ */}
@@ -213,21 +255,48 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
                 </div>
               </div>
 
-              {/* Sucursales (solo miembros de sucursal) */}
+              {/* Sucursales */}
               {tipo === 'sucursal' && miSucursales.length > 0 && (
                 <div className="tdmodal__row">
                   <span className="tdmodal__row-icon">🏪</span>
-                  <div className="tdmodal__row-body">
-                    <span className="tdmodal__row-label">Sucursal{miSucursales.length > 1 ? 'es' : ''}:</span>
-                    <span className="tdmodal__row-val">
-                      {miSucursales.map((s, i) => (
-                        <span key={s.id}>
-                          {s.nombre ?? `Sucursal ${s.id}`}
-                          <span className="mmdetail__suc-rol"> ({ROL_LABEL[s.rol] ?? s.rol})</span>
-                          {i < miSucursales.length - 1 && ' · '}
+                  <div className="tdmodal__row-body" style={{ flex: 1 }}>
+                    {esMultiSucursal ? (
+                      /* Label + dropdown inline para seleccionar qué sucursal gestionar */
+                      <div className="mmdetail__suc-select-row">
+                        <span className="tdmodal__row-label">Sucursales:</span>
+                        <CustomSelect
+                          options={[
+                            { value: '', label: '— Ver sucursal —' },
+                            ...miSucursales.map(s => ({
+                              value: String(s.id),
+                              label: `${s.nombre ?? `Sucursal ${s.id}`} — ${ROL_LABEL[s.rol] ?? s.rol}`,
+                            })),
+                          ]}
+                          value=""
+                          onChange={val => {
+                            if (!val) return
+                            const suc = miSucursales.find(s => String(s.id) === val)
+                            if (suc) setSelectedSucursalModal(suc)
+                          }}
+                          width="100%"
+                          height={40}
+                        />
+                      </div>
+                    ) : (
+                      /* Lista estática cuando solo hay 1 sucursal activa en la empresa */
+                      <>
+                        <span className="tdmodal__row-label">Sucursal{miSucursales.length > 1 ? 'es' : ''}:</span>
+                        <span className="tdmodal__row-val">
+                          {miSucursales.map((s, i) => (
+                            <span key={s.id}>
+                              {s.nombre ?? `Sucursal ${s.id}`}
+                              <span className="mmdetail__suc-rol"> ({ROL_LABEL[s.rol] ?? s.rol})</span>
+                              {i < miSucursales.length - 1 && ' · '}
+                            </span>
+                          ))}
                         </span>
-                      ))}
-                    </span>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -240,20 +309,26 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
 
             {puedeActuar && (
               <>
-                {/* Agregar a sucursal — solo para miembros de sucursal, si hay más de una y el miembro no está en todas */}
-                {tipo === 'sucursal' && sucursales.length > 1 && sucursalesDisponiblesAdd.length > 0 && (
-                  <button className="btn btn-secondary" onClick={() => setFormView('agregar-sucursal')} disabled={loading}>
-                    + Sucursal
+                {/* Eliminar — oculto en multi-sucursal (se gestiona desde SucursalMiembroDetailModal) */}
+                {!esMultiSucursal && (
+                  <button className="btn btn-orange" onClick={() => setConfirmDelete(true)} disabled={loading}>
+                    Eliminar
                   </button>
                 )}
 
-                <button className="btn btn-orange" onClick={() => setConfirmDelete(true)} disabled={loading}>
-                  Eliminar
-                </button>
+                {/* Modificar rol — en multi-sucursal solo el propietario puede subir a empresa */}
+                {puedeModificarRol && (
+                  <button className="btn btn-indigo" onClick={() => setFormView('modificar-rol')} disabled={loading}>
+                    Modificar rol
+                  </button>
+                )}
 
-                <button className="btn btn-indigo" onClick={() => setFormView('modificar-rol')} disabled={loading}>
-                  Modificar rol
-                </button>
+                {/* + Sucursal — siempre el último (más a la derecha) */}
+                {tipo === 'sucursal' && sucursalesActivas.length > 1 && sucursalesDisponiblesAdd.length > 0 && (
+                  <button className="btn btn-green" onClick={() => setFormView('agregar-sucursal')} disabled={loading}>
+                    + Sucursal
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -295,13 +370,13 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
                     {errNuevoRol && <p className="form-error">{errNuevoRol}</p>}
                   </div>
 
-                  {esBranchRolNuevo && (
+                  {necesitaSucursalSelector && (
                     <div className="form-group">
                       <label>Sucursal <span className="mmdetail__req">*</span></label>
                       <CustomSelect
                         options={[
                           { value: '', label: '— Seleccioná una sucursal —' },
-                          ...sucursales.map(s => ({ value: String(s.id), label: s.nombre ?? `Sucursal ${s.id}` })),
+                          ...(tipo === 'sucursal' ? miSucursales : sucursales).map(s => ({ value: String(s.id), label: s.nombre ?? `Sucursal ${s.id}` })),
                         ]}
                         value={sucursalParaRol}
                         onChange={val => { setSucursalParaRol(val); setErrSucursalParaRol(null) }}
@@ -320,22 +395,6 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
               {formView === 'agregar-sucursal' && (
                 <div className="mmdetail__form">
                   <div className="form-group">
-                    <label>Sucursal <span className="mmdetail__req">*</span></label>
-                    <CustomSelect
-                      options={[
-                        { value: '', label: '— Seleccioná una sucursal —' },
-                        ...sucursalesDisponiblesAdd.map(s => ({ value: String(s.id), label: s.nombre ?? `Sucursal ${s.id}` })),
-                      ]}
-                      value={sucursalParaAdd}
-                      onChange={val => { setSucursalParaAdd(val); setErrSucursalParaAdd(null) }}
-                      width="100%"
-                      height={44}
-                      disabled={loading}
-                      className={errSucursalParaAdd ? 'error' : ''}
-                    />
-                    {errSucursalParaAdd && <p className="form-error">{errSucursalParaAdd}</p>}
-                  </div>
-                  <div className="form-group">
                     <label>Rol <span className="mmdetail__req">*</span></label>
                     <CustomSelect
                       options={[
@@ -351,6 +410,22 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
                       className={errRolParaAdd ? 'error' : ''}
                     />
                     {errRolParaAdd && <p className="form-error">{errRolParaAdd}</p>}
+                  </div>
+                  <div className="form-group">
+                    <label>Sucursal <span className="mmdetail__req">*</span></label>
+                    <CustomSelect
+                      options={[
+                        { value: '', label: '— Seleccioná una sucursal —' },
+                        ...sucursalesDisponiblesAdd.map(s => ({ value: String(s.id), label: s.nombre ?? `Sucursal ${s.id}` })),
+                      ]}
+                      value={sucursalParaAdd}
+                      onChange={val => { setSucursalParaAdd(val); setErrSucursalParaAdd(null) }}
+                      width="100%"
+                      height={44}
+                      disabled={loading}
+                      className={errSucursalParaAdd ? 'error' : ''}
+                    />
+                    {errSucursalParaAdd && <p className="form-error">{errSucursalParaAdd}</p>}
                   </div>
                 </div>
               )}
@@ -372,7 +447,26 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
         </div>
       )}
 
-      {/* ConfirmModal eliminar */}
+      {/* ── Modal de sucursal específica (multi-sucursal) ── */}
+      {selectedSucursalModal && (
+        <SucursalMiembroDetailModal
+          miembro={miembro}
+          sucursal={selectedSucursalModal}
+          miRol={miRol}
+          onClose={() => setSelectedSucursalModal(null)}
+          onUpdated={data => {
+            setSelectedSucursalModal(null)
+            onUpdated?.(data)
+          }}
+          onDeleted={() => {
+            setSelectedSucursalModal(null)
+            onDeleted?.()
+          }}
+          onError={onError}
+        />
+      )}
+
+      {/* ConfirmModal eliminar (non-multi) */}
       {confirmDelete && (
         <ConfirmModal
           icon="⚠️"
@@ -384,6 +478,16 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
           onCancel={() => setConfirmDelete(false)}
         />
       )}
+
+      <ErrorModal
+        success={successMsg}
+        onClose={() => {
+          setSuccessMsg(null)
+          resetForm()                           // cierra el form modal
+          onUpdated?.(pendingUpdateRef.current)  // actualiza lista; detail modal queda abierto
+          pendingUpdateRef.current = null
+        }}
+      />
     </>
   )
 }

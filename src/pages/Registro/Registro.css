@@ -150,20 +150,6 @@
 }
 .btn-remove-phone:hover { background: var(--danger-bg); }
 
-.btn-agregar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--brand-light);
-  color: var(--brand);
-  height: 40px;
-  padding: 0 20px;
-  width: fit-content;
-  margin: 8px auto 0;
-  transition: filter .15s;
-}
-.btn-agregar:hover { filter: brightness(.93); }
-.btn-agregar:disabled { opacity: .5; cursor: not-allowed; }
 
 /* Estado de geocodificación */
 .reg-geo-status {

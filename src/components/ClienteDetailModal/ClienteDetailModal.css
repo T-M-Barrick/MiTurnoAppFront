@@ -49,11 +49,9 @@
   word-break: break-word;
 }
 
-/* ── Fila de 4 botones: tamaño reducido para que entren en hilera ── */
-/* Los botones heredan todo el formato de .btn global (igual que detalle turno),
-   solo se fuerza flex para que los 4 entren en fila */
+/* ── Fila de 4 botones: ancho fijo para que al ocultar "Reservar turno" los 3 restantes queden centrados con el mismo tamaño ── */
 .cdmodal__actions.tdmodal__actions .btn {
-  flex: 1;
+  flex: 0 0 calc(25% - 6px);
   min-width: 0;
 }
 

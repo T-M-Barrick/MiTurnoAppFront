@@ -178,9 +178,9 @@
 
 /* Botón agregar teléfono */
 .cfmodal__phone-add {
-  background: var(--brand-light);
+  background: #fff0f0;
   color: var(--brand);
-  border: none;
+  border: 1px solid var(--brand);
   border-radius: 8px;
   padding: 10px 20px;
   font-size: 14px;
@@ -190,7 +190,8 @@
   width: auto;
   display: block;
   margin: 6px auto 0;
-  transition: filter .15s;
+  transition: background .15s;
 }
-.cfmodal__phone-add:hover { filter: brightness(.93); }
+.cfmodal__phone-add:hover { background: var(--brand); color: #fff; }
 .cfmodal__phone-add:disabled { opacity: .5; cursor: not-allowed; }
+[data-theme="dark"] .cfmodal__phone-add { background: rgba(229, 57, 53, .12); }

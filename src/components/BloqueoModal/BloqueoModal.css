@@ -308,8 +308,10 @@
 }
 
 .blq-footer__btn--create:hover {
-  opacity: .88;
+  background: #4338ca;
 }
+[data-theme="dark"] .blq-footer__btn--create { background: #818cf8; }
+[data-theme="dark"] .blq-footer__btn--create:hover { background: #6d6af0; }
 
 .blq-footer__btn:disabled {
   opacity: .5;

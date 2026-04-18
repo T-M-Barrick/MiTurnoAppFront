@@ -194,14 +194,16 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
             Modificar
           </button>
 
-          {/* Reservar turno */}
-          <button
-            className="btn btn-green"
-            onClick={() => setReservarOpen(true)}
-            disabled={loading}
-          >
-            Reservar turno
-          </button>
+          {/* Reservar turno — oculto si el cliente está bloqueado */}
+          {!cliente.bloqueado && (
+            <button
+              className="btn btn-green"
+              onClick={() => setReservarOpen(true)}
+              disabled={loading}
+            >
+              Reservar turno
+            </button>
+          )}
 
         </div>
       </div>

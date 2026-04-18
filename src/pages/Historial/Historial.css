@@ -54,11 +54,11 @@
   padding: 0 28px;
   background: var(--brand);
   color: #fff;
-  transition: opacity .2s;
+  transition: background .2s;
 }
 
 .hist-btn-mas:hover:not(:disabled) {
-  opacity: .88;
+  background: var(--brand-dark);
 }
 
 .hist-btn-mas:disabled {

@@ -1,11 +1,22 @@
 import { api } from './api'
 
 export const sucursalService = {
+  // GET /sucursales/{id}/panel — datos del home de sucursal (para GERENTE_SUCURSAL/EMPLEADO)
+  getSucursalPanel: (sucursalId) => api.get(`/sucursales/${sucursalId}/panel`),
+
   // POST /sucursales/ — crea una nueva sucursal para la empresa del usuario
   createSucursal: (data) => api.post('/sucursales/', data),
 
-  // GET /sucursales/{id}/servicios — lista de servicios de una sucursal
+  // GET /sucursales/{id}/servicios — lista de servicios de una sucursal (panel admin)
   getServicios: (sucursalId) => api.get(`/sucursales/${sucursalId}/servicios`),
+
+  // GET /sucursales/{id}/servicios/reserva?usuario=bool — servicios para reserva
+  // usuario=true: modo usuario público | usuario=false: modo empresa (cliente_email opcional para verificar bloqueo)
+  getServiciosParaReserva: (sucursalId, usuario, clienteEmail = null) => {
+    const params = new URLSearchParams({ usuario: String(usuario) })
+    if (clienteEmail) params.set('cliente_email', clienteEmail)
+    return api.get(`/sucursales/${sucursalId}/servicios/reserva?${params}`)
+  },
 
   // POST /sucursales/{id}/servicios — crea un nuevo servicio base con su primera versión
   createServicio: (sucursalId, data) => api.post(`/sucursales/${sucursalId}/servicios`, data),

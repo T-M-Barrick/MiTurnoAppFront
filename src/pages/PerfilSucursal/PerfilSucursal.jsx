@@ -2,6 +2,7 @@ import { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } fr
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { usuarioService } from '../../services/usuarioService'
+import { sucursalService } from '../../services/sucursalService'
 import { formatDireccionCascade, formatDuracion, getVersionActiva } from '../../utils/dateUtils'
 import AppTopBar from '../../components/AppTopBar/AppTopBar'
 import UserTopBarRight from '../../components/UserTopBarRight/UserTopBarRight'
@@ -709,7 +710,7 @@ export default function PerfilSucursal() {
   useEffect(() => {
     if (!sucursalId) return
     setLoading(true)
-    usuarioService.getServiciosDeSucursal(sucursalId)
+    sucursalService.getServiciosParaReserva(sucursalId, true)
       .then(data => setServicios(data))
       .catch(err  => setBackError(err))
       .finally(()  => setLoading(false))

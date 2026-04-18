@@ -42,16 +42,19 @@
   color: #fff;
   font-size: 13px;
   font-family: inherit;
-  transition: opacity .15s;
+  transition: background .15s;
 }
 
-.miem-action-btn:hover:not(:disabled) { opacity: .88; }
-.miem-action-btn:disabled             { opacity: .5; cursor: not-allowed; }
+.miem-action-btn:hover:not(:disabled)        { background: var(--brand-dark); }
+.miem-action-btn:disabled                     { opacity: .5; cursor: not-allowed; }
 
 .miem-action-btn--indigo { background: #4f46e5; }
-[data-theme="dark"] .miem-action-btn--indigo { background: #818cf8; }
+.miem-action-btn--indigo:hover:not(:disabled) { background: #4338ca; }
+[data-theme="dark"] .miem-action-btn--indigo  { background: #818cf8; }
+[data-theme="dark"] .miem-action-btn--indigo:hover:not(:disabled) { background: #6d6af0; }
 
 .miem-action-btn--orange { background: #ea580c; }
+.miem-action-btn--orange:hover:not(:disabled) { background: #c2410c; }
 
 /* Selector de sucursal: ocupa todo el espacio restante a la derecha */
 .miem-actions-row__sucursal {

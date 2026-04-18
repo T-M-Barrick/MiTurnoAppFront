@@ -73,9 +73,10 @@
   padding: 0;
   background: #16a34a;
   color: #fff;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 
-.dir-item__btn-buscar:hover:not(:disabled) { opacity: 0.88; }
+.dir-item__btn-buscar:hover:not(:disabled) { background: #15803d; }
 .dir-item__btn-buscar:disabled { opacity: 0.5; cursor: not-allowed; }
 [data-theme="dark"] .dir-item__btn-buscar { background: #15803d; }
+[data-theme="dark"] .dir-item__btn-buscar:hover:not(:disabled) { background: #14532d; }

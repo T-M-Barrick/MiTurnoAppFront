@@ -219,20 +219,28 @@ export default function Miembros() {
       const match = norm.sucursales.find(s => String(s.id) === String(selectedSucursal.id))
       return match?.rol ?? norm.sucursales[0]?.rol
     }
+    // Si el miembro está en múltiples sucursales, mostrar badge solo si tiene el mismo rol en todas
+    if (norm.sucursales.length > 1) {
+      const primer = norm.sucursales[0]?.rol
+      return norm.sucursales.every(s => s.rol === primer) ? primer : null
+    }
     return norm.sucursales[0]?.rol
   }
 
   // Callbacks post-acción
   const handleUpdated = (updatedData) => {
     if (updatedData?.miembro) {
-      // MiembroSucursalOut devuelto por add_miembro — actualiza en-place sin refetch
-      const normed = {
-        miembro:    updatedData.miembro,
-        tipo:       'sucursal',
-        rolEmpresa: null,
-        sucursales: updatedData.sucursales,
-      }
-      setMiembros(prev => prev.map(m => m.miembro.id === normed.miembro.id ? normed : m))
+      const esSucursal = updatedData.sucursales != null
+      const normed = esSucursal
+        ? { miembro: updatedData.miembro, tipo: 'sucursal', rolEmpresa: null,            sucursales: updatedData.sucursales }
+        : { miembro: updatedData.miembro, tipo: 'empresa',  rolEmpresa: updatedData.rol, sucursales: [] }
+
+      setMiembros(prev => {
+        // Elimina TODAS las entradas del usuario (puede haber varias si era sucursal-multi)
+        // y agrega la nueva al final
+        const sinUsuario = prev.filter(m => m.miembro.id !== normed.miembro.id)
+        return [...sinUsuario, normed]
+      })
       setMiembroSeleccionado(normed)
     } else {
       fetchData()

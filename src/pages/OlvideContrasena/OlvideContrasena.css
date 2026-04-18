@@ -32,11 +32,11 @@
   background: var(--brand);
   color: #fff;
   border: none;
-  transition: opacity .15s;
+  transition: background .15s;
 }
 
 .olvide-actions__btn--confirm:hover:not(:disabled) {
-  opacity: .88;
+  background: var(--brand-dark);
 }
 
 .olvide-actions__btn--confirm:disabled {
@@ -73,9 +73,9 @@
   background: var(--brand);
   color: #fff;
   margin-top: 8px;
-  transition: opacity .15s;
+  transition: background .15s;
 }
 
 .olvide-sent__btn:hover {
-  opacity: .88;
+  background: var(--brand-dark);
 }
