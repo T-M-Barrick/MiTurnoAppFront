@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { useParams, useLocation, useNavigate } from 'react-router-dom'
+import { useParams, useLocation, useNavigate, useMatch } from 'react-router-dom'
 import { sucursalService } from '../../services/sucursalService'
 import { empresaService } from '../../services/empresaService'
 import { useAuth } from '../../context/AuthContext'
 import { formatDiaSemana, formatFechaTurno, formatHoraTurno, labelEstado } from '../../utils/dateUtils'
 import AppTopBar from '../../components/AppTopBar/AppTopBar'
 import UserTopBarRight from '../../components/UserTopBarRight/UserTopBarRight'
+import SucursalTopBarRight from '../../components/SucursalTopBarRight/SucursalTopBarRight'
 import EmpresaSidebar from '../../components/EmpresaSidebar/EmpresaSidebar'
+import SucursalSidebar from '../../components/SucursalSidebar/SucursalSidebar'
 import TurnoDetalleSucursalModal from '../../components/TurnoDetalleSucursalModal/TurnoDetalleSucursalModal'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ErrorModal from '../../components/ErrorModal/ErrorModal'
@@ -129,10 +131,14 @@ export function TurnoCardSucursal({ turno, onSelect }) {
  * Sin barra de búsqueda.
  */
 export default function TurnosSucursal() {
-  const { id: empresaId } = useParams()
-  const { empresaPanel, setEmpresaPanel } = useAuth()
-  const location          = useLocation()
-  const navigate          = useNavigate()
+  const { id }             = useParams()
+  const matchSucursal      = useMatch('/sucursal/:id/*')
+  const isSucursalMode     = !!matchSucursal
+  const empresaId          = isSucursalMode ? null : id
+  const { empresaPanel, setEmpresaPanel, sucursalPanel } = useAuth()
+  const location           = useLocation()
+  const navigate           = useNavigate()
+  const miRol              = isSucursalMode ? (sucursalPanel?.panel?.rol ?? null) : null
 
   // Sucursales disponibles (cargadas del panel)
   const [sucursales,        setSucursales]        = useState([])
@@ -159,9 +165,22 @@ export default function TurnosSucursal() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Carga sucursales al montar: usa el panel en caché del contexto si ya fue fetched
-  // en HomeEmpresa; de lo contrario hace el GET (acceso directo por URL).
+  // Carga sucursales al montar.
+  // En modo sucursal (GERENTE_SUCURSAL/EMPLEADO): la sucursal está fijada por la URL.
+  // En modo empresa: usa el panel en caché o lo fetchea.
   useEffect(() => {
+    if (isSucursalMode) {
+      // La sucursal ya está determinada por la URL — no hay selector
+      const nombre = sucursalPanel?.sucursalId === String(id)
+        ? sucursalPanel.panel.nombre_sucursal ?? ''
+        : ''
+      const suc = { id: Number(id), nombre }
+      setSucursales([suc])
+      setSelectedSucursal(suc)
+      setLoadingInit(false)
+      return
+    }
+
     const cached = empresaPanel?.empresaId === String(empresaId)
       ? empresaPanel.panel.sucursales ?? []
       : null
@@ -191,7 +210,7 @@ export default function TurnosSucursal() {
     }
     fetchInit()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [empresaId])
+  }, [id, isSucursalMode])
 
   // Carga turnos cuando cambia la sucursal seleccionada
   useEffect(() => {
@@ -324,18 +343,30 @@ export default function TurnosSucursal() {
             </svg>
           </button>
         }
-        right={<UserTopBarRight empresaId={empresaId} />}
+        right={isSucursalMode
+          ? <SucursalTopBarRight sucursalId={id} />
+          : <UserTopBarRight empresaId={empresaId} />
+        }
       />
 
       {/* ═══ CUERPO ═══ */}
       <div className="hp-body">
 
-        <EmpresaSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          empresaId={empresaId}
-          activeKey="turnos"
-        />
+        {isSucursalMode
+          ? <SucursalSidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              sucursalId={id}
+              miRol={miRol}
+              activeKey="turnos"
+            />
+          : <EmpresaSidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              empresaId={empresaId}
+              activeKey="turnos"
+            />
+        }
 
         {/* ─── CONTENIDO ─── */}
         <main className="hp-main">
@@ -348,7 +379,7 @@ export default function TurnosSucursal() {
 
             {/* Fila superior: botón eliminar + selector de sucursal */}
             {!loadingInit && selectedSucursal && (
-              <div className="tsuc-top-bar">
+              <div className="svc-top-bar">
                 <button
                   className="btn svc-btn-add btn-danger"
                   onClick={() => setConfirmEliminar(true)}
@@ -358,7 +389,7 @@ export default function TurnosSucursal() {
                   🗑️ Eliminar turnos
                 </button>
 
-                {sucursales.length > 1 && (
+                {!isSucursalMode && sucursales.length > 1 && (
                   <CustomSelect
                     options={sucursales.map((s, idx) => ({ value: String(s.id), label: s.nombre?.trim() || `Sucursal ${idx + 1}` }))}
                     value={String(selectedSucursal?.id ?? '')}

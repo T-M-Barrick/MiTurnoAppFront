@@ -26,6 +26,10 @@ const ROLES_GERENTE_EMPRESA_MULTI = [
 const ROLES_GERENTE_EMPRESA_SINGLE = [
   { value: 'EMPLEADO',         label: 'Empleado' },
 ]
+// GERENTE_SUCURSAL solo puede invitar empleados a su propia sucursal
+const ROLES_GERENTE_SUCURSAL = [
+  { value: 'EMPLEADO',         label: 'Empleado' },
+]
 
 // Roles que requieren asignar una sucursal específica
 const ROLES_SUCURSAL = ['GERENTE_SUCURSAL', 'EMPLEADO']
@@ -52,7 +56,9 @@ export default function InvitarMiembroModal({ empresaId, sucursales, miRol, onCl
   const esSucursalUnica  = sucursales.length === 1
   const rolesDisponibles = miRol === 'PROPIETARIO'
     ? (esSucursalUnica ? ROLES_PROPIETARIO_SINGLE  : ROLES_PROPIETARIO_MULTI)
-    : (esSucursalUnica ? ROLES_GERENTE_EMPRESA_SINGLE : ROLES_GERENTE_EMPRESA_MULTI)
+    : miRol === 'GERENTE_SUCURSAL'
+      ? ROLES_GERENTE_SUCURSAL
+      : (esSucursalUnica ? ROLES_GERENTE_EMPRESA_SINGLE : ROLES_GERENTE_EMPRESA_MULTI)
   const esBranchRol      = ROLES_SUCURSAL.includes(rol)
 
   const clearError = (field) => setErrors(prev => ({ ...prev, [field]: null }))

@@ -37,6 +37,17 @@
   margin-right: auto;
 }
 
+.cli-search-bar--hint { margin-bottom: 0; }
+
+/* ── Hint de búsqueda ── */
+.cli-search-hint {
+  font-size: 11px;
+  color: var(--brand);
+  margin: 6px auto 16px;
+  max-width: 770px;
+  width: 100%;
+}
+
 /* ── Botón agregar — alineado con la barra buscadora ── */
 .cli-content .svc-btn-add-wrap {
   max-width: 770px;
@@ -45,11 +56,6 @@
 }
 
 /* ── Selector de sucursal — alineado con la barra buscadora ── */
-.cli-content .svc-sucursal-wrap {
-  max-width: 770px;
-  margin-left: auto;
-  margin-right: auto;
-}
 
 .cli-content .svc-top-bar {
   max-width: 770px;
@@ -107,13 +113,6 @@
   background: var(--brand-dark);
   border-color: var(--brand-dark);
   color: #fff;
-}
-
-/* ── Hint de búsqueda ── */
-.cli-search-hint {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin: 0 0 12px;
 }
 
 /* ── Grid de tarjetas — 2 columnas alineadas con la barra buscadora ── */

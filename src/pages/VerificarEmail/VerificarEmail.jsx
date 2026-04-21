@@ -62,7 +62,7 @@ export default function VerificarEmail() {
             <h1 className="ve-title">✅ Email verificado</h1>
             <p className="ve-text">{mensaje}</p>
             <button
-              className="ve-btn"
+              className="btn btn-primary"
               onClick={() => navigate(tipoUrl === 'empresa' ? '/home' : '/')}
             >
               Ir al inicio
@@ -75,7 +75,7 @@ export default function VerificarEmail() {
             <div className="ve-icon ve-icon--err">✕</div>
             <h1 className="ve-title">❌ Verificación fallida</h1>
             <p className="ve-text">{mensaje}</p>
-            <button className="ve-btn" onClick={() => navigate('/')}>
+            <button className="btn btn-primary" onClick={() => navigate('/')}>
               Ir al inicio
             </button>
           </>

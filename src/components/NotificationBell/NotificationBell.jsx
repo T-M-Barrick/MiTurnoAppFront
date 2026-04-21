@@ -24,9 +24,9 @@ export default function NotificationBell({
   notificaciones: notifProp = [],
   ultimoCursorId: cursorProp = null,
   notifContext = { type: 'usuario' },
-  onNotifLeida,       // callback(notifId) — actualiza la fuente de verdad en AuthContext
-  onNuevasNotifs,     // callback(nuevas[]) — notifica al padre cuando el polling encuentra nuevas
-  cantidadSucursales, // número de sucursales — para mapear rol GERENTE_EMPRESA correctamente
+  onNotifLeida,  // callback(notifId) — actualiza la fuente de verdad en AuthContext
+  onNuevasNotifs, // callback(nuevas[]) — notifica al padre cuando el polling encuentra nuevas
+  sucursales,    // array {id, nombre} del panel — para lookup de nombre por sucursal_id
 }) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -219,7 +219,7 @@ export default function NotificationBell({
                             </span>
                           </span>
                           <p className="nbell__item-body">
-                            {getNotifBody(notif.tipo, notif.extra_data, cantidadSucursales)}
+                            {getNotifBody(notif.tipo, notif.extra_data, sucursales)}
                           </p>
                         </span>
                       </a>

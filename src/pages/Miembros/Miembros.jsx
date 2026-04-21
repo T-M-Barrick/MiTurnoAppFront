@@ -143,12 +143,12 @@ export default function Miembros() {
   useEffect(() => {
     const cached = empresaPanel?.empresaId === String(empresaId)
     if (cached) {
-      setSucursales(empresaPanel.panel.sucursales ?? [])
+      setSucursales((empresaPanel.panel.sucursales ?? []).filter(s => s.activa !== false))
       setMiRol(empresaPanel.panel.rol)
       return
     }
     empresaService.getPanel(empresaId)
-      .then(data => { setEmpresaPanel(empresaId, data); setSucursales(data.sucursales ?? []); setMiRol(data.rol) })
+      .then(data => { setEmpresaPanel(empresaId, data); setSucursales((data.sucursales ?? []).filter(s => s.activa !== false)); setMiRol(data.rol) })
       .catch(err => setBackError(err))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaId])
@@ -317,17 +317,19 @@ export default function Miembros() {
 
             {/* ── Fila de acciones propias + selector de sucursal ── */}
             <div className="miem-actions-row">
-              <button className="btn miem-action-btn" onClick={() => setInvitarOpen(true)} disabled={loading}>
-                + Invitar miembro
-              </button>
-              <button className="btn miem-action-btn miem-action-btn--orange" onClick={() => setAbandonarOpen(true)} disabled={loading}>
-                Abandonar empresa
-              </button>
-              {miRol === 'PROPIETARIO' && (
-                <button className="btn miem-action-btn miem-action-btn--indigo" onClick={() => setModificarRolOpen(true)} disabled={loading}>
-                  Modificar mi rol
+              <div className="miem-actions-row__btns">
+                <button className="btn svc-btn-add" onClick={() => setInvitarOpen(true)} disabled={loading}>
+                  + Invitar miembro
                 </button>
-              )}
+                <button className="btn svc-btn-add svc-btn-add--orange" onClick={() => setAbandonarOpen(true)} disabled={loading}>
+                  Abandonar empresa
+                </button>
+                {miRol === 'PROPIETARIO' && (
+                  <button className="btn svc-btn-add svc-btn-add--indigo" onClick={() => setModificarRolOpen(true)} disabled={loading}>
+                    Modificar mi rol
+                  </button>
+                )}
+              </div>
 
               {/* Selector de sucursal — solo sucursales activas, a la derecha */}
               {!loading && sucursales.filter(s => s.activa !== false).length > 1 && (
@@ -355,11 +357,15 @@ export default function Miembros() {
             {/* ── Buscador local ── */}
             <div className="miem-search-row">
               <div className="hp-search__bar miem-search-row__input">
-                <span className="hp-search__icon">🔍</span>
+                <span className="hp-search__icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#d1d5db" aria-hidden="true">
+                    <path d="M4 4h16l-6 8v8h-4v-8L4 4z"/>
+                  </svg>
+                </span>
                 <input
                   type="search"
                   className="hp-search__input"
-                  placeholder="Buscar por nombre, apellido, DNI, email o rol…"
+                  placeholder="Filtrar por nombre, apellido, DNI, email o rol"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />

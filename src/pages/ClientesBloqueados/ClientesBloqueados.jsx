@@ -1,11 +1,13 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useMatch } from 'react-router-dom'
 import { sucursalService } from '../../services/sucursalService'
 import { empresaService } from '../../services/empresaService'
 import { useAuth } from '../../context/AuthContext'
 import AppTopBar from '../../components/AppTopBar/AppTopBar'
 import UserTopBarRight from '../../components/UserTopBarRight/UserTopBarRight'
+import SucursalTopBarRight from '../../components/SucursalTopBarRight/SucursalTopBarRight'
 import EmpresaSidebar from '../../components/EmpresaSidebar/EmpresaSidebar'
+import SucursalSidebar from '../../components/SucursalSidebar/SucursalSidebar'
 import BloqueoDetailModal from '../../components/BloqueoDetailModal/BloqueoDetailModal'
 import BloquearClienteModal from '../../components/BloquearClienteModal/BloquearClienteModal'
 import CustomSelect from '../../components/CustomSelect/CustomSelect'
@@ -65,8 +67,12 @@ function ClienteBloqueadoCard({ bloqueo, onSelect }) {
  * Permite filtrar localmente, bloquear nuevos clientes y desbloquear desde el detalle.
  */
 export default function ClientesBloqueados() {
-  const { id: empresaId } = useParams()
-  const { empresaPanel, setEmpresaPanel } = useAuth()
+  const { id }         = useParams()
+  const matchSucursal  = useMatch('/sucursal/:id/*')
+  const isSucursalMode = !!matchSucursal
+  const empresaId      = isSucursalMode ? null : id
+  const { empresaPanel, setEmpresaPanel, sucursalPanel } = useAuth()
+  const miRol          = isSucursalMode ? (sucursalPanel?.panel?.rol ?? null) : null
 
   // Sucursales
   const [sucursales,       setSucursales]       = useState([])
@@ -96,8 +102,21 @@ export default function ClientesBloqueados() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Carga sucursales desde caché del contexto o fetcha si se accede directo por URL
+  // Carga sucursales al montar.
+  // En modo sucursal: la sucursal está fijada por la URL.
+  // En modo empresa: usa panel en caché o lo fetchea.
   useEffect(() => {
+    if (isSucursalMode) {
+      const nombre = sucursalPanel?.sucursalId === String(id)
+        ? sucursalPanel.panel.nombre_sucursal ?? ''
+        : ''
+      const suc = { id: Number(id), nombre }
+      setSucursales([suc])
+      setSelectedSucursal(suc)
+      setLoadingInit(false)
+      return
+    }
+
     const cached = empresaPanel?.empresaId === String(empresaId)
       ? empresaPanel.panel.sucursales ?? []
       : null
@@ -127,7 +146,7 @@ export default function ClientesBloqueados() {
     }
     fetchInit()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [empresaId])
+  }, [id, isSucursalMode])
 
   // Carga todos los clientes bloqueados de la sucursal seleccionada
   const fetchBloqueos = useCallback(async (sucursalId) => {
@@ -192,18 +211,30 @@ export default function ClientesBloqueados() {
             </svg>
           </button>
         }
-        right={<UserTopBarRight empresaId={empresaId} />}
+        right={isSucursalMode
+          ? <SucursalTopBarRight sucursalId={id} />
+          : <UserTopBarRight empresaId={empresaId} />
+        }
       />
 
       {/* ═══ CUERPO ═══ */}
       <div className="hp-body">
 
-        <EmpresaSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          empresaId={empresaId}
-          activeKey="clientes-bloqueados"
-        />
+        {isSucursalMode
+          ? <SucursalSidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              sucursalId={id}
+              miRol={miRol}
+              activeKey="clientes-bloqueados"
+            />
+          : <EmpresaSidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              empresaId={empresaId}
+              activeKey="clientes-bloqueados"
+            />
+        }
 
         <main className="hp-main">
 
@@ -221,7 +252,7 @@ export default function ClientesBloqueados() {
                   + Bloquear cliente
                 </button>
 
-                {sucursales.length > 1 && (
+                {!isSucursalMode && sucursales.length > 1 && (
                   <CustomSelect
                     options={sucursales.map((s, idx) => ({ value: String(s.id), label: s.nombre?.trim() || `Sucursal ${idx + 1}` }))}
                     value={String(selectedSucursal?.id ?? '')}
@@ -240,11 +271,15 @@ export default function ClientesBloqueados() {
             {selectedSucursal && (
               <div className="cb-search-bar">
                 <div className="hp-search__bar cli-search-bar__input">
-                  <span className="hp-search__icon">🔍</span>
+                  <span className="hp-search__icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#d1d5db" aria-hidden="true">
+                      <path d="M4 4h16l-6 8v8h-4v-8L4 4z"/>
+                    </svg>
+                  </span>
                   <input
                     type="search"
                     className="hp-search__input"
-                    placeholder="Buscar por nombre, apellido, DNI o email…"
+                    placeholder="Filtrar por nombre, apellido, DNI o email"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />

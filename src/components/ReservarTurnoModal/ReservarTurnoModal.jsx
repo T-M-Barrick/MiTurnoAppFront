@@ -662,9 +662,6 @@ export default function ReservarTurnoModal({ sucursalId, cliente, onClose, onErr
                             </span>
                           )}
                         </div>
-                        <svg className="ps-servicio-card__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polyline points="9 18 15 12 9 6"/>
-                        </svg>
                       </button>
                     )
                   })}
@@ -716,9 +713,6 @@ export default function ReservarTurnoModal({ sucursalId, cliente, onClose, onErr
                           </>
                         )}
                       </div>
-                      <svg className="ps-servicio-card__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="9 18 15 12 9 6"/>
-                      </svg>
                     </button>
                   )
                 })}

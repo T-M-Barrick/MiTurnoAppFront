@@ -63,7 +63,7 @@ export default function AceptarInvitacion() {
               Fuiste incorporado como <strong>{getRolLabel(datos.rol, datos.cantidad_sucursales)}</strong> en{' '}
               <strong>{datos.nombre}</strong>.
             </p>
-            <button className="ve-btn" onClick={() => navigate('/home')}>
+            <button className="btn btn-primary" onClick={() => navigate('/home')}>
               Ir al inicio
             </button>
           </>
@@ -74,7 +74,7 @@ export default function AceptarInvitacion() {
             <div className="ve-icon ve-icon--err">✕</div>
             <h1 className="ve-title">Invitación inválida</h1>
             <p className="ve-text">{mensaje}</p>
-            <button className="ve-btn" onClick={() => navigate('/')}>
+            <button className="btn btn-primary" onClick={() => navigate('/')}>
               Ir al inicio
             </button>
           </>

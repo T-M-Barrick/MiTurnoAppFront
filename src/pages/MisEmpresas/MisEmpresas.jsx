@@ -239,7 +239,7 @@ export default function MisEmpresas() {
                   />
                 ))}
 
-                {/* Sucursales asignadas */}
+                {/* Sucursales asignadas (GERENTE_SUCURSAL / EMPLEADO) */}
                 {sucursales.map((suc) => (
                   <MeCard
                     key={`suc-${suc.sucursal_id}`}
@@ -249,8 +249,8 @@ export default function MisEmpresas() {
                     email={suc.email}
                     rol={suc.rol}
                     isLoading={false}
-                    href={`#/sucursal/${suc.sucursal_id}`}
-                    onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); navigate(`/sucursal/${suc.sucursal_id}`) }}
+                    href={`#/sucursal/${suc.sucursal_id}/panel`}
+                    onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); navigate(`/sucursal/${suc.sucursal_id}/panel`) }}
                   />
                 ))}
 

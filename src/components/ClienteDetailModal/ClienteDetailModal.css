@@ -12,6 +12,11 @@
   gap: 6px;
 }
 
+/* Cancela el position:absolute del badge base para que el flex los ubique en fila */
+.cdmodal__badge-wrap .tdmodal__badge {
+  position: static;
+}
+
 /* ── Badges de estado ── */
 .cdmodal__badge--activo {
   background: #dcfce7;

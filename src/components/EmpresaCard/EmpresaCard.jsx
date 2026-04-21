@@ -111,9 +111,8 @@ export default function EmpresaCard({ sucursal, onClick, isFavorito = false, onT
   useLayoutEffect(() => {
     const el = dirRef.current
     if (!el || !hasDept) return
-    if (el.scrollWidth > el.offsetWidth) setShowDept(false)
-    else setShowDept(true)
-  })
+    setShowDept(el.scrollWidth <= el.offsetWidth)
+  }, [hasDept, dirFull, dirShort])
 
   const dirTexto = (showDept ? dirFull : dirShort)
 
@@ -129,7 +128,9 @@ export default function EmpresaCard({ sucursal, onClick, isFavorito = false, onT
   }
 
   const handleMapsClick = (e) => {
-    e.stopPropagation() // evita abrir la empresa al hacer click en el link de maps
+    e.preventDefault()
+    e.stopPropagation()
+    if (mapsUrl) window.open(mapsUrl, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -161,16 +162,14 @@ export default function EmpresaCard({ sucursal, onClick, isFavorito = false, onT
             <span className="ecard__dir-icon" aria-hidden="true">📍</span>
             <span className="ecard__dir-text" ref={dirRef}>{dirTexto}</span>
             {mapsUrl && (
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
                 className="ecard__maps-link"
                 onClick={handleMapsClick}
                 aria-label="Ver en Google Maps"
               >
                 <MapsIcon />
-              </a>
+              </button>
             )}
           </div>
         )}

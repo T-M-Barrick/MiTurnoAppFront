@@ -25,6 +25,9 @@ import ResetearContrasena from './pages/ResetearContrasena/ResetearContrasena'
 import AceptarInvitacion from './pages/AceptarInvitacion/AceptarInvitacion'
 import CrearSucursal from './pages/CrearSucursal/CrearSucursal'
 import PerfilesSucursales from './pages/PerfilesSucursales/PerfilesSucursales'
+import HomeSucursal from './pages/HomeSucursal/HomeSucursal'
+import MiembrosSucursal from './pages/MiembrosSucursal/MiembrosSucursal'
+import PerfilSucursalGestion from './pages/PerfilSucursalGestion/PerfilSucursalGestion'
 
 // Ruta protegida: redirige al login si no hay sesión activa
 function ProtectedRoute({ children }) {
@@ -61,6 +64,14 @@ export default function App() {
             <Route path="/empresa/:id/servicios" element={<ProtectedRoute><Servicios /></ProtectedRoute>} />
             <Route path="/empresa/:id/perfil" element={<ProtectedRoute><PerfilEmpresa /></ProtectedRoute>} />
             <Route path="/sucursal/:id" element={<ProtectedRoute><PerfilSucursal /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/panel" element={<ProtectedRoute><HomeSucursal /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/turnos" element={<ProtectedRoute><TurnosSucursal /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/historial" element={<ProtectedRoute><HistorialSucursal /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/clientes" element={<ProtectedRoute><Clientes /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/clientes-bloqueados" element={<ProtectedRoute><ClientesBloqueados /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/servicios" element={<ProtectedRoute><Servicios /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/miembros" element={<ProtectedRoute><MiembrosSucursal /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/perfil" element={<ProtectedRoute><PerfilSucursalGestion /></ProtectedRoute>} />
             <Route path="/favoritos" element={<ProtectedRoute><Favoritos /></ProtectedRoute>} />
             <Route path="/historial" element={<ProtectedRoute><Historial /></ProtectedRoute>} />
             <Route path="/notificaciones" element={<ProtectedRoute><Notificaciones /></ProtectedRoute>} />

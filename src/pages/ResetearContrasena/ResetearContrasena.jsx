@@ -157,9 +157,9 @@ export default function ResetearContrasena() {
                 {loading ? <><span className="spinner spinner-sm" /> Guardando…</> : 'Guardar contraseña'}
               </button>
 
-              <Link to="/" className="login-card__forgot">
+              <button type="button" className="btn btn-ghost" style={{ marginTop: '12px' }} onClick={() => navigate('/')}>
                 Volver al inicio de sesión
-              </Link>
+              </button>
             </form>
           )}
         </div>

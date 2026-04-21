@@ -24,6 +24,10 @@
   margin: 0 auto;
 }
 
+.hsuc-content .svc-top-bar {
+  justify-content: flex-end;
+}
+
 @media (max-width: 767px) {
   .hsuc-content { padding: 24px 14px 40px; }
 }

@@ -225,9 +225,5 @@
     padding: 12px 10px 12px 8px;
   }
 
-  .notif-page__load-more {
-    grid-template-columns: auto auto;
-  }
-  .notif-page__load-select-wrap { justify-content: flex-start; }
-  .notif-page__load-btn { width: 100%; }
+  .notif-page__load-btn { width: auto; }
 }

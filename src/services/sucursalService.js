@@ -4,6 +4,9 @@ export const sucursalService = {
   // GET /sucursales/{id}/panel — datos del home de sucursal (para GERENTE_SUCURSAL/EMPLEADO)
   getSucursalPanel: (sucursalId) => api.get(`/sucursales/${sucursalId}/panel`),
 
+  // GET /sucursales/{id}/perfil — perfil editable de sucursal (SucursalPerfilOut)
+  getPerfil: (sucursalId) => api.get(`/sucursales/${sucursalId}/perfil`),
+
   // POST /sucursales/ — crea una nueva sucursal para la empresa del usuario
   createSucursal: (data) => api.post('/sucursales/', data),
 
@@ -129,6 +132,10 @@ export const sucursalService = {
   // DELETE /sucursales/{id}/miembros/{targetId} — elimina miembro de la sucursal (204)
   deleteMiembroSucursal: (sucursalId, targetId) =>
     api.delete(`/sucursales/${sucursalId}/miembros/${targetId}`),
+
+  // DELETE /sucursales/{id}/miembros/me — abandona la sucursal (204)
+  leaveSucursal: (sucursalId) =>
+    api.delete(`/sucursales/${sucursalId}/miembros/me`),
 
   // POST /sucursales/{id}/turnos — reserva un turno para un cliente desde la empresa
   reservarTurnoCliente: (sucursalId, data) =>

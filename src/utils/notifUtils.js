@@ -1,6 +1,16 @@
 // Utilidades para notificaciones: generación de texto y formato de tiempo.
 // Los tipos y mensajes replican la lógica de constantes.py del back.
 
+// Busca el nombre de una sucursal por id dentro del array del contexto.
+// Usa el índice en orden ascendente de id como fallback ("Sucursal N").
+function getSucursalNombre(sucursales, sucursalId) {
+  if (!sucursales || sucursalId == null) return null
+  const sorted = [...sucursales].sort((a, b) => a.id - b.id)
+  const idx    = sorted.findIndex((s) => s.id === sucursalId)
+  if (idx === -1) return null
+  return sorted[idx].nombre?.trim() || `Sucursal ${idx + 1}`
+}
+
 // Mapeo de roles a texto legible — mismo criterio que AceptarInvitacion
 function getRolLabel(rol, cantidadSucursales) {
   if (rol === 'GERENTE_EMPRESA' && cantidadSucursales === 1) return 'Gerente'
@@ -29,16 +39,17 @@ export function getNotifTitle(tipo) {
 
 // Devuelve el cuerpo de texto de una notificación según tipo + extra_data.
 // Replica la lógica de templates de constantes.py para determinar la variante correcta.
-// cantidadSucursales: se pasa desde el contexto para mapear correctamente el rol de GERENTE_EMPRESA.
-export function getNotifBody(tipo, extraData, cantidadSucursales) {
-  const ed = extraData ?? {}
+// sucursales: array {id, nombre} del panel de empresa — para lookup de nombre y conteo de sucursales.
+export function getNotifBody(tipo, extraData, sucursales) {
+  const ed               = extraData ?? {}
+  const cantidadSucursales = sucursales?.length
 
   switch (tipo) {
     case 'TURNO_NUEVO_USUARIO':
       return `${ed.nombre_empresa ?? '?'} te reservó un turno para ${ed.cuando ?? '?'}`
 
     case 'TURNO_CANCELADO_USUARIO':
-      return `${ed.nombre_empresa ?? '?'} canceló tu turno para ${ed.cuando ?? '?'}`
+      return `${ed.nombre_empresa ?? '?'} canceló tu turno programado para ${ed.cuando ?? '?'}`
 
     case 'RECORDATORIO_USUARIO':
       return `Recordatorio: tenés un turno en ${ed.nombre_empresa ?? '?'} para ${ed.cuando ?? '?'}`
@@ -47,37 +58,46 @@ export function getNotifBody(tipo, extraData, cantidadSucursales) {
       return `${ed.usuario_apellido ?? '?'}, ${ed.usuario_nombre ?? '?'} se unió a la empresa como ${getRolLabel(ed.rol, cantidadSucursales)}`
 
     case 'TURNO_NUEVO_SUCURSAL': {
-      const hasNombreSucursal = !!ed.nombre_sucursal
-      const isProfesional     = !!ed.profesional_id
+      // sucursal_id presente en extra_data → contexto empresa; ausente → contexto sucursal
+      const nombreSucursal = cantidadSucursales !== 1 && 'sucursal_id' in ed
+        ? getSucursalNombre(sucursales, ed.sucursal_id)
+        : null
+      const isProfesional  = !!ed.profesional_id
       const cliente = `${ed.cliente_apellido ?? '?'}, ${ed.cliente_nombre ?? '?'}`
-      if (hasNombreSucursal && isProfesional)
-        return `El cliente ${cliente} reservó un turno con vos en la sucursal ${ed.nombre_sucursal} para ${ed.cuando ?? '?'}`
-      if (hasNombreSucursal)
-        return `El cliente ${cliente} reservó un turno en la sucursal ${ed.nombre_sucursal} para ${ed.cuando ?? '?'}`
+      if (nombreSucursal && isProfesional)
+        return `El cliente ${cliente} reservó un turno con vos en la sucursal ${nombreSucursal} para ${ed.cuando ?? '?'}`
+      if (nombreSucursal)
+        return `El cliente ${cliente} reservó un turno en la sucursal ${nombreSucursal} para ${ed.cuando ?? '?'}`
       if (isProfesional)
         return `El cliente ${cliente} reservó un turno con vos para ${ed.cuando ?? '?'}`
       return `El cliente ${cliente} reservó un turno para ${ed.cuando ?? '?'}`
     }
 
     case 'TURNO_CANCELADO_SUCURSAL': {
-      const hasNombreSucursal = !!ed.nombre_sucursal
-      const isProfesional     = !!ed.profesional_id
+      // sucursal_id presente en extra_data → contexto empresa; ausente → contexto sucursal
+      const nombreSucursal = cantidadSucursales !== 1 && 'sucursal_id' in ed
+        ? getSucursalNombre(sucursales, ed.sucursal_id)
+        : null
+      const isProfesional  = !!ed.profesional_id
       const cliente = `${ed.cliente_apellido ?? '?'}, ${ed.cliente_nombre ?? '?'}`
-      if (hasNombreSucursal && isProfesional)
-        return `El cliente ${cliente} canceló su turno con vos en la sucursal ${ed.nombre_sucursal} para ${ed.cuando ?? '?'}`
-      if (hasNombreSucursal)
-        return `El cliente ${cliente} canceló su turno en la sucursal ${ed.nombre_sucursal} para ${ed.cuando ?? '?'}`
+      if (nombreSucursal && isProfesional)
+        return `El cliente ${cliente} canceló su turno con vos en la sucursal ${nombreSucursal} programado para ${ed.cuando ?? '?'}`
+      if (nombreSucursal)
+        return `El cliente ${cliente} canceló su turno en la sucursal ${nombreSucursal} programado para ${ed.cuando ?? '?'}`
       if (isProfesional)
-        return `El cliente ${cliente} canceló su turno con vos para ${ed.cuando ?? '?'}`
-      return `El cliente ${cliente} canceló su turno para ${ed.cuando ?? '?'}`
+        return `El cliente ${cliente} canceló su turno con vos programado para ${ed.cuando ?? '?'}`
+      return `El cliente ${cliente} canceló su turno programado para ${ed.cuando ?? '?'}`
     }
 
     case 'MIEMBRO_NUEVO_SUCURSAL': {
-      const miembro = `${ed.usuario_apellido ?? '?'}, ${ed.usuario_nombre ?? '?'}`
+      const miembro  = `${ed.usuario_apellido ?? '?'}, ${ed.usuario_nombre ?? '?'}`
       const rolLabel = getRolLabel(ed.rol, cantidadSucursales)
-      if (ed.nombre_sucursal)
-        return `${miembro} se unió a la sucursal ${ed.nombre_sucursal} como ${rolLabel}`
-      return `${miembro} se unió a la sucursal como ${rolLabel}`
+      // sucursal_id solo viene para contexto empresa; en contexto sucursal la clave no existe
+      if (cantidadSucursales !== 1 && 'sucursal_id' in ed) {
+        const nombreSucursal = getSucursalNombre(sucursales, ed.sucursal_id)
+        return `${miembro} se unió a la sucursal ${nombreSucursal ?? '?'} como ${rolLabel}`
+      }
+      return `${miembro} se unió a la ${cantidadSucursales === 1 ? 'empresa' : 'sucursal'} como ${rolLabel}`
     }
 
     default:

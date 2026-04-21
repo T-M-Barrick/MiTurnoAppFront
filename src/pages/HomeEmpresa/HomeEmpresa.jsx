@@ -236,9 +236,6 @@ export default function HomeEmpresa() {
                   <span className="he-card__label">{card.label}</span>
                   <span className="he-card__desc">{card.desc}</span>
                 </div>
-                <svg className="he-card__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="9 18 15 12 9 6"/>
-                </svg>
               </a>
             ))}
           </div>

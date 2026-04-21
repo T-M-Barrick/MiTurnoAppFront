@@ -107,7 +107,11 @@ export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}
         notifContext={notifContext}
         onNotifLeida={handleNotifLeida}
         onNuevasNotifs={handleNuevasNotifs}
-        cantidadSucursales={empresaId ? (empresaPanel?.panel?.sucursales?.length ?? undefined) : undefined}
+        sucursales={empresaId ? (
+  empresaPanel?.panel?.rol === 'PROPIETARIO'
+    ? empresaPanel?.panel?.sucursales
+    : empresaPanel?.panel?.sucursales?.filter(s => s.activa !== false)
+) ?? undefined : undefined}
       />
 
       {/* ── Avatar + dropdown ── */}
@@ -151,7 +155,9 @@ export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}
                   onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); setProfileOpen(false); navigate(`/empresa/${empresaId}/perfil`) }}>
                   🏢 Perfil de empresa
                 </a>
-                {(empresaPanel?.panel?.sucursales?.length ?? 0) >= 2 && (
+                {((empresaPanel?.panel?.rol === 'PROPIETARIO'
+                  ? empresaPanel?.panel?.sucursales?.length
+                  : empresaPanel?.panel?.sucursales?.filter(s => s.activa !== false).length) ?? 0) >= 2 && (
                   <a className="utr__dropdown-item" role="menuitem"
                     href={`#/empresa/${empresaId}/perfiles-sucursales`}
                     onClick={(e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); setProfileOpen(false); navigate(`/empresa/${empresaId}/perfiles-sucursales`) }}>

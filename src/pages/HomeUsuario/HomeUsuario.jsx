@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
@@ -40,6 +40,9 @@ export default function HomeUsuario() {
   // ---- UI ----
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [backError, setBackError]     = useState(null)
+
+  // Ref para bloquear volverATurnos mientras hay búsqueda activa
+  const busquedaActivaRef = useRef(false)
 
   // Cierra sidebar en resize a desktop
   useEffect(() => {
@@ -103,6 +106,7 @@ export default function HomeUsuario() {
     const lat = user?.direcciones?.[0]?.lat ?? -34.6
     const lng = user?.direcciones?.[0]?.lng ?? -58.4
 
+    busquedaActivaRef.current = true
     setLoadingSearch(true)
     setBuscando(true)
     setResultados(null)
@@ -114,11 +118,15 @@ export default function HomeUsuario() {
       setBuscando(false)
     } finally {
       setLoadingSearch(false)
+      busquedaActivaRef.current = false
     }
   }
 
   const handleSearchKeyDown = (e) => {
-    if (e.key === 'Enter') ejecutarBusqueda()
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      ejecutarBusqueda()
+    }
   }
 
   // Agrega o quita de favoritos con actualización optimista
@@ -292,17 +300,19 @@ export default function HomeUsuario() {
               <input
                 type="search"
                 className="hp-search__input"
-                placeholder="Buscar por empresa o rubro…"
+                placeholder="Buscar por empresa o rubro"
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value)
-                  if (!e.target.value) volverATurnos()
+                  if (!e.target.value && !busquedaActivaRef.current) volverATurnos()
                 }}
                 onKeyDown={handleSearchKeyDown}
                 aria-label="Buscar empresa"
               />
             </div>
-            <p className="hp-search__hint">Escribí 3 o más letras y presioná Enter para buscar</p>
+            {search.length > 0 && search.length < 3 && (
+              <p className="hp-search__hint hp-search__hint--error">Ingresá al menos 3 caracteres y presioná Enter para buscar</p>
+            )}
           </div>
 
           {/* Zona de contenido */}

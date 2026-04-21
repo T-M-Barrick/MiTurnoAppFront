@@ -26,40 +26,44 @@
 /* ── Fila de botones de acción propia ── */
 .miem-actions-row {
   display: flex;
-  gap: 10px;
-  justify-content: flex-start;
-  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
   max-width: 770px;
   margin: 0 auto 16px;
 }
 
-.miem-action-btn {
-  min-width: 152px;
-  width: fit-content;
-  height: 36px;
-  padding: 0 16px;
-  background: var(--brand);
-  color: #fff;
-  font-size: 13px;
-  font-family: inherit;
-  transition: background .15s;
+.miem-actions-row__btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  flex: 1;
 }
 
-.miem-action-btn:hover:not(:disabled)        { background: var(--brand-dark); }
-.miem-action-btn:disabled                     { opacity: .5; cursor: not-allowed; }
+@media (max-width: 767px) {
+  .miem-actions-row {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 100%;
+  }
+  .miem-actions-row__btns {
+    flex-direction: column;
+  }
+  .miem-actions-row .svc-btn-add {
+    width: 100% !important;
+  }
+  .miem-actions-row__sucursal {
+    width: 100% !important;
+  }
+}
 
-.miem-action-btn--indigo { background: #4f46e5; }
-.miem-action-btn--indigo:hover:not(:disabled) { background: #4338ca; }
-[data-theme="dark"] .miem-action-btn--indigo  { background: #818cf8; }
-[data-theme="dark"] .miem-action-btn--indigo:hover:not(:disabled) { background: #6d6af0; }
-
-.miem-action-btn--orange { background: #ea580c; }
-.miem-action-btn--orange:hover:not(:disabled) { background: #c2410c; }
+.miem-actions-row .svc-btn-add {
+  min-width: 152px;
+}
 
 /* Selector de sucursal: ocupa todo el espacio restante a la derecha */
 .miem-actions-row__sucursal {
-  flex: 1;
-  min-width: 0;
+  flex: none;
+  width: 285px;
 }
 
 /* ── Fila: buscador centrado, ancho acotado ── */

@@ -7,6 +7,7 @@ import { usuarioService } from '../../services/usuarioService'
 import { getNotifTitle, getNotifBody, getNotifIcon, formatNotifTime } from '../../utils/notifUtils'
 import AppTopBar from '../../components/AppTopBar/AppTopBar'
 import UserTopBarRight from '../../components/UserTopBarRight/UserTopBarRight'
+import SucursalTopBarRight from '../../components/SucursalTopBarRight/SucursalTopBarRight'
 import ErrorModal from '../../components/ErrorModal/ErrorModal'
 import CustomSelect from '../../components/CustomSelect/CustomSelect'
 import './Notificaciones.css'
@@ -29,7 +30,7 @@ export default function Notificaciones() {
   const location = useLocation()
   const params   = useParams()
   const navigate = useNavigate()
-  const { markNotifLeida, markEmpresaNotifLeida, empresaPanel } = useAuth()
+  const { markNotifLeida, markEmpresaNotifLeida, markSucursalNotifLeida, empresaPanel } = useAuth()
 
   // Determina el contexto desde el state de navegación o desde la URL
   const stateContext = location.state?.notifContext
@@ -107,8 +108,8 @@ export default function Notificaciones() {
       else if (type === 'sucursal') await sucursalService.markNotificacionLeida(id, notif.id)
       // Sincroniza la fuente de verdad en AuthContext para que la campana refleje el cambio
       if (notifContext.type === 'usuario')        markNotifLeida(notif.id)
-      else if (notifContext.type === 'empresa' ||
-               notifContext.type === 'sucursal')  markEmpresaNotifLeida(notif.id)
+      else if (notifContext.type === 'empresa')   markEmpresaNotifLeida(notif.id)
+      else if (notifContext.type === 'sucursal')  markSucursalNotifLeida(notif.id)
     } catch {
       setNotificaciones((prev) =>
         prev.map((n) => (n.id === notif.id ? { ...n, leida: false } : n))
@@ -142,7 +143,8 @@ export default function Notificaciones() {
   // Botón de volver según el contexto
   const handleBack = () => {
     const { type, id } = notifContext
-    if (type === 'empresa' || type === 'sucursal') navigate(`/empresa/${id}`)
+    if (type === 'sucursal') navigate(`/sucursal/${id}/panel`)
+    else if (type === 'empresa') navigate(`/empresa/${id}`)
     else navigate('/home')
   }
 
@@ -162,8 +164,12 @@ export default function Notificaciones() {
   const unreadCount = notificaciones.filter((n) => !n.leida).length
   const { type: ctxType, id: ctxId } = notifContext
 
-  // Cantidad de sucursales del panel de empresa — para mapear el rol de GERENTE_EMPRESA correctamente
-  const cantidadSucursales = empresaPanel?.panel?.sucursales?.length ?? undefined
+  // Sucursales del panel de empresa — para lookup de nombre por sucursal_id en los mensajes
+  const sucursales = ctxType === 'empresa'
+    ? (empresaPanel?.panel?.rol === 'PROPIETARIO'
+        ? empresaPanel?.panel?.sucursales
+        : empresaPanel?.panel?.sucursales?.filter(s => s.activa !== false)) ?? undefined
+    : undefined
 
   return (
     <div className="notif-page">
@@ -172,9 +178,11 @@ export default function Notificaciones() {
       <AppTopBar
         left={backBtn}
         right={
-          ctxType === 'empresa' || ctxType === 'sucursal'
-            ? <UserTopBarRight empresaId={ctxId} />
-            : <UserTopBarRight />
+          ctxType === 'sucursal'
+            ? <SucursalTopBarRight sucursalId={ctxId} />
+            : ctxType === 'empresa'
+              ? <UserTopBarRight empresaId={ctxId} />
+              : <UserTopBarRight />
         }
       />
 
@@ -232,7 +240,7 @@ export default function Notificaciones() {
                         </span>
                       </span>
                       <p className="notif-item__body">
-                        {getNotifBody(notif.tipo, notif.extra_data, cantidadSucursales)}
+                        {getNotifBody(notif.tipo, notif.extra_data, sucursales)}
                       </p>
                     </span>
                   </button>

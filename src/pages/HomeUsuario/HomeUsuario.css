@@ -5,6 +5,7 @@
 /* Contenedor raíz */
 .hp {
   height: 100vh;
+  height: 100dvh; /* Ajusta dinámicamente cuando el teclado virtual aparece/desaparece */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -342,6 +343,10 @@
   color: var(--text-muted);
   margin-top: 6px;
   text-align: center;
+}
+
+.hp-search__hint--error {
+  color: var(--brand);
 }
 
 /* Área de contenido (turnos / resultados) — scrolleable, full-width para que

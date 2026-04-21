@@ -1,11 +1,13 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useMatch } from 'react-router-dom'
 import { sucursalService } from '../../services/sucursalService'
 import { empresaService } from '../../services/empresaService'
 import { useAuth } from '../../context/AuthContext'
 import AppTopBar from '../../components/AppTopBar/AppTopBar'
 import UserTopBarRight from '../../components/UserTopBarRight/UserTopBarRight'
+import SucursalTopBarRight from '../../components/SucursalTopBarRight/SucursalTopBarRight'
 import EmpresaSidebar from '../../components/EmpresaSidebar/EmpresaSidebar'
+import SucursalSidebar from '../../components/SucursalSidebar/SucursalSidebar'
 import ClienteDetailModal from '../../components/ClienteDetailModal/ClienteDetailModal'
 import ClienteFormModal from '../../components/ClienteFormModal/ClienteFormModal'
 import CustomSelect from '../../components/CustomSelect/CustomSelect'
@@ -73,8 +75,12 @@ function ClienteCard({ cliente, onSelect }) {
  * Permite buscar, filtrar por activo/inactivo, crear y ver el detalle de cada cliente.
  */
 export default function Clientes() {
-  const { id: empresaId }  = useParams()
-  const { empresaPanel, setEmpresaPanel } = useAuth()
+  const { id }         = useParams()
+  const matchSucursal  = useMatch('/sucursal/:id/*')
+  const isSucursalMode = !!matchSucursal
+  const empresaId      = isSucursalMode ? null : id
+  const { empresaPanel, setEmpresaPanel, sucursalPanel } = useAuth()
+  const miRol          = isSucursalMode ? (sucursalPanel?.panel?.rol ?? null) : null
 
   // Sucursales
   const [sucursales,       setSucursales]       = useState([])
@@ -105,9 +111,21 @@ export default function Clientes() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Carga sucursales al montar: usa el panel en caché del contexto si ya fue fetched
-  // en HomeEmpresa; de lo contrario hace el GET (acceso directo por URL).
+  // Carga sucursales al montar.
+  // En modo sucursal: la sucursal está fijada por la URL.
+  // En modo empresa: usa panel en caché o lo fetchea.
   useEffect(() => {
+    if (isSucursalMode) {
+      const nombre = sucursalPanel?.sucursalId === String(id)
+        ? sucursalPanel.panel.nombre_sucursal ?? ''
+        : ''
+      const suc = { id: Number(id), nombre }
+      setSucursales([suc])
+      setSelectedSucursal(suc)
+      setLoadingInit(false)
+      return
+    }
+
     const cached = empresaPanel?.empresaId === String(empresaId)
       ? empresaPanel.panel.sucursales ?? []
       : null
@@ -137,7 +155,7 @@ export default function Clientes() {
     }
     fetchInit()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [empresaId])
+  }, [id, isSucursalMode])
 
   // Función de fetch principal (primera página)
   const fetchClientes = useCallback(async (sucursalId, query, activo) => {
@@ -207,8 +225,7 @@ export default function Clientes() {
   }
 
   const loading = loadingInit || loadingList
-
-  const showSearchHint = false
+  const showHint = searchInput.length > 0 && searchInput.length < 3
 
   return (
     <div className="cli-page">
@@ -224,18 +241,30 @@ export default function Clientes() {
             </svg>
           </button>
         }
-        right={<UserTopBarRight empresaId={empresaId} />}
+        right={isSucursalMode
+          ? <SucursalTopBarRight sucursalId={id} />
+          : <UserTopBarRight empresaId={empresaId} />
+        }
       />
 
       {/* ═══ CUERPO ═══ */}
       <div className="hp-body">
 
-        <EmpresaSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          empresaId={empresaId}
-          activeKey="clientes"
-        />
+        {isSucursalMode
+          ? <SucursalSidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              sucursalId={id}
+              miRol={miRol}
+              activeKey="clientes"
+            />
+          : <EmpresaSidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              empresaId={empresaId}
+              activeKey="clientes"
+            />
+        }
 
         <main className="hp-main">
 
@@ -253,7 +282,7 @@ export default function Clientes() {
                   + Agregar cliente
                 </button>
 
-                {sucursales.length > 1 && (
+                {!isSucursalMode && sucursales.length > 1 && (
                   <CustomSelect
                     options={sucursales.map((s, idx) => ({ value: String(s.id), label: s.nombre?.trim() || `Sucursal ${idx + 1}` }))}
                     value={String(selectedSucursal?.id ?? '')}
@@ -270,14 +299,14 @@ export default function Clientes() {
 
             {/* ── Buscador + filtro activo ── */}
             {selectedSucursal && (
-              <div className="cli-search-bar">
+              <div className={`cli-search-bar${showHint ? ' cli-search-bar--hint' : ''}`}>
                 {/* Misma barra que HomeUsuario */}
                 <div className="hp-search__bar cli-search-bar__input">
                   <span className="hp-search__icon hp-search__icon--btn" onClick={() => selectedSucursal && fetchClientes(selectedSucursal.id, searchInput, activoFilter)} role="button" aria-label="Buscar">🔍</span>
                   <input
                     type="search"
                     className="hp-search__input"
-                    placeholder="Buscar por nombre, apellido, DNI, email, teléfono u observación…"
+                    placeholder="Buscar por nombre, apellido, DNI, email, teléfono u observación"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
@@ -304,9 +333,10 @@ export default function Clientes() {
               </div>
             )}
 
+
             {/* Hint de búsqueda */}
-            {showSearchHint && (
-              <p className="cli-search-hint">Ingresá al menos 3 caracteres para buscar.</p>
+            {selectedSucursal && showHint && (
+              <p className="cli-search-hint">Ingresá al menos 3 caracteres y presioná Enter para buscar</p>
             )}
 
             {/* Sin sucursal */}
@@ -322,7 +352,7 @@ export default function Clientes() {
             {loading && <div className="hist-loading"><div className="spinner" /></div>}
 
             {/* Sin resultados */}
-            {!loading && selectedSucursal && clientes.length === 0 && !showSearchHint && (
+            {!loading && selectedSucursal && clientes.length === 0 && (
               <div className="empty-state">
                 <div className="empty-state-icon">👤</div>
                 <h3>{searchInput ? 'Sin resultados' : 'Sin clientes'}</h3>

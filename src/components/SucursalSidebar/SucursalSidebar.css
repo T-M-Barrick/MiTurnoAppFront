@@ -1,0 +1,16 @@
+/* Reutiliza estilos base del sidebar de empresa */
+@import '../EmpresaSidebar/EmpresaSidebar.css';
+
+/* Ítem bloqueado: cursor no-drop y opacidad reducida */
+.ss-sidebar__item--locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+
+/* Ícono de candado al final del ítem */
+.ss-sidebar__lock {
+  margin-left: auto;
+  font-size: 13px;
+  opacity: 0.8;
+}

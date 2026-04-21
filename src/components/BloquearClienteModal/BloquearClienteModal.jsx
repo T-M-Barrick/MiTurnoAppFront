@@ -65,6 +65,7 @@ function ResultItem({ cliente, formatDni, onSelect, onError }) {
 
 export default function BloquearClienteModal({ sucursalId, resetKey = 0, onClose, onBloqueado, onError }) {
   const [searchInput,   setSearchInput]   = useState('')
+  const showHint = searchInput.length > 0 && searchInput.length < 3
   const [resultados,    setResultados]    = useState(null)
   const [loadingSearch, setLoadingSearch] = useState(false)
   const [seleccionado,  setSeleccionado]  = useState(null)
@@ -146,7 +147,7 @@ export default function BloquearClienteModal({ sucursalId, resetKey = 0, onClose
 
           <div className="tdmodal__body">
             {/* ── Buscador ── */}
-            <div className="blkmodal__search">
+            <div className={`blkmodal__search${showHint ? ' blkmodal__search--hint' : ''}`}>
               <div className="hp-search__bar">
                 <span
                   className="hp-search__icon hp-search__icon--btn"
@@ -157,13 +158,16 @@ export default function BloquearClienteModal({ sucursalId, resetKey = 0, onClose
                 <input
                   type="search"
                   className="hp-search__input"
-                  placeholder="Buscar por nombre, apellido, DNI o email…"
+                  placeholder="Buscar por nombre, apellido, DNI o email"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBuscar()}
                   autoFocus
                 />
               </div>
+              {showHint && (
+                <p className="blkmodal__hint blkmodal__hint--error">Ingresá al menos 3 caracteres y presioná Enter para buscar</p>
+              )}
             </div>
 
             {loadingSearch && (

@@ -63,6 +63,11 @@ export default function PerfilesSucursales() {
   const todasSucursales = [...(empresaPanel?.panel?.sucursales ?? [])].sort((a, b) => a.id - b.id)
   const esPropietario   = empresaPanel?.panel?.rol === 'PROPIETARIO'
 
+  // Propietario ve todas (activas e inactivas); gerente de empresa solo las activas
+  const sucursalesSelector = esPropietario
+    ? todasSucursales
+    : todasSucursales.filter((s) => s.activa !== false)
+
   // Sucursal seleccionada actualmente
   const [selectedSucursal, setSelectedSucursal] = useState(null)
 
@@ -253,10 +258,10 @@ export default function PerfilesSucursales() {
     </button>
   )
 
-  // Opciones del selector: activas primero, luego inactivas, con indicador visual
-  const selectorOptions = todasSucursales.map((s, idx) => ({
+  // Opciones del selector: usa índice de todasSucursales para nombrado estable ("Sucursal N")
+  const selectorOptions = sucursalesSelector.map((s) => ({
     value: String(s.id),
-    label: s.nombre?.trim() || `Sucursal ${idx + 1}`,
+    label: s.nombre?.trim() || `Sucursal ${todasSucursales.indexOf(s) + 1}`,
   }))
 
   return (

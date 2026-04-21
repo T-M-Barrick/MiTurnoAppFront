@@ -183,7 +183,7 @@
 .he-card {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 4px;
   padding: 22px 20px;
   background: var(--card-bg);
   border: 1px solid var(--border);
@@ -242,18 +242,6 @@
   text-overflow: ellipsis;
 }
 
-/* Flecha */
-.he-card__arrow {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  stroke: var(--text-muted);
-  transition: stroke .15s, transform .15s;
-}
-.he-card:hover .he-card__arrow {
-  stroke: var(--brand);
-  transform: translateX(3px);
-}
 
 /* ══════════════════════════════════════════
    MODAL DE LOGO

@@ -79,8 +79,26 @@ export function validateTexto(value, min = 1, max = 255, campo = 'El campo') {
  */
 export function scrollToFirstError() {
   setTimeout(() => {
-    const sel = '.form-group input.error, .form-group select.error, .form-group textarea.error, .form-error, .sm-field__error'
+    const sel = '.sm-field__error, .form-error, .form-group input.error, .form-group select.error, .form-group textarea.error, [class*="field__error"]'
     const first = document.querySelector(sel)
-    first?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (!first) return
+
+    // Busca el ancestro scrolleable más cercano (ej: el body de un modal)
+    let container = first.parentElement
+    while (container && container !== document.documentElement) {
+      const style = window.getComputedStyle(container)
+      if (/auto|scroll/.test(style.overflowY) && container.scrollHeight > container.clientHeight) break
+      container = container.parentElement
+    }
+
+    if (container && container !== document.documentElement) {
+      // Scroll explícito dentro del contenedor modal
+      const containerRect = container.getBoundingClientRect()
+      const firstRect     = first.getBoundingClientRect()
+      const offset        = firstRect.top - containerRect.top + container.scrollTop - container.clientHeight / 3
+      container.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' })
+    } else {
+      first.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
   }, 50)
 }

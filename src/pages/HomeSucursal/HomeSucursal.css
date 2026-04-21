@@ -1,0 +1,42 @@
+/* Reutiliza todos los estilos de HomeEmpresa */
+@import '../HomeEmpresa/HomeEmpresa.css';
+
+/* Espeja exactamente las reglas de .he-page para este contexto */
+.hs-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.hs-page .hp-main {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* ── Logo (solo visual, sin botón) ── */
+.hs-logo-wrap {
+  flex-shrink: 0;
+  width: 76px;
+  height: 76px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tarjeta bloqueada: sin hover, cursor no-drop */
+.hs-card--locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+.hs-card--locked:hover {
+  box-shadow: none;
+  transform: none;
+  border-color: var(--border);
+}

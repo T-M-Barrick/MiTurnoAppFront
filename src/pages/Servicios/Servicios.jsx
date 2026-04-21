@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useMatch } from 'react-router-dom'
 import { empresaService } from '../../services/empresaService'
 import { sucursalService } from '../../services/sucursalService'
 import { useAuth } from '../../context/AuthContext'
 import { formatDuracion, getVersionActiva } from '../../utils/dateUtils'
 import AppTopBar from '../../components/AppTopBar/AppTopBar'
 import UserTopBarRight from '../../components/UserTopBarRight/UserTopBarRight'
+import SucursalTopBarRight from '../../components/SucursalTopBarRight/SucursalTopBarRight'
 import EmpresaSidebar from '../../components/EmpresaSidebar/EmpresaSidebar'
+import SucursalSidebar from '../../components/SucursalSidebar/SucursalSidebar'
 import ErrorModal from '../../components/ErrorModal/ErrorModal'
 import ServicioModal from '../../components/ServicioModal/ServicioModal'
 import CustomSelect from '../../components/CustomSelect/CustomSelect'
@@ -74,9 +76,13 @@ function ServicioCard({ servicio, onClick }) {
  * Página de Servicios — gestión de servicios de una sucursal de empresa.
  */
 export default function Servicios() {
-  const { id: empresaId } = useParams()
-  const navigate          = useNavigate()
-  const { empresaPanel, setEmpresaPanel } = useAuth()
+  const { id }         = useParams()
+  const matchSucursal  = useMatch('/sucursal/:id/*')
+  const isSucursalMode = !!matchSucursal
+  const empresaId      = isSucursalMode ? null : id
+  const navigate       = useNavigate()
+  const { empresaPanel, setEmpresaPanel, sucursalPanel } = useAuth()
+  const miRol          = isSucursalMode ? (sucursalPanel?.panel?.rol ?? null) : null
 
   // Estado de UI
   const [sidebarOpen,    setSidebarOpen]    = useState(false)
@@ -100,9 +106,27 @@ export default function Servicios() {
   // Modal de creación de servicio
   const [crearOpen, setCrearOpen] = useState(false)
 
-  // Carga inicial: sucursales desde caché del contexto (sin GET extra si ya se pasó
-  // por HomeEmpresa), y miembros siempre desde el back. Fallback a getPanel si acceso directo.
+  // Carga inicial: en modo sucursal fija la sucursal por URL y fetchea solo miembros de sucursal.
+  // En modo empresa: usa panel en caché o lo fetchea, y carga miembros de empresa.
   useEffect(() => {
+    if (isSucursalMode) {
+      const nombre = sucursalPanel?.sucursalId === String(id)
+        ? sucursalPanel.panel.nombre_sucursal ?? ''
+        : ''
+      const suc = { id: Number(id), nombre }
+      setSucursales([suc])
+      setSelectedSucursal(suc)
+      // Carga miembros de la sucursal para asignar profesional en ServicioModal
+      sucursalService.getMiembrosSucursal(id)
+        .then((data) => {
+          // Adapta al formato que espera ServicioModal (MiembrosEmpresaOut)
+          setMiembros({ miembros_empresa: [], miembros_sucursales: [{ sucursal_id: Number(id), miembros: data ?? [] }] })
+        })
+        .catch(() => setMiembros(null))
+        .finally(() => setLoadingInit(false))
+      return
+    }
+
     const fetchInit = async () => {
       setLoadingInit(true)
       try {
@@ -129,7 +153,7 @@ export default function Servicios() {
     }
     fetchInit()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [empresaId])
+  }, [id, isSucursalMode])
 
   // Carga servicios cuando cambia la sucursal seleccionada
   useEffect(() => {
@@ -190,19 +214,31 @@ export default function Servicios() {
             </svg>
           </button>
         }
-        right={<UserTopBarRight empresaId={empresaId} />}
+        right={isSucursalMode
+          ? <SucursalTopBarRight sucursalId={id} />
+          : <UserTopBarRight empresaId={empresaId} />
+        }
       />
 
       {/* ═══ CUERPO ═══ */}
       <div className="hp-body">
 
         {/* ─── SIDEBAR ─── */}
-        <EmpresaSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          empresaId={empresaId}
-          activeKey="servicios"
-        />
+        {isSucursalMode
+          ? <SucursalSidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              sucursalId={id}
+              miRol={miRol}
+              activeKey="servicios"
+            />
+          : <EmpresaSidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              empresaId={empresaId}
+              activeKey="servicios"
+            />
+        }
 
         {/* ─── CONTENIDO PRINCIPAL ─── */}
         <main className="hp-main">
@@ -231,7 +267,7 @@ export default function Servicios() {
                   Agregar servicio
                 </button>
 
-                {sucursales.length > 1 && (
+                {!isSucursalMode && sucursales.length > 1 && (
                   <CustomSelect
                     options={sucursales.map((s, idx) => ({ value: String(s.id), label: s.nombre?.trim() || `Sucursal ${idx + 1}` }))}
                     value={String(selectedSucursal?.id ?? '')}

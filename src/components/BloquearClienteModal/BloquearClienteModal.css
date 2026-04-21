@@ -14,9 +14,19 @@
 }
 
 .blkmodal__hint {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
-  margin: 6px 0 0;
+  margin: 6px auto 0;
+  max-width: 480px;
+  width: 100%;
+}
+
+.blkmodal__hint--error {
+  color: var(--brand);
+}
+
+.blkmodal__search--hint {
+  margin-bottom: 0;
 }
 
 .blkmodal__empty {

@@ -53,13 +53,10 @@
 .tdmodal__header h3 { font-size: 17px; font-weight: 700; margin: 0; }
 
 /* ── Cuerpo ── */
-.tdmodal__body { padding: 10px 20px 8px; }
+.tdmodal__body { padding: 18px 20px 8px; position: relative; }
 
 /* ── Empresa: logo + nombre + badge ── */
 .tdmodal__empresa {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
   margin-bottom: 18px;
 }
 
@@ -67,9 +64,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 1;
   min-width: 0;
-  margin-top: 14px;
+  margin-top: 20px;
 }
 
 .tdmodal__logo {
@@ -96,13 +92,15 @@
   color: var(--text);
   line-height: 1.3;
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 
-/* Badge de estado — formato base en main.css */
-.tdmodal__badge { flex-shrink: 0; }
+/* Badge de estado — absoluto en esquina superior derecha del body */
+.tdmodal__badge {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
 
 .tdmodal__badge--confirmado  { background: #dcfce7; color: #15803d; }
 .tdmodal__badge--en-hora     { background: #e0f2fe; color: #0369a1; }

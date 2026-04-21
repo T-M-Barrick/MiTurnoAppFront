@@ -128,8 +128,8 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
   const esSelf      = miembro.id === userId
   const puedeActuar = !esSelf && (ROL_RANK[miRol] ?? 0) > (ROL_RANK[rolPermisos] ?? 0)
 
-  // En modo multi-sucursal, solo el propietario puede modificar rol (para subir a empresa)
-  const puedeModificarRol = puedeActuar && (!esMultiSucursal || miRol === 'PROPIETARIO')
+  // Solo PROPIETARIO y GERENTE_EMPRESA pueden modificar roles; en multi-sucursal solo el propietario
+  const puedeModificarRol = puedeActuar && ['PROPIETARIO', 'GERENTE_EMPRESA'].includes(miRol) && (!esMultiSucursal || miRol === 'PROPIETARIO')
 
   /** Limpia el formulario y cierra el modal de form. */
   const resetForm = () => {
@@ -169,11 +169,15 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
     }
   }
 
-  /* ── Eliminar de empresa (solo modo non-multi) ── */
+  /* ── Eliminar de empresa o sucursal (solo modo non-multi) ── */
   const handleDelete = async () => {
     setLoading(true)
     try {
-      await empresaService.deleteMiembro(empresaId, miembro.id)
+      if (tipo === 'sucursal') {
+        await sucursalService.deleteMiembroSucursal(miSucursales[0].id, miembro.id)
+      } else {
+        await empresaService.deleteMiembro(empresaId, miembro.id)
+      }
       onDeleted?.()
     } catch (err) {
       onError?.(err)
@@ -255,8 +259,8 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
                 </div>
               </div>
 
-              {/* Sucursales */}
-              {tipo === 'sucursal' && miSucursales.length > 0 && (
+              {/* Sucursales — oculto para GERENTE_SUCURSAL y EMPLEADO (ya saben a qué sucursal pertenecen) */}
+              {tipo === 'sucursal' && miSucursales.length > 0 && !['GERENTE_SUCURSAL', 'EMPLEADO'].includes(miRol) && (
                 <div className="tdmodal__row">
                   <span className="tdmodal__row-icon">🏪</span>
                   <div className="tdmodal__row-body" style={{ flex: 1 }}>

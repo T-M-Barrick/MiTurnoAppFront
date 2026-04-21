@@ -28,14 +28,6 @@
 }
 
 /* ── Fila superior: botón eliminar + selector de sucursal ── */
-.tsuc-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
 
 /* ── Filtro de profesional: centrado bajo la barra superior ── */
 .tsuc-profesional-wrap {

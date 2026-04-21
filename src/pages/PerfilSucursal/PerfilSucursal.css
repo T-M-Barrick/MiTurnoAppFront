@@ -74,9 +74,7 @@
   font-weight: 700;
   color: var(--text);
   line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 
 .ps-sucursal-rubro {
@@ -88,12 +86,10 @@
 /* Fila con icono + texto (dirección, teléfono, email) */
 .ps-sucursal-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
   font-size: 14px;
   color: var(--text-muted);
-  flex-wrap: nowrap;
-  overflow: hidden;
   margin-left: 0;
 }
 
@@ -101,16 +97,31 @@
 .ps-row-icon {
   flex-shrink: 0;
   font-size: 14px;
-  line-height: 1;
+  line-height: 1.4;
 }
 
-/* El texto de dirección se encoge si no entra — el ícono de Maps queda pegado al texto */
-.ps-sucursal-row > span {
+/* Texto genérico de filas simples (teléfono, email, aclaración) */
+.ps-sucursal-row > span:not(.ps-dir-group) {
   flex: 0 1 auto;
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Grupo dirección: texto + pin Maps fluyen inline juntos */
+.ps-sucursal-row > .ps-dir-group {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.ps-dir-text {
+  display: inline;
+}
+.ps-dir-group .ps-maps-link {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 2px;
 }
 
 .ps-sucursal-acl {
@@ -517,19 +528,6 @@
   flex-shrink: 0;
 }
 
-/* Flecha de la tarjeta */
-.ps-servicio-card__arrow {
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  stroke: var(--text-muted);
-  transition: stroke .15s, transform .15s;
-}
-
-.ps-servicio-card:hover .ps-servicio-card__arrow {
-  stroke: var(--brand);
-  transform: translateX(3px);
-}
 
 /* ════════════════════════════════════════════════════════════
    PASO 2 — SELECCIÓN DE PROFESIONAL
@@ -635,18 +633,6 @@
   color: var(--text-muted);
 }
 
-.ps-prof-card__arrow {
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  stroke: var(--text-muted);
-  transition: stroke .15s, transform .15s;
-}
-
-.ps-prof-card:hover .ps-prof-card__arrow {
-  stroke: var(--brand);
-  transform: translateX(3px);
-}
 
 /* ════════════════════════════════════════════════════════════
    PASO 3 — CALENDARIO

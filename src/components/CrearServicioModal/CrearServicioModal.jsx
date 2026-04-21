@@ -147,7 +147,15 @@ export default function CrearServicioModal({ sucursalId, miembros, onClose, onCr
   const [horariosOpen, setHorariosOpen] = useState(false)
   const [helpOpen,     setHelpOpen]     = useState(false)
 
-  const firstInputRef = useRef(null)
+  const firstInputRef  = useRef(null)
+  const scrollTrigger  = useRef(0)
+
+  // Scroll al primer error después de que React commitea los errores al DOM
+  useEffect(() => {
+    if (scrollTrigger.current > 0 && Object.values(formErrors).some(Boolean)) {
+      scrollToFirstError()
+    }
+  }, [formErrors])
 
   // Cierra con Escape (solo si el modal de horarios no está abierto)
   useEffect(() => {
@@ -180,8 +188,8 @@ export default function CrearServicioModal({ sucursalId, miembros, onClose, onCr
     }
     const errors = validateForm(fields)
     if (Object.keys(errors).length > 0) {
+      scrollTrigger.current += 1
       setFormErrors(errors)
-      scrollToFirstError()
       return
     }
     setFormErrors({})
