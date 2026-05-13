@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { formatFechaCompleta, labelEstado } from '../../utils/dateUtils'
 import { sucursalService } from '../../services/sucursalService'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import '../../styles/DetailModal.css'
 
@@ -35,6 +36,9 @@ export default function TurnoDetalleSucursalModal({ turno, sucursalId, onClose, 
   const [confirmAction, setConfirmAction] = useState(null)
   const [motivo,        setMotivo]        = useState('')
   const [loadingAction, setLoadingAction] = useState(false)
+
+  const actionsRef  = useRef(null)
+  const actionsMode = useFooterLayout(actionsRef)
 
   useEffect(() => {
     if (!turno) return
@@ -270,7 +274,7 @@ export default function TurnoDetalleSucursalModal({ turno, sucursalId, onClose, 
         </div>
 
         {/* ═══ ACCIONES ═══ */}
-        <div className={`tdmodal__actions${readOnly ? ' tdmodal__actions--center' : ''}`}>
+        <div ref={actionsRef} className={`tdmodal__actions tdmodal__actions--${actionsMode}${readOnly ? ' tdmodal__actions--center' : ''}`}>
 
           {/* Solo lectura (historial): únicamente Cerrar centrado */}
           {readOnly && (

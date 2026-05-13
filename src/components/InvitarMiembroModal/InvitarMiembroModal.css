@@ -8,10 +8,13 @@
   height: auto;
 }
 
-/* Botones del footer: cada uno ocupa la mitad del ancho disponible */
+/* Botones del footer: ancho fijo; se apilan cuando ya no entran */
 .tdmodal.immodal .tdmodal__actions .btn {
-  flex: 1;
+  width: 148px;
 }
+
+/* ── Modos de layout del footer (gestionados por useFooterLayout) ── */
+.cfmodal-actions--column { flex-direction: column-reverse; align-items: center; }
 
 /* Cuerpo más compacto */
 .tdmodal.immodal .immodal__body {

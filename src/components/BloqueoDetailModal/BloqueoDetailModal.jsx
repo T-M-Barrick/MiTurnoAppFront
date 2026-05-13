@@ -4,12 +4,6 @@ import { getRolLabel } from '../../utils/rolUtils'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import './BloqueoDetailModal.css'
 
-const ROL_CLASS = {
-  PROPIETARIO:      'bdmodal__rol-badge--propietario',
-  GERENTE_EMPRESA:  'bdmodal__rol-badge--gerente-empresa',
-  GERENTE_SUCURSAL: 'bdmodal__rol-badge--gerente-sucursal',
-  EMPLEADO:         'bdmodal__rol-badge--empleado',
-}
 
 /**
  * Modal de detalle de un cliente bloqueado (BlockClienteOut).
@@ -56,6 +50,13 @@ export default function BloqueoDetailModal({ bloqueo, sucursalId, numSucursales 
     const fechaCap = fecha.charAt(0).toUpperCase() + fecha.slice(1)
     const hora = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })
     return `${fechaCap} a las ${hora} hs`
+  }
+
+  const ROL_CLASS = {
+    PROPIETARIO:      'propietario',
+    GERENTE_EMPRESA:  'gerente-empresa',
+    GERENTE_SUCURSAL: 'gerente-sucursal',
+    EMPLEADO:         'empleado',
   }
 
   const { cliente, motivo, created_at,
@@ -145,7 +146,7 @@ export default function BloqueoDetailModal({ bloqueo, sucursalId, numSucursales 
               </div>
             )}
 
-            {/* 👥 Bloqueado por: apellido, nombre (DNI xxx) + badge de rol */}
+            {/* 👥 Bloqueado por: apellido, nombre (Rol) */}
             <div className="tdmodal__row bdmodal__por-row">
               <span className="tdmodal__row-icon">👥</span>
               <div className="bdmodal__por-inner">
@@ -153,16 +154,26 @@ export default function BloqueoDetailModal({ bloqueo, sucursalId, numSucursales 
                   <span className="tdmodal__row-label">Bloqueado por:</span>
                   <span className="tdmodal__row-val">
                     {miembro_apellido}, {miembro_nombre}
-                    {miembro_dni && ` (DNI ${formatDni(miembro_dni)})`}
+                    {rolLabel && (
+                      <span className={`bdmodal__rol-text bdmodal__rol-text--${ROL_CLASS[miembro_rol] ?? ''}`}>
+                        {` (${rolLabel})`}
+                      </span>
+                    )}
                   </span>
                 </span>
-                {rolLabel && (
-                  <span className={`bdmodal__rol-badge ${ROL_CLASS[miembro_rol] ?? ''}`}>
-                    {rolLabel}
-                  </span>
-                )}
               </div>
             </div>
+
+            {/* 🪪 DNI del miembro que realizó el bloqueo */}
+            {miembro_dni && (
+              <div className="tdmodal__row">
+                <span className="tdmodal__row-icon tdsumodal__dni-icon">🪪</span>
+                <div className="tdmodal__row-body">
+                  <span className="tdmodal__row-label">DNI:</span>
+                  <span className="tdmodal__row-val">{formatDni(miembro_dni)}</span>
+                </div>
+              </div>
+            )}
 
             {/* 🚫 Motivo del bloqueo */}
             {motivo && (

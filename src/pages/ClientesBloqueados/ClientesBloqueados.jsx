@@ -1,4 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
+import { useFitPlaceholder } from '../../utils/useFitPlaceholder'
 import { useParams, useMatch } from 'react-router-dom'
 import { sucursalService } from '../../services/sucursalService'
 import { empresaService } from '../../services/empresaService'
@@ -73,6 +74,8 @@ export default function ClientesBloqueados() {
   const empresaId      = isSucursalMode ? null : id
   const { empresaPanel, setEmpresaPanel, sucursalPanel } = useAuth()
   const miRol          = isSucursalMode ? (sucursalPanel?.panel?.rol ?? null) : null
+  const searchInputRef = useRef(null)
+  useFitPlaceholder(searchInputRef, 'Filtrar por nombre, apellido, DNI o email')
 
   // Sucursales
   const [sucursales,       setSucursales]       = useState([])
@@ -278,6 +281,7 @@ export default function ClientesBloqueados() {
                   </span>
                   <input
                     type="search"
+                    ref={searchInputRef}
                     className="hp-search__input"
                     placeholder="Filtrar por nombre, apellido, DNI o email"
                     value={searchInput}

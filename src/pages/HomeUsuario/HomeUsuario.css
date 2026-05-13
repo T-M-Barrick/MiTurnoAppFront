@@ -311,6 +311,7 @@
 }
 .hp-search__input {
   width: 100%;
+  height: 44px;
   padding: 11px 16px 11px 42px;
   border: 1.5px solid var(--border);
   border-radius: 24px;
@@ -321,6 +322,10 @@
   transition: border-color .2s, background .2s;
   appearance: none;
   -webkit-appearance: none;
+}
+/* --ph-size solo achica el placeholder, no el input → evita el desplazamiento vertical */
+.hp-search__input::placeholder {
+  font-size: var(--ph-size, 15px);
 }
 .hp-search__input:focus {
   border-color: var(--brand);
@@ -408,12 +413,17 @@
 /* Grid de turnos — 2 columnas en desktop */
 .hp-turnos-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-@media (max-width: 599px) {
-  .hp-turnos-grid { grid-template-columns: 1fr; }
+/* Tarjetas llegan al ~80% (323px de 404px original): apila, recupera tamaño original centrado */
+@media (max-width: 690px) {
+  .hp-turnos-grid {
+    grid-template-columns: 1fr;
+    max-width: 404px;
+    margin: 0 auto;
+  }
 }
 
 /* ============================================================

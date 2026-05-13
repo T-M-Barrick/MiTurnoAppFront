@@ -324,7 +324,7 @@
 
 .ps-servicios-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
   gap: 10px;
   margin-top: 8px;
@@ -555,7 +555,7 @@
 
 .ps-profesionales {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
   gap: 10px;
   margin-top: 8px;
@@ -1138,7 +1138,7 @@
   flex: 1;
   justify-content: center;
   padding: 10px 16px;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* Botón verde confirmar */
@@ -1416,6 +1416,7 @@
 .ps-month-picker {
   position: absolute;
   top: calc(100% + 6px);
+  bottom: auto;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
@@ -1428,6 +1429,12 @@
   flex-direction: column;
   gap: 8px;
   width: 204px;
+}
+
+/* Abre hacia arriba cuando no hay espacio abajo */
+.ps-month-picker--up {
+  top: auto;
+  bottom: calc(100% + 6px);
 }
 
 /* Fila de navegación del año: flecha | año | flecha */
@@ -1537,14 +1544,13 @@
     padding: 0 14px 48px;
   }
 
-  /* Servicios y profesionales en 1 columna en móvil */
+  /* Tarjetas llegan al ~83% (291px de 351px original): apila, recupera tamaño original centrado */
   .ps-servicios-list,
   .ps-profesionales {
     grid-template-columns: 1fr;
-  }
-
-  .ps-sucursal-nombre {
-    font-size: 18px;
+    max-width: 351px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .ps-strip-day {

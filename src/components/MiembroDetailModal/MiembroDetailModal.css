@@ -72,26 +72,32 @@
   gap: 8px;
 }
 
-/* 600px modal - 40px padding = 560px. 4 botones con 3 gaps de 8px: (560-24)/4 = 134px = calc(25% - 6px) */
 .mmdetail__actions .btn {
-  flex: 0 0 calc(25% - 6px);
-  min-width: 0;
+  width: 134px;
   font-size: 13px;
   padding: 0 8px;
 }
 
 /* ── Botones en vista de formulario: igual que InvitarMiembroModal ── */
 .mmdetail__actions--form .btn {
-  flex: 1;
+  width: 166px;
   padding: 11px 8px;
   font-size: 13px;
   border-radius: 10px;
 }
 
+/* SucursalMiembroDetailModal: mismo ancho que mmdetail normal (134px) */
+.mmdetail--sucursal-view .mmdetail__actions--form .btn {
+  width: 134px;
+}
+
+/* ── Modos de layout del footer (gestionados por useFooterLayout) ── */
+.mmdetail__actions.tdmodal__actions--column { flex-direction: column-reverse; align-items: center; }
+.mmdetail__actions.tdmodal__actions--2x2    { flex-wrap: wrap-reverse; }
+
 /* ── Badge de rol ── */
 .mmdetail__badge {
   flex-shrink: 0;
-  margin-top: -4px;
 }
 
 /* Propietario — verde */
@@ -136,5 +142,4 @@
 /* Badge en vista de sucursal: no se encoge aunque el nombre sea largo */
 .mmdetail__badge--sucursal-view {
   flex-shrink: 0;
-  margin-top: -4px;
 }

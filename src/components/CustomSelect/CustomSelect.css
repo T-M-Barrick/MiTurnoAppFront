@@ -83,19 +83,3 @@
   font-weight: 600;
 }
 
-/* En mobile, los selectores dentro de barras de acción ocupan el ancho completo */
-@media (max-width: 767px) {
-  .svc-top-bar .cselect,
-  .svc-top-bar .cselect__trigger,
-  .miem-actions-row__sucursal .cselect,
-  .miem-actions-row__sucursal .cselect__trigger,
-  .psuc-header .cselect,
-  .psuc-header .cselect__trigger {
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-  .psuc-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}

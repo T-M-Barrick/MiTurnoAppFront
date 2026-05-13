@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { invitacionesService } from '../../services/invitacionesService'
+import { scrollToFirstError } from '../../utils/validation'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import CustomSelect from '../CustomSelect/CustomSelect'
 import ErrorModal from '../ErrorModal/ErrorModal'
 import '../ClienteFormModal/ClienteFormModal.css'
@@ -53,6 +55,9 @@ export default function InvitarMiembroModal({ empresaId, sucursales, miRol, onCl
   const [loading,    setLoading]    = useState(false)
   const [success,    setSuccess]    = useState(false)
 
+  const actionsRef  = useRef(null)
+  const actionsMode = useFooterLayout(actionsRef)
+
   const esSucursalUnica  = sucursales.length === 1
   const rolesDisponibles = miRol === 'PROPIETARIO'
     ? (esSucursalUnica ? ROLES_PROPIETARIO_SINGLE  : ROLES_PROPIETARIO_MULTI)
@@ -78,7 +83,7 @@ export default function InvitarMiembroModal({ empresaId, sucursales, miRol, onCl
   }
 
   const handleSubmit = async () => {
-    if (!validate()) return
+    if (!validate()) { scrollToFirstError(); return }
     setLoading(true)
     try {
       const payload = {
@@ -169,7 +174,7 @@ export default function InvitarMiembroModal({ empresaId, sucursales, miRol, onCl
         </div>
 
         {/* ═══ FOOTER ═══ */}
-        <div className="tdmodal__actions cfmodal-actions">
+        <div ref={actionsRef} className={`tdmodal__actions cfmodal-actions cfmodal-actions--${actionsMode}`}>
           <button className="btn btn-ghost" onClick={onClose} disabled={loading}>Cancelar</button>
           <button className="btn btn-primary" onClick={handleSubmit} disabled={loading}>
             {loading ? <><span className="spinner spinner-sm" /> Enviando…</> : 'Enviar invitación'}

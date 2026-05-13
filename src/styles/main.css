@@ -63,6 +63,15 @@ button {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* Botones dentro de un footer gestionado por useFooterLayout.
+   Base: flex:none + padding mínimo para los modos apilados.
+   En modo row el hook sobreescribe flex:1 y min-width via inline styles.
+   Cambiar el padding aquí ajusta el mínimo garantizado en todos los modales. */
+.footer-managed .btn {
+  flex: 0 1 auto;
+  padding: 0 4px;
+}
+
 /* Elementos <a> que actúan como botones de navegación heredan el estilo
    del componente y no muestran el subrayado/color azul de los enlaces. */
 a.hp-sidebar__item,
@@ -297,6 +306,8 @@ body {
 
 .form-row { display: flex; gap: 12px; }
 .form-row .form-group { flex: 1; }
+/* Evita que el asterisco/hint baje de línea antes de que el form-row colapse a columna */
+.form-row .form-group label { min-height: 20px; white-space: nowrap; }
 
 /* ── Autocompletado de dirección (compartido entre formularios) ── */
 .addr-autocomplete-wrapper { position: relative; }
@@ -347,7 +358,6 @@ body {
 .tcard__badge,
 .tdmodal__badge,
 .me-card__rol,
-.bdmodal__rol-badge,
 .blkmodal__item-badge {
   display: inline-flex;
   align-items: center;
@@ -410,6 +420,12 @@ body {
 
 .password-wrapper input {
   padding-right: 44px; /* espacio para el botón ojo */
+}
+
+/* Oculta el ícono nativo de Edge/IE para no duplicar el ojito custom */
+.password-wrapper input[type="password"]::-ms-reveal,
+.password-wrapper input[type="password"]::-ms-clear {
+  display: none;
 }
 
 .eye-btn {

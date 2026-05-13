@@ -127,6 +127,5 @@
 
 /* ── Responsive ── */
 @media (max-width: 767px) {
-  .ce-body  { padding: 8px 14px 40px; }
-  .ce-title { font-size: 19px; }
+  .ce-body { padding: 8px 14px 40px; }
 }

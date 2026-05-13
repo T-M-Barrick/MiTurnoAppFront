@@ -58,9 +58,9 @@ export default function AceptarInvitacion() {
         {status === 'success' && datos && (
           <>
             <div className="ve-icon ve-icon--ok">✓</div>
-            <h1 className="ve-title">¡Bienvenido al equipo!</h1>
+            <h1 className="ve-title">¡Ya sos parte del equipo!</h1>
             <p className="ve-text">
-              Fuiste incorporado como <strong>{getRolLabel(datos.rol, datos.cantidad_sucursales)}</strong> en{' '}
+              Ahora formás parte como <strong>{getRolLabel(datos.rol, datos.cantidad_sucursales)}</strong> en{' '}
               <strong>{datos.nombre}</strong>.
             </p>
             <button className="btn btn-primary" onClick={() => navigate('/home')}>

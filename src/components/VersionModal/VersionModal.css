@@ -57,35 +57,12 @@
   margin: 0;
 }
 
-
-
-/* Barra de info de solo lectura (solo en edit mode) */
-.vm-info-bar {
-  display: flex;
-  gap: 16px;
-  padding: 10px 24px;
-  background: var(--bg-alt);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.vm-info-bar__item {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.vm-info-bar__item strong {
-  color: var(--text);
-  font-weight: 600;
-}
-
 /* ── Inputs de duración HH:MM ── */
 .vm-duration-input {
   display: flex;
   align-items: center;
   gap: 14px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .vm-duration-input__group {
@@ -163,8 +140,6 @@
   justify-content: center;
   width: 148px;
   height: 40px;
-  flex-shrink: 0;
-  padding: 0 12px;
   font-size: 13px;
   transition: opacity .15s, background .15s;
   gap: 6px;
@@ -203,3 +178,46 @@
 .vm-footer__btn--confirm:hover {
   background: var(--brand-dark);
 }
+
+/* VersionModal usa una columna única; las filas flex manejan su propio layout */
+.vm-body .sm-form-grid {
+  grid-template-columns: 1fr;
+}
+
+/* Fila Duración + Precio */
+.vm-dur-price-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Duración: ancho fijo = mismo que vigente desde (228px) para que precio
+   quede verticalmente alineado con vigente hasta */
+.vm-field-duracion {
+  flex: 0 0 228px;
+}
+
+/* Precio: ocupa el espacio restante; baja cuando el contenedor < 336px
+   (mismo umbral que fechas: 160 + 160 + 16 = 336).
+   92px = 336 - 228(duración) - 16(gap).
+   min-width: 0 anula el min-content automático del input. */
+.vm-field-precio {
+  flex: 1 0 92px;
+  min-width: 0;
+}
+
+/* Fila de fechas — igual ancho en ambas, se apilan al llegar a 160px cada campo */
+.vm-dates-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.vm-dates-row .sm-field {
+  flex: 1 0 160px;
+}
+
+/* ── Modos de layout del footer (gestionados por useFooterLayout) ── */
+.vm-footer--split                    { flex-wrap: wrap; }
+.vm-footer--split > .btn:first-child { order: 1; }
+.vm-footer--column                   { flex-direction: column-reverse; align-items: center; }

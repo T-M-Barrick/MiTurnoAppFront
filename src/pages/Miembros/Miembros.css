@@ -39,20 +39,56 @@
   flex: 1;
 }
 
-@media (max-width: 767px) {
-  .miem-actions-row {
+/*
+  Apila cuando el selector de sucursal está visible y los ítems ya no caben.
+  Dos casos por cantidad de botones:
+    · 3 botones (PROPIETARIO, detectado por svc-btn-add--indigo): overflow a ~812px
+    · 2 botones (otros roles): overflow a ~633px
+  :has() evita stacking innecesario cuando no hay selector de sucursal.
+*/
+@media (max-width: 812px) {
+  .miem-actions-row:has(.miem-actions-row__sucursal):has(.svc-btn-add--indigo) {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     max-width: 100%;
   }
-  .miem-actions-row__btns {
+  .miem-actions-row:has(.miem-actions-row__sucursal):has(.svc-btn-add--indigo) .miem-actions-row__btns {
     flex-direction: column;
+    align-items: center;
   }
-  .miem-actions-row .svc-btn-add {
-    width: 100% !important;
+}
+
+@media (max-width: 633px) {
+  .miem-actions-row:has(.miem-actions-row__sucursal):not(:has(.svc-btn-add--indigo)) {
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
   }
-  .miem-actions-row__sucursal {
-    width: 100% !important;
+  .miem-actions-row:has(.miem-actions-row__sucursal):not(:has(.svc-btn-add--indigo)) .miem-actions-row__btns {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Sin selector + 3 botones (PROPIETARIO empresa, detectado por svc-btn-add--indigo): apila a ~500px */
+@media (max-width: 500px) {
+  .miem-actions-row:not(:has(.miem-actions-row__sucursal)):has(.svc-btn-add--indigo) {
+    max-width: 100%;
+  }
+  .miem-actions-row:not(:has(.miem-actions-row__sucursal)):has(.svc-btn-add--indigo) .miem-actions-row__btns {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Sin selector + 2 botones (modo sucursal u otros): apila antes de que se corten */
+@media (max-width: 340px) {
+  .miem-actions-row:not(:has(.miem-actions-row__sucursal)):not(:has(.svc-btn-add--indigo)) {
+    max-width: 100%;
+  }
+  .miem-actions-row:not(:has(.miem-actions-row__sucursal)):not(:has(.svc-btn-add--indigo)) .miem-actions-row__btns {
+    flex-direction: column;
+    align-items: center;
   }
 }
 
@@ -60,7 +96,7 @@
   min-width: 152px;
 }
 
-/* Selector de sucursal: ocupa todo el espacio restante a la derecha */
+/* Selector de sucursal: ancho fijo a la derecha */
 .miem-actions-row__sucursal {
   flex: none;
   width: 285px;
@@ -75,7 +111,6 @@
   margin: 0 auto 16px;
 }
 
-/* La barra ocupa todo el espacio del contenedor */
 .miem-search-row__input {
   width: 100%;
   min-width: 0;
@@ -86,38 +121,24 @@
   background: var(--card-bg);
 }
 
-/* ── Grid — mismo ancho que la barra buscadora ── */
+/* ── Grid ── */
 .miem-grid {
   max-width: 770px;
   margin: 0 auto;
 }
 
-/* ── Badges de rol en la tarjeta — formato base en main.css ── */
+/* El max-width: 770px de arriba sobreescribiría el 379px de cli-grid en el breakpoint */
+@media (max-width: 650px) {
+  .miem-grid { max-width: 379px; }
+}
+
+/* ── Badges de rol en la tarjeta ── */
 .miem-card__badge { flex-shrink: 0; }
 
-/* Propietario — verde (= CONFIRMADO en turnos) */
-.miem-card__badge--propietario {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-/* Gerente de empresa — azul (= EN_HORA en turnos) */
-.miem-card__badge--gerente-empresa {
-  background: #e0f2fe;
-  color: #0369a1;
-}
-
-/* Gerente de sucursal — indigo (= NO_CUMPLIDO en turnos) */
-.miem-card__badge--gerente-sucursal {
-  background: #ede9fe;
-  color: #5b21b6;
-}
-
-/* Empleado — amarillo/marrón (= color anterior de propietario) */
-.miem-card__badge--empleado {
-  background: #fef9c3;
-  color: #854d0e;
-}
+.miem-card__badge--propietario      { background: #dcfce7; color: #15803d; }
+.miem-card__badge--gerente-empresa  { background: #e0f2fe; color: #0369a1; }
+.miem-card__badge--gerente-sucursal { background: #ede9fe; color: #5b21b6; }
+.miem-card__badge--empleado         { background: #fef9c3; color: #854d0e; }
 
 /* ── Dark mode ── */
 [data-theme="dark"] .miem-card__badge--propietario      { background: rgba(34,197,94,.18);  color: #4ade80; }
@@ -143,5 +164,5 @@
 
 /* ── Responsive ── */
 @media (max-width: 767px) {
-  .miem-content { padding: 16px 14px 40px; }
+  .miem-content { padding: 24px 14px 48px; }
 }

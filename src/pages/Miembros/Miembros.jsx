@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react'
+import { useFitPlaceholder } from '../../utils/useFitPlaceholder'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { empresaService } from '../../services/empresaService'
 import { useAuth } from '../../context/AuthContext'
@@ -112,6 +113,8 @@ export default function Miembros() {
   const [selectedSucursal,     setSelectedSucursal]     = useState(null)
   const [sidebarOpen,          setSidebarOpen]          = useState(false)
   const [search,               setSearch]               = useState('')
+  const searchInputRef         = useRef(null)
+  useFitPlaceholder(searchInputRef, 'Filtrar por nombre, apellido, DNI, email o rol')
   const [miembroSeleccionado,  setMiembroSeleccionado]  = useState(null)
   const [invitarOpen,          setInvitarOpen]          = useState(false)
   const [modificarRolOpen,     setModificarRolOpen]     = useState(false)
@@ -364,6 +367,7 @@ export default function Miembros() {
                 </span>
                 <input
                   type="search"
+                  ref={searchInputRef}
                   className="hp-search__input"
                   placeholder="Filtrar por nombre, apellido, DNI, email o rol"
                   value={search}
@@ -446,7 +450,7 @@ export default function Miembros() {
       {abandonarOpen && (
         <ConfirmModal
           icon="🚪"
-          message="¿Estás seguro que querés abandonar esta empresa?"
+          message="¿Confirmás que querés abandonar esta empresa?"
           confirmText="Abandonar"
           confirmVariant="btn-orange"
           loading={actionLoading}

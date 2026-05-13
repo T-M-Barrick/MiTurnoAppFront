@@ -22,12 +22,12 @@
   max-width: 660px;
   margin: 0 auto;
   max-height: 96vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;           /* el scroll está en el body, no aquí */
   animation: slideUp .28s ease;
   font-family: inherit;
-  scrollbar-width: none;
 }
-.tdmodal::-webkit-scrollbar { display: none; }
 
 /* Handle de arrastre (solo mobile) */
 .tdmodal__handle {
@@ -36,12 +36,12 @@
   background: var(--border);
   border-radius: 2px;
   margin: 10px auto 0;
+  flex-shrink: 0;
 }
 
-/* ── Cabecera sticky ── */
+/* ── Cabecera ── */
 .tdmodal__header {
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   background: var(--card-bg);
   z-index: 1;
   padding: 10px 20px;
@@ -52,8 +52,16 @@
 }
 .tdmodal__header h3 { font-size: 17px; font-weight: 700; margin: 0; }
 
-/* ── Cuerpo ── */
-.tdmodal__body { padding: 18px 20px 8px; position: relative; }
+/* ── Cuerpo: scrolleable cuando el contenido supera el espacio disponible ── */
+.tdmodal__body {
+  padding: 18px 20px 8px;
+  position: relative;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.tdmodal__body::-webkit-scrollbar { display: none; }
 
 /* ── Empresa: logo + nombre + badge ── */
 .tdmodal__empresa {
@@ -98,7 +106,7 @@
 /* Badge de estado — absoluto en esquina superior derecha del body */
 .tdmodal__badge {
   position: absolute;
-  top: 10px;
+  top: 8px;
   right: 20px;
 }
 
@@ -167,15 +175,17 @@
 }
 
 .tdmodal__row-val--dir {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  /* inline en lugar de inline-flex: el texto puede cortar en cualquier punto
+     en vez de bajar todo el bloque completo al renglón siguiente */
+  display: inline;
 }
 
 .tdmodal__maps-link {
-  flex-shrink: 0;
-  display: flex;
+  display: inline-flex;
+  vertical-align: middle;
   align-items: center;
+  margin-left: 4px;   /* reemplaza el gap del padre */
+  flex-shrink: 0;
   transition: opacity .15s;
   text-decoration: none;
 }
@@ -255,6 +265,7 @@
 
 /* ── Acciones ── */
 .tdmodal__actions {
+  flex-shrink: 0;
   padding: 20px;
   border-top: 1px solid var(--border);
   display: flex;
@@ -265,7 +276,7 @@
 }
 
 .tdmodal__actions .btn {
-  flex: 0 0 calc(33.33% - 6px);
+  width: 149px;
   height: 40px;
   padding: 0 12px;
   font-size: 13px;
@@ -363,6 +374,7 @@
   gap: 10px;
 }
 
+
 .tdmodal-rec-modal__success {
   display: flex;
   flex-direction: column;
@@ -382,6 +394,11 @@
 /* ── Solo lectura: Cerrar centrado ── */
 .tdmodal__actions--center { justify-content: center; }
 
+/* ── Modos de layout del footer (gestionados por useFooterLayout) ── */
+.tdmodal__actions--column                   { flex-direction: column-reverse; align-items: center; }
+.tdmodal__actions--split > .btn:first-child { order: 1; }
+.tdmodal__actions--2x2                      { flex-wrap: wrap-reverse; }
+
 /* ── Fila superior de modales de detalle de sucursal/cliente/miembro ── */
 .tdsumodal__top-row {
   display: flex;
@@ -399,7 +416,7 @@
 
 .tdsumodal__badge-wrap {
   flex-shrink: 0;
-  margin-top: -4px;
+  margin-top: -10px;
 }
 
 .tdsumodal__dni-icon {
@@ -439,8 +456,6 @@
 /* ── Responsive ── */
 @media (max-width: 479px) {
   .tdmodal { font-size: 13px; }
-  .tdmodal__header h3 { font-size: 15px; }
-  .tdmodal__empresa-nombre { font-size: 16px; }
   .tdmodal__row { font-size: 12px; }
   .tdmodal__row-icon { font-size: 13px; }
 }

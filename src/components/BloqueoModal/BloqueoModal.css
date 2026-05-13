@@ -196,6 +196,8 @@
   text-transform: uppercase;
   letter-spacing: .05em;
 }
+/* Iguala altura de labels en la fila de 2 columnas para absorber la expansión del asterisco */
+.blq-form-row .blq-field__label { min-height: 20px; }
 
 
 .blq-field__input,
@@ -270,8 +272,6 @@
   justify-content: center;
   width: 148px;
   height: 40px;
-  flex-shrink: 0;
-  padding: 0 12px;
   font-size: 13px;
   transition: opacity .15s, background .15s;
   gap: 6px;
@@ -318,16 +318,16 @@
   cursor: not-allowed;
 }
 
+/* ── Modos de layout del footer (gestionados por useFooterLayout) ── */
+.blq-footer--split                    { flex-wrap: wrap; }
+.blq-footer--split > .btn:first-child { order: 1; }
+.blq-footer--column                   { flex-direction: column-reverse; align-items: center; }
+
 /* ── Responsive ── */
+
+/* Fechas del formulario: colapsan a una columna */
 @media (max-width: 480px) {
   .blq-form-row {
     grid-template-columns: 1fr;
-  }
-  .blq-footer {
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
-  .blq-footer__btn {
-    width: 100%;
   }
 }

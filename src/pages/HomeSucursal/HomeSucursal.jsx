@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { sucursalService } from '../../services/sucursalService'
@@ -37,6 +37,72 @@ export default function HomeSucursal() {
   const [loading,     setLoading]     = useState(true)
   const [backError,   setBackError]   = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // ---- Refs para ajuste dinámico de texto ----
+  const nombreEmpresaRef = useRef(null)
+  const userRef          = useRef(null)
+  const rowRef           = useRef(null)
+  const [, forceUpdate]  = useState(0)
+
+  // Reajusta el texto al redimensionar la ventana
+  useEffect(() => {
+    const handler = () => forceUpdate(n => n + 1)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+
+  // Encoge el font-size del nombre hasta el mínimo; si sigue sin entrar, permite wrapping
+  useLayoutEffect(() => {
+    const el = nombreEmpresaRef.current
+    if (!el) return
+    el.style.fontSize   = ''
+    el.style.whiteSpace = 'nowrap'
+    const base    = parseInt(window.getComputedStyle(el).fontSize, 10) || 22
+    const minSize = window.innerWidth < 480 ? 15 : 17
+    let size = base
+    el.style.fontSize = `${size}px`
+    while (el.scrollWidth > el.offsetWidth && size > minSize) {
+      size--
+      el.style.fontSize = `${size}px`
+    }
+    if (el.scrollWidth > el.offsetWidth) el.style.whiteSpace = ''
+  })
+
+  // Ajusta el nombre del usuario: 1) inline con badge, 2) badge abajo, 3) truncar nombre
+  useLayoutEffect(() => {
+    const rowEl  = rowRef.current
+    const nameEl = userRef.current
+    if (!rowEl || !nameEl || !user) return
+    const nombres   = (user.nombre   ?? '').trim().split(/\s+/).filter(Boolean)
+    const apellidos = (user.apellido ?? '').trim().split(/\s+/).filter(Boolean)
+    const build = (ns, as) => [...ns, ...as].join(' ')
+    // Resetear a layout inline
+    rowEl.style.flexDirection = ''
+    rowEl.style.alignItems    = ''
+    nameEl.style.width        = ''
+    nameEl.textContent        = build(nombres, apellidos)
+    // Paso 1: ¿el ancho natural del nombre + gap + badge cabe en el row?
+    const badgeEl = rowEl.children.length > 1 ? rowEl.lastElementChild : null
+    const totalW  = nameEl.scrollWidth + (badgeEl ? badgeEl.offsetWidth + 10 : 0)
+    if (totalW <= rowEl.offsetWidth) return
+    // Paso 2: bajar el badge — columna con gap 8px (ya definido en CSS)
+    rowEl.style.flexDirection = 'column'
+    rowEl.style.alignItems    = 'flex-start'
+    nameEl.style.width        = '100%'
+    if (nameEl.scrollWidth <= nameEl.offsetWidth) return
+    // Paso 3: truncar eliminando palabras (apellido → nombre alternando) hasta 1+1
+    let ns   = [...nombres]
+    let as   = [...apellidos]
+    let turn = 'apellido'
+    while (nameEl.scrollWidth > nameEl.offsetWidth && (ns.length + as.length > 2)) {
+      if (turn === 'apellido' && as.length > 1) { as = as.slice(0, -1); turn = 'nombre' }
+      else if (turn === 'nombre' && ns.length > 1) { ns = ns.slice(0, -1); turn = 'apellido' }
+      else if (as.length > 1) { as = as.slice(0, -1) }
+      else if (ns.length > 1) { ns = ns.slice(0, -1) }
+      else break
+      nameEl.textContent = build(ns, as)
+    }
+  })
 
   // Cierra sidebar al pasar a desktop
   useEffect(() => {
@@ -118,14 +184,14 @@ export default function HomeSucursal() {
 
                   {/* Info */}
                   <div className="he-empresa-info">
-                    <span className="he-empresa-name">
+                    <span ref={nombreEmpresaRef} className="he-empresa-name">
                       {panel?.nombre_empresa
                         ? `${panel.nombre_empresa} - ${panel.nombre_sucursal ?? 'Sucursal 1'}`
                         : panel?.nombre_sucursal ?? 'Sucursal 1'}
                     </span>
                     {user && (
-                      <div className="he-empresa-user-row">
-                        <span className="he-empresa-user">{user.nombre} {user.apellido}</span>
+                      <div ref={rowRef} className="he-empresa-user-row">
+                        <span ref={userRef} className="he-empresa-user">{user.nombre} {user.apellido}</span>
                         {miRol && (
                           <span className={`he-empresa-rol he-empresa-rol--${miRol.toLowerCase().replace(/_/g, '-')}`}>
                             {ROL_LABEL[miRol] ?? miRol}

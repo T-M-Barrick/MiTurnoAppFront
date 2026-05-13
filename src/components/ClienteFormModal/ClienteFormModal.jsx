@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { useFooterLayout } from '../../utils/useFooterLayout'
+import { scrollToFirstError } from '../../utils/validation'
 import { sucursalService } from '../../services/sucursalService'
 import CustomSelect from '../CustomSelect/CustomSelect'
 import ErrorModal from '../ErrorModal/ErrorModal'
@@ -52,7 +54,9 @@ function initTelefonos(cliente) {
  */
 export default function ClienteFormModal({ sucursalId, cliente, onClose, onCreated, onUpdated, onError }) {
 
-  const isEdit = !!cliente
+  const isEdit      = !!cliente
+  const actionsRef  = useRef(null)
+  const actionsMode = useFooterLayout(actionsRef)
 
   const [clienteActualizado, setClienteActualizado] = useState(null)
 
@@ -118,7 +122,7 @@ export default function ClienteFormModal({ sucursalId, cliente, onClose, onCreat
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!validate()) return
+    if (!validate()) { scrollToFirstError(); return }
 
     // Construye los valores de telefono y telefono2 desde el array
     const tel1 = telefonos[0]?.numero.trim() ? telefonos[0].codigo + telefonos[0].numero.trim() : null
@@ -253,7 +257,7 @@ export default function ClienteFormModal({ sucursalId, cliente, onClose, onCreat
                       value={tel.codigo}
                       onChange={(val) => updateCodigo(idx, val)}
                       width={184}
-                      height={44}
+                      height={46}
                       disabled={loading}
                     />
                     <input
@@ -311,7 +315,7 @@ export default function ClienteFormModal({ sucursalId, cliente, onClose, onCreat
         </form>
 
         {/* ═══ FOOTER CON BOTONES ═══ */}
-        <div className="tdmodal__actions">
+        <div ref={actionsRef} className={`tdmodal__actions tdmodal__actions--${actionsMode}`}>
           <button className="btn btn-ghost" onClick={onClose} disabled={loading}>
             Cancelar
           </button>

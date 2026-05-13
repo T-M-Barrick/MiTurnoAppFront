@@ -164,11 +164,11 @@ const ERROR_MAP = {
   EMPRESA_PROPIETARIO_OUT:
     'La empresa no puede quedar sin propietarios.',
   EMPRESA_PROFESIONAL_CON_TURNOS_CONFIRMADOS_OUT:
-    'No se puede eliminar a un miembro que tiene turnos confirmados como profesional.',
+    'No se puede eliminar a un miembro que tiene turnos confirmados o vencidos como profesional. Cambiá el estado de los mismos y volvé a intentarlo.',
   EMPRESA_INVALID_SELF_REMOVAL:
     'No podés abandonar la empresa desde este flujo.',
   EMPRESA_MIEMBRO_DELETE_WITH_TURNOS_CONFIRMADOS:
-    'No se puede eliminar a un miembro que aún posee turnos confirmados como profesional.',
+    'No se puede eliminar a un miembro que aún posee turnos confirmados o vencidos como profesional. Cambiá el estado de los mismos y volvé a intentarlo.',
   EMPRESA_PERMISSION_DENIED:
     'No tenés permiso para realizar esta acción.',
   EMPRESA_ACCESS_GLOBAL_RESOURCES_FORBIDDEN:
@@ -206,15 +206,15 @@ const ERROR_MAP = {
   SUCURSAL_DEACTIVATE_WITH_ONE_SUCURSAL_IN_EMPRESA:
     'Una empresa no puede quedar sin sucursales activas.',
   SUCURSAL_DEACTIVATE_WITH_TURNOS_CONFIRMADOS:
-    'No se puede desactivar una sucursal que posee turnos confirmados.',
+    'No se puede desactivar una sucursal que posee turnos confirmados o vencidos. Cambiá el estado de los mismos y volvé a intentarlo.',
   SUCURSAL_MIEMBRO_NOT_FOUND:
     'El usuario no pertenece a esta sucursal.',
   SUCURSAL_MIEMBRO_ALREADY_EXISTS:
     'El usuario ya pertenece a esta sucursal.',
   SUCURSAL_PROFESIONAL_WITH_TURNOS_CONFIRMADOS_OUT:
-    'No se puede abandonar la sucursal mientras tengas turnos confirmados como profesional.',
+    'No se puede abandonar la sucursal mientras tengas turnos confirmados o vencidos como profesional. Cambiá el estado de los mismos y volvé a intentarlo.',
   SUCURSAL_MIEMBRO_DELETE_WITH_TURNOS_CONFIRMADOS:
-    'No se puede eliminar a un miembro de una sucursal que aún tiene turnos confirmados como profesional.',
+    'No se puede eliminar a un miembro de una sucursal que aún tiene turnos confirmados o vencidos como profesional. Cambiá el estado de los mismos y volvé a intentarlo.',
   SUCURSAL_MIEMBRO_ADD:
     'No se puede agregar a este miembro a la sucursal desde este flujo.',
   SUCURSAL_INVALID_SELF_REMOVAL:
@@ -254,9 +254,9 @@ const ERROR_MAP = {
   SUCURSAL_SERVICE_UPDATE_VIGENCIA_WITH_TURNOS_EXISTENTES:
     'No se puede reducir el período de vigencia: hay {cant_turnos_actual} turnos confirmados que quedarían fuera del nuevo rango.',
   SUCURSAL_SERVICE_DELETE_DISPONIBILIDAD_WITH_TURNOS_EXISTENTES:
-    'La disponibilidad del día {dia} a las {hora} hs no puede eliminarse: hay {cant_turnos_actual} turnos confirmados para el {fecha}.',
+    'La disponibilidad del día {dia} a las {hora} hs no puede eliminarse: ya hay {cant_turnos_actual} turnos confirmados para el {fecha}.',
   SUCURSAL_SERVICE_DELETE_WITH_TURNOS_CONFIRMADOS:
-    'No se puede eliminar un servicio o versión que posee turnos confirmados.',
+    'No se puede eliminar un servicio o versión que posee turnos confirmados o vencidos. Cambiá el estado de los mismos y volvé a intentarlo.',
   SUCURSAL_SERVICE_VIEWED_BY_EMPLEADO:
     'Los empleados no pueden visualizar los servicios.',
   SUCURSAL_SERVICE_CREATED_BY_EMPLEADO:
@@ -289,7 +289,7 @@ const ERROR_MAP = {
   CLIENTE_ALREADY_EXISTS:
     'Ya existe un cliente registrado con ese email en esta sucursal.',
   CLIENTE_DEACTIVATE_WITH_TURNOS_CONFIRMADOS:
-    'No se puede desactivar a un cliente que tiene turnos confirmados.',
+    'No se puede desactivar a un cliente que tiene turnos confirmados o vencidos. Cambiá el estado de los mismos y volvé a intentarlo.',
   CLIENTE_BLOCKED:
     'Este cliente se encuentra bloqueado.',
   CLIENTE_ALREADY_BLOCKED:

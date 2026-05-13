@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import { scrollToFirstError } from '../../utils/validation'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import HorariosModal from '../HorariosModal/HorariosModal'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import DateInput from '../DateInput/DateInput'
@@ -129,6 +131,8 @@ export default function VersionModal({ version, initialData, onClose, onSave, on
   const [deletingVersion,   setDeletingVersion]   = useState(false)
 
   const firstInputRef = useRef(null)
+  const footerRef     = useRef(null)
+  const footerMode    = useFooterLayout(footerRef)
 
   // Cierra con Escape (solo si HorariosModal no está abierto)
   useEffect(() => {
@@ -151,7 +155,7 @@ export default function VersionModal({ version, initialData, onClose, onSave, on
       vigente_hasta,
     }
     const errors = validateForm(fields, isCreate)
-    if (Object.keys(errors).length > 0) { setFormErrors(errors); return }
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); scrollToFirstError(); return }
     setFormErrors({})
 
     const h = parseInt(duracion_h, 10) || 0
@@ -197,89 +201,99 @@ export default function VersionModal({ version, initialData, onClose, onSave, on
           <div className="vm-body">
             <div className="sm-form-grid">
 
-              {/* Duración — editable en create, solo lectura en edit */}
-              <div className="sm-field">
-                <label className="sm-field__label">
-                  Duración {isCreate && <span className="csm-required">*</span>}
-                </label>
-                <div className="vm-duration-input">
-                  <div className="vm-duration-input__group">
-                    <input
-                      ref={isCreate ? firstInputRef : undefined}
-                      type="text"
-                      inputMode="numeric"
-                      className="vm-duration__input vm-duration__input--h"
-                      value={duracion_h}
-                      placeholder="0"
-                      disabled={!isCreate}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, '')
-                        setDuracionH(val)
-                      }}
-                    />
-                    <span className="vm-duration__unit">horas</span>
+              {/* Duración + Precio — misma fila; Precio baja cuando no caben a 100px de ancho */}
+              <div className="vm-dur-price-row sm-field--full">
+
+                {/* Duración — editable en create, solo lectura en edit */}
+                <div className="sm-field vm-field-duracion">
+                  <label className="sm-field__label">
+                    Duración {isCreate && <span className="csm-required">*</span>}
+                  </label>
+                  <div className="vm-duration-input">
+                    <div className="vm-duration-input__group">
+                      <input
+                        ref={isCreate ? firstInputRef : undefined}
+                        type="text"
+                        inputMode="numeric"
+                        className="vm-duration__input vm-duration__input--h"
+                        value={duracion_h}
+                        placeholder="0"
+                        disabled={!isCreate}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '')
+                          setDuracionH(val)
+                        }}
+                      />
+                      <span className="vm-duration__unit">horas</span>
+                    </div>
+                    <div className="vm-duration-input__group">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        className="vm-duration__input vm-duration__input--m"
+                        value={duracion_m}
+                        placeholder="00"
+                        disabled={!isCreate}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '').slice(0, 2)
+                          setDuracionM(val)
+                        }}
+                      />
+                      <span className="vm-duration__unit">minutos</span>
+                    </div>
                   </div>
-                  <div className="vm-duration-input__group">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      className="vm-duration__input vm-duration__input--m"
-                      value={duracion_m}
-                      placeholder="00"
-                      disabled={!isCreate}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, '').slice(0, 2)
-                        setDuracionM(val)
-                      }}
-                    />
-                    <span className="vm-duration__unit">minutos</span>
-                  </div>
+                  {formErrors.duracion && <span className="sm-field__error">{formErrors.duracion}</span>}
                 </div>
-                {formErrors.duracion && <span className="sm-field__error">{formErrors.duracion}</span>}
+
+                {/* Precio */}
+                <div className="sm-field vm-field-precio">
+                  <label className="sm-field__label">
+                    Precio ($) <span className="csm-required">*</span>
+                  </label>
+                  <input
+                    ref={isCreate ? undefined : firstInputRef}
+                    type="number"
+                    className="sm-field__input"
+                    value={precio}
+                    onChange={(e) => setPrecio(e.target.value)}
+                    min={0}
+                    step={0.01}
+                    placeholder="ej: 5000"
+                  />
+                  {formErrors.precio && <span className="sm-field__error">{formErrors.precio}</span>}
+                </div>
+
               </div>
 
-              {/* Precio */}
-              <div className="sm-field">
-                <label className="sm-field__label">
-                  Precio ($) <span className="csm-required">*</span>
-                </label>
-                <input
-                  ref={isCreate ? undefined : firstInputRef}
-                  type="number"
-                  className="sm-field__input"
-                  value={precio}
-                  onChange={(e) => setPrecio(e.target.value)}
-                  min={0}
-                  step={0.01}
-                  placeholder="ej: 5000"
-                />
-                {formErrors.precio && <span className="sm-field__error">{formErrors.precio}</span>}
-              </div>
+              {/* Vigente desde y Vigente hasta — mismo ancho, se apilan al llegar al mínimo de fecha */}
+              <div className="vm-dates-row sm-field--full">
 
-              {/* Vigente desde — editable en create, solo lectura en edit */}
-              <div className="sm-field">
-                <label className="sm-field__label">
-                  Vigente desde {isCreate && <span className="csm-required">*</span>}
-                </label>
-                <DateInput
-                  value={vigente_desde}
-                  onChange={isCreate ? (e) => setVigenteDesde(e.target.value) : undefined}
-                  disabled={!isCreate}
-                  min={isCreate ? getTomorrow() : undefined}
-                  className="sm-field__input"
-                />
-                {formErrors.vigente_desde && <span className="sm-field__error">{formErrors.vigente_desde}</span>}
-              </div>
+                {/* Vigente desde — editable en create, solo lectura en edit */}
+                <div className="sm-field">
+                  <label className="sm-field__label">
+                    Vigente desde {isCreate && <span className="csm-required">*</span>}
+                  </label>
+                  <DateInput
+                    value={vigente_desde}
+                    onChange={isCreate ? (e) => setVigenteDesde(e.target.value) : undefined}
+                    disabled={!isCreate}
+                    min={isCreate ? getTomorrow() : undefined}
+                    className="sm-field__input"
+                  />
+                  {formErrors.vigente_desde && <span className="sm-field__error">{formErrors.vigente_desde}</span>}
+                </div>
 
-              {/* Vigente hasta */}
-              <div className="sm-field">
-                <label className="sm-field__label">Vigente hasta</label>
-                <DateInput
-                  value={vigente_hasta}
-                  onChange={(e) => setVigenteHasta(e.target.value)}
-                  className="sm-field__input"
-                />
-                {formErrors.vigente_hasta && <span className="sm-field__error">{formErrors.vigente_hasta}</span>}
+                {/* Vigente hasta */}
+                <div className="sm-field">
+                  <label className="sm-field__label">Vigente hasta</label>
+                  <DateInput
+                    value={vigente_hasta}
+                    onChange={(e) => setVigenteHasta(e.target.value)}
+                    className="sm-field__input"
+                  />
+                  {formErrors.vigente_hasta && <span className="sm-field__error">{formErrors.vigente_hasta}</span>}
+                </div>
+
               </div>
 
             </div>
@@ -304,7 +318,7 @@ export default function VersionModal({ version, initialData, onClose, onSave, on
           </div>
 
           {/* ── Footer ── */}
-          <div className="vm-footer">
+          <div ref={footerRef} className={`vm-footer vm-footer--${footerMode}`}>
             <button className="btn vm-footer__btn vm-footer__btn--cancel" onClick={onClose} type="button">
               Cancelar
             </button>

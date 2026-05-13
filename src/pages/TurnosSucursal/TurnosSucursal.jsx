@@ -411,7 +411,7 @@ export default function TurnosSucursal() {
                   options={profesionalOptions}
                   value={profesionalFilter}
                   onChange={setProfesionalFilter}
-                  width={500}
+                  width={480}
                   height={36}
                 />
               </div>

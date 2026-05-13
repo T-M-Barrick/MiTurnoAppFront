@@ -1,4 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { useFitPlaceholder } from '../../utils/useFitPlaceholder'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import { sucursalService } from '../../services/sucursalService'
 import './BloquearClienteModal.css'
 
@@ -72,7 +74,11 @@ export default function BloquearClienteModal({ sucursalId, resetKey = 0, onClose
   const [motivo,        setMotivo]        = useState('')
   const [loading,       setLoading]       = useState(false)
 
-  const clienteNombreRef = useRef(null)
+  const clienteNombreRef   = useRef(null)
+  const searchInputRef     = useRef(null)
+  const subModalActionsRef = useRef(null)
+  const subModalActionsMode = useFooterLayout(subModalActionsRef)
+  useFitPlaceholder(searchInputRef, 'Buscar por nombre, apellido, DNI o email')
   const formatDni = (dni) => dni?.replace(/\B(?=(\d{3})+(?!\d))/g, '.') ?? ''
 
   const clienteTexto = seleccionado
@@ -157,6 +163,7 @@ export default function BloquearClienteModal({ sucursalId, resetKey = 0, onClose
                 >🔍</span>
                 <input
                   type="search"
+                  ref={searchInputRef}
                   className="hp-search__input"
                   placeholder="Buscar por nombre, apellido, DNI o email"
                   value={searchInput}
@@ -231,7 +238,7 @@ export default function BloquearClienteModal({ sucursalId, resetKey = 0, onClose
               <p className="blkmodal__chars">{motivo.length}/255</p>
             </div>
 
-            <div className="tdmodal__actions">
+            <div ref={subModalActionsRef} className={`tdmodal__actions tdmodal__actions--${subModalActionsMode}`}>
               <button className="btn btn-ghost" onClick={handleCancelarMotivo} disabled={loading}>Cancelar</button>
               <button className="btn btn-danger" onClick={handleBloquear} disabled={loading}>
                 {loading ? <span className="spinner spinner-sm" /> : 'Bloquear'}

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { sucursalService } from '../../services/sucursalService'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import ReservarTurnoModal from '../ReservarTurnoModal/ReservarTurnoModal'
 import ClienteFormModal from '../ClienteFormModal/ClienteFormModal'
@@ -21,6 +22,9 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
   const [reservarOpen,   setReservarOpen]   = useState(false)
   const [modificarOpen,  setModificarOpen]  = useState(false)
   const [loading,        setLoading]        = useState(false)
+
+  const actionsRef  = useRef(null)
+  const actionsMode = useFooterLayout(actionsRef)
 
   // Resetea estado al abrir un cliente distinto
   useEffect(() => {
@@ -75,7 +79,7 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
 
   return (
     <div className="tdmodal-overlay">
-      <div className="tdmodal" onClick={(e) => e.stopPropagation()}>
+      <div className="tdmodal cdmodal" onClick={(e) => e.stopPropagation()}>
         <div className="tdmodal__handle" />
 
         {/* ═══ CABECERA ═══ */}
@@ -86,24 +90,22 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
 
         <div className="tdmodal__body">
 
-          {/* ── Nombre + badge activo/inactivo ── */}
-          <div className="tdsumodal__top-row">
-            <div className="tdsumodal__cliente-row">
-              <div className="tdmodal__row">
-                <span className="tdmodal__row-icon">👤</span>
-                <div className="tdmodal__row-body">
-                  <span className="tdmodal__row-label">Cliente:</span>
-                  <span className="tdmodal__row-val">{clienteNombre}</span>
-                </div>
-              </div>
-            </div>
-            <div className="tdsumodal__badge-wrap cdmodal__badge-wrap">
-              {cliente.bloqueado && (
-                <span className="tdmodal__badge cdmodal__badge--bloqueado">Bloqueado</span>
-              )}
-              <span className={`tdmodal__badge ${cliente.activo ? 'cdmodal__badge--activo' : 'cdmodal__badge--inactivo'}`}>
-                {cliente.activo ? 'Activo' : 'Inactivo'}
-              </span>
+          {/* ── Badges absolutos en esquina superior derecha ── */}
+          <div className="cdmodal__badge-wrap">
+            {cliente.bloqueado && (
+              <span className="tdmodal__badge cdmodal__badge--bloqueado">Bloqueado</span>
+            )}
+            <span className={`tdmodal__badge ${cliente.activo ? 'cdmodal__badge--activo' : 'cdmodal__badge--inactivo'}`}>
+              {cliente.activo ? 'Activo' : 'Inactivo'}
+            </span>
+          </div>
+
+          {/* ── Nombre: usa todo el ancho sin competir con los badges ── */}
+          <div className="tdmodal__row cdmodal__nombre-row">
+            <span className="tdmodal__row-icon">👤</span>
+            <div className="tdmodal__row-body">
+              <span className="tdmodal__row-label">Cliente:</span>
+              <span className="tdmodal__row-val">{clienteNombre}</span>
             </div>
           </div>
 
@@ -166,7 +168,7 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
         </div>
 
         {/* ═══ ACCIONES ═══ */}
-        <div className="tdmodal__actions cdmodal__actions">
+        <div ref={actionsRef} className={`tdmodal__actions cdmodal__actions tdmodal__actions--${actionsMode}`}>
 
           {/* Cerrar */}
           <button className="btn btn-ghost" onClick={onClose}>Cerrar</button>

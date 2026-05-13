@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useFitPlaceholder } from '../../utils/useFitPlaceholder'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
@@ -22,7 +23,6 @@ export default function HomeUsuario() {
 
   // ---- Turnos ----
   const [turnos, setTurnos]     = useState(user?.turnos ?? [])
-  const [loadingTurnos]         = useState(false)
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null)
 
 
@@ -43,6 +43,8 @@ export default function HomeUsuario() {
 
   // Ref para bloquear volverATurnos mientras hay búsqueda activa
   const busquedaActivaRef = useRef(false)
+  const searchInputRef    = useRef(null)
+  useFitPlaceholder(searchInputRef, 'Buscar por empresa o rubro')
 
   // Cierra sidebar en resize a desktop
   useEffect(() => {
@@ -300,6 +302,7 @@ export default function HomeUsuario() {
               <input
                 type="search"
                 className="hp-search__input"
+                ref={searchInputRef}
                 placeholder="Buscar por empresa o rubro"
                 value={search}
                 onChange={(e) => {
@@ -360,11 +363,7 @@ export default function HomeUsuario() {
             {/* Vista: turnos */}
             {!buscando && (
               <>
-                {loadingTurnos && (
-                  <div className="loading-inline"><div className="spinner" /></div>
-                )}
-
-                {!loadingTurnos && turnosOrdenados.length === 0 && (
+                {turnosOrdenados.length === 0 && (
                   <div className="empty-state">
                     <div className="empty-state-icon">📅</div>
                     <h3>No tenés turnos</h3>
@@ -372,7 +371,7 @@ export default function HomeUsuario() {
                   </div>
                 )}
 
-                {!loadingTurnos && turnosOrdenados.length > 0 && (
+                {turnosOrdenados.length > 0 && (
                   <div className="hp-turnos-grid">
                     {turnosOrdenados.map((turno) => (
                       <TurnoCard

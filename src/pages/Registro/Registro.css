@@ -268,7 +268,9 @@
 /* Botón final */
 .reg-submit { margin-top: 8px; height: 46px; font-size: 15px; }
 
-/* Responsive */
-@media (max-width: 400px) {
-  .form-row { flex-direction: column; }
+/* Responsive — colapsa antes de que los inputs empiecen a achicarse */
+@media (max-width: 480px) {
+  .form-row { flex-direction: column; gap: 0; }
+  /* Sobreescribe flex fijo (ej: col-dni 33%) para que todo sea full-width en columna */
+  .form-row .form-group { flex: 1 !important; }
 }

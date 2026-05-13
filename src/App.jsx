@@ -76,6 +76,7 @@ export default function App() {
             <Route path="/historial" element={<ProtectedRoute><Historial /></ProtectedRoute>} />
             <Route path="/notificaciones" element={<ProtectedRoute><Notificaciones /></ProtectedRoute>} />
             <Route path="/empresa/:id/notificaciones" element={<ProtectedRoute><Notificaciones /></ProtectedRoute>} />
+            <Route path="/sucursal/:id/notificaciones" element={<ProtectedRoute><Notificaciones /></ProtectedRoute>} />
             <Route path="/empresa/:id/turnos" element={<ProtectedRoute><TurnosSucursal /></ProtectedRoute>} />
             <Route path="/empresa/:id/historial" element={<ProtectedRoute><HistorialSucursal /></ProtectedRoute>} />
             <Route path="/empresa/:id/clientes" element={<ProtectedRoute><Clientes /></ProtectedRoute>} />

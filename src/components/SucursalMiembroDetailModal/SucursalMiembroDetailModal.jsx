@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { sucursalService } from '../../services/sucursalService'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import ErrorModal from '../ErrorModal/ErrorModal'
 import '../MiembroDetailModal/MiembroDetailModal.css'
@@ -33,6 +34,9 @@ export default function SucursalMiembroDetailModal({ miembro, sucursal, miRol, o
   const [loading,          setLoading]          = useState(false)
   const [successMsg,       setSuccessMsg]       = useState(null)
   const pendingUpdateRef = useRef(null)
+
+  const actionsRef  = useRef(null)
+  const actionsMode = useFooterLayout(actionsRef)
 
   // Rol alternativo: toggle entre los dos roles de sucursal
   const otroRol      = sucursal.rol === 'GERENTE_SUCURSAL' ? 'EMPLEADO' : 'GERENTE_SUCURSAL'
@@ -103,7 +107,7 @@ export default function SucursalMiembroDetailModal({ miembro, sucursal, miRol, o
           </div>
 
           {/* Acciones */}
-          <div className="tdmodal__actions mmdetail__actions mmdetail__actions--form">
+          <div ref={actionsRef} className={`tdmodal__actions mmdetail__actions mmdetail__actions--form tdmodal__actions--${actionsMode}`}>
             <button className="btn btn-ghost"   onClick={onClose}                          disabled={loading}>Cerrar</button>
             <button className="btn btn-orange"  onClick={() => setConfirmDelete(true)}     disabled={loading}>Eliminar</button>
             <button className="btn btn-indigo"  onClick={() => setConfirmModificar(true)}  disabled={loading}>Modificar rol</button>

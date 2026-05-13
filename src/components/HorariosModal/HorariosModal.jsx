@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import ErrorModal from '../ErrorModal/ErrorModal'
 import './HorariosModal.css'
 
@@ -191,6 +192,9 @@ export default function HorariosModal({ disponibilidades, onClose, onSave }) {
   const [copyMenu,    setCopyMenu]    = useState(null)
   // overlapError: true cuando hay superposición (muestra ErrorModal)
   const [overlapError, setOverlapError] = useState(false)
+
+  const footerRef  = useRef(null)
+  const footerMode = useFooterLayout(footerRef)
 
   // Cierra con Escape
   useEffect(() => {
@@ -522,7 +526,7 @@ export default function HorariosModal({ disponibilidades, onClose, onSave }) {
           </div>
 
           {/* ── Footer ── */}
-          <div className="hm-footer">
+          <div ref={footerRef} className={`hm-footer hm-footer--${footerMode}`}>
             <button className="btn hm-btn-cancel" onClick={onClose} type="button">
               Cancelar
             </button>

@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { sucursalService } from '../../services/sucursalService'
 import NotificationBell from '../NotificationBell/NotificationBell'
+import ConfirmModal from '../ConfirmModal/ConfirmModal'
+import ErrorModal from '../ErrorModal/ErrorModal'
 import './SucursalTopBarRight.css'
 
 /**
@@ -25,7 +27,10 @@ export default function SucursalTopBarRight({ sucursalId }) {
   } = useAuth()
   const navigate    = useNavigate()
   const location    = useLocation()
-  const [profileOpen, setProfileOpen] = useState(false)
+  const [profileOpen,    setProfileOpen]    = useState(false)
+  const [abandonarOpen,  setAbandonarOpen]  = useState(false)
+  const [abandonLoading, setAbandonLoading] = useState(false)
+  const [backError,      setBackError]      = useState(null)
   const profileRef  = useRef(null)
 
   // Datos del panel de sucursal
@@ -34,6 +39,7 @@ export default function SucursalTopBarRight({ sucursalId }) {
   const Entidad     = entidad.charAt(0).toUpperCase() + entidad.slice(1)
   const emoji       = entidad === 'empresa' ? '🏢' : '🏪'
   const nombreDisplay = panel?.nombre_sucursal ?? 'Sucursal 1'
+  const esEmpleado  = panel?.rol === 'EMPLEADO'
 
   // Si el panel no está en contexto, lo fetchea — excepto en /panel donde HomeSucursal ya lo hace
   const isHomeSucursal = location.pathname.endsWith('/panel')
@@ -79,6 +85,20 @@ export default function SucursalTopBarRight({ sucursalId }) {
     setProfileOpen(false)
     clearEmpresaNotifs()
     navigate('/mis-empresas')
+  }
+
+  const handleAbandonar = async () => {
+    setAbandonLoading(true)
+    try {
+      await sucursalService.leaveSucursal(sucursalId)
+      clearEmpresaNotifs()
+      navigate('/mis-empresas')
+    } catch (err) {
+      setBackError(err)
+      setAbandonarOpen(false)
+    } finally {
+      setAbandonLoading(false)
+    }
   }
 
   // Notificaciones de sucursal
@@ -140,6 +160,17 @@ export default function SucursalTopBarRight({ sucursalId }) {
               {emoji} Perfil de {entidad}
             </a>
 
+            {/* ── Abandonar empresa/sucursal (solo EMPLEADO) ── */}
+            {esEmpleado && (
+              <button
+                className="utr__dropdown-item utr__dropdown-item--danger"
+                role="menuitem"
+                onClick={() => { setProfileOpen(false); setAbandonarOpen(true) }}
+              >
+                🚪 Abandonar {entidad}
+              </button>
+            )}
+
             {/* ── Cabecera usuario ── */}
             {user && (
               <div className="utr__dropdown-user utr__dropdown-user--secondary">
@@ -170,6 +201,20 @@ export default function SucursalTopBarRight({ sucursalId }) {
           </div>
         )}
       </div>
+
+      {abandonarOpen && (
+        <ConfirmModal
+          icon="🚪"
+          message={`¿Confirmás que querés abandonar esta ${entidad}?`}
+          confirmText="Abandonar"
+          confirmVariant="btn-orange"
+          loading={abandonLoading}
+          onConfirm={handleAbandonar}
+          onCancel={() => setAbandonarOpen(false)}
+        />
+      )}
+
+      <ErrorModal error={backError} onClose={() => setBackError(null)} />
     </div>
   )
 }

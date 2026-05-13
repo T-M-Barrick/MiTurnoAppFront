@@ -52,7 +52,10 @@ function ServicioCard({ servicio, onClick }) {
             </span>
           )}
           {(servicio.excepciones_fechas?.length ?? 0) > 0 && (
-            <span className="svc-badge svc-badge--bloqueo">Bloqueos de fechas</span>
+            <span className="svc-badge svc-badge--bloqueo">
+              <span className="svc-badge__full">Bloqueos de fechas</span>
+              <span className="svc-badge__short">BDF</span>
+            </span>
           )}
         </div>
       )}
@@ -65,7 +68,10 @@ function ServicioCard({ servicio, onClick }) {
           {profesionalNombre ?? '—'}
         </span>
         {servicio.cancelacion_turno_limitada && (
-          <span className="svc-badge svc-badge--cancel svc-badge--sm">Cancelación limitada</span>
+          <span className="svc-badge svc-badge--cancel svc-badge--sm">
+            <span className="svc-badge__full">Cancelación limitada</span>
+            <span className="svc-badge__short">CL</span>
+          </span>
         )}
       </div>
     </button>
@@ -119,8 +125,13 @@ export default function Servicios() {
       // Carga miembros de la sucursal para asignar profesional en ServicioModal
       sucursalService.getMiembrosSucursal(id)
         .then((data) => {
-          // Adapta al formato que espera ServicioModal (MiembrosEmpresaOut)
-          setMiembros({ miembros_empresa: [], miembros_sucursales: [{ sucursal_id: Number(id), miembros: data ?? [] }] })
+          // Adapta list[{miembro, rol}] al formato MiembrosEmpresaOut que espera buildMiembrosList:
+          // cada item necesita { miembro, sucursales: [{id}] } para que el filtro por sucursalId funcione
+          const adapted = (data ?? []).map((item) => ({
+            miembro:   item.miembro,
+            sucursales: [{ id: Number(id) }],
+          }))
+          setMiembros({ miembros_empresa: [], miembros_sucursales: adapted })
         })
         .catch(() => setMiembros(null))
         .finally(() => setLoadingInit(false))

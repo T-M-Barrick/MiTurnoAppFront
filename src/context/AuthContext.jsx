@@ -139,12 +139,11 @@ export function AuthProvider({ children }) {
 
   // Polling de notificaciones de usuario cada 5 minutos.
   // Corre durante toda la sesión. Usa /nuevas?id_posterior=X (array directo).
-  // id_posterior es requerido por el back — se saltea si no hay notificaciones cargadas.
+  // Envía 0 cuando no hay notificaciones previas para detectar las primeras que lleguen.
   useEffect(() => {
     const poll = setInterval(async () => {
       if (!userNotifsRef.current) return
-      const topId = userNotifsRef.current[0]?.id ?? null
-      if (!topId) return
+      const topId = userNotifsRef.current[0]?.id ?? 0
       try {
         const nuevas = await usuarioService.getNotificacionesNuevas(topId)
         if (!nuevas || nuevas.length === 0) return
@@ -175,8 +174,7 @@ export function AuthProvider({ children }) {
     const poll = setInterval(async () => {
       const current = empresaNotifsRef.current
       if (!current) return // no hay sesión de empresa activa
-      const topId = current.notificaciones?.[0]?.id ?? null
-      if (!topId) return // id_posterior es requerido por el back
+      const topId = current.notificaciones?.[0]?.id ?? 0
       try {
         const { empresaId } = current
         const nuevas = await empresaService.getNotificacionesNuevas(empresaId, topId)
@@ -201,8 +199,7 @@ export function AuthProvider({ children }) {
     const poll = setInterval(async () => {
       const current = sucursalNotifsRef.current
       if (!current) return
-      const topId = current.notificaciones?.[0]?.id ?? null
-      if (!topId) return
+      const topId = current.notificaciones?.[0]?.id ?? 0
       try {
         const { sucursalId } = current
         const nuevas = await sucursalService.getNotificacionesNuevas(sucursalId, topId)

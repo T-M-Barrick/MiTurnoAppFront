@@ -252,10 +252,13 @@
   line-height: 1.4;
 }
 
-/* ── Responsive: en mobile el dropdown ocupa casi todo el ancho ── */
-@media (max-width: 400px) {
+/* ── Responsive: en mobile usa position fixed para no quedar cortado por el viewport ── */
+@media (max-width: 480px) {
   .nbell__dropdown {
-    width: calc(100vw - 24px);
-    right: -40px;
+    position: fixed;
+    top: 68px;
+    left: 12px;
+    right: 12px;
+    width: auto;
   }
 }

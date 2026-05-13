@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { sucursalService } from '../../services/sucursalService'
 import { formatDuracion, getVersionActiva } from '../../utils/dateUtils'
+import { scrollToFirstError } from '../../utils/validation'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import ErrorModal from '../ErrorModal/ErrorModal'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import VersionModal from '../VersionModal/VersionModal'
@@ -148,6 +150,8 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
   const [bloqueos,         setBloqueos]         = useState(servicio?.excepciones_fechas ?? [])
 
   const firstInputRef = useRef(null)
+  const footerRef     = useRef(null)
+  const footerMode    = useFooterLayout(footerRef)
 
   // Cierra con Escape
   useEffect(() => {
@@ -234,7 +238,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
 
     const fields = { nombre, aclaracion, horas_min: horasMin, mins_min: minsMin, limite_dias_reserva: diasMax }
     const errors = validateForm(fields)
-    if (Object.keys(errors).length > 0) { setFormErrors(errors); return }
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); scrollToFirstError(); return }
     setFormErrors({})
 
     if (minTimeEnabled && (horasMin === '' || minsMin === '')) {
@@ -286,7 +290,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
   const handleUpdate = async () => {
     const fields = { nombre, aclaracion, horas_min: horasMin, mins_min: minsMin, limite_dias_reserva: diasMax }
     const errors = validateForm(fields)
-    if (Object.keys(errors).length > 0) { setFormErrors(errors); return }
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); scrollToFirstError(); return }
     setFormErrors({})
 
     if (minTimeEnabled && (horasMin === '' || minsMin === '')) {
@@ -583,15 +587,6 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
                           onEdit={() => openVersionModal(i)}
                         />
                       ))}
-                      {pendingVersiones.length < 1 && (
-                        <button
-                          className="sm-btn-add-version"
-                          type="button"
-                          onClick={() => openVersionModal(null)}
-                        >
-                          + Agregar versión
-                        </button>
-                      )}
                     </>
                   )}
                 </>
@@ -624,7 +619,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
           {/* ── Footer ── */}
           {isCreate ? (
             /* Create: 2 botones centrados */
-            <div className="sm-footer sm-footer--create">
+            <div ref={footerRef} className={`sm-footer sm-footer--create sm-footer--${footerMode}`}>
               <button
                 className="btn sm-footer__btn sm-footer__btn--cancel"
                 onClick={onClose}
@@ -644,7 +639,7 @@ export default function ServicioModal({ servicio, sucursalId, miembros, onClose,
             </div>
           ) : (
             /* Edit: 4 botones distribuidos */
-            <div className="sm-footer sm-footer--edit">
+            <div ref={footerRef} className={`sm-footer sm-footer--edit sm-footer--${footerMode}`}>
               <button
                 className="btn sm-footer__btn sm-footer__btn--cancel"
                 onClick={onClose}

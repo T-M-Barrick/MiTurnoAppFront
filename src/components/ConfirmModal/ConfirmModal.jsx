@@ -28,6 +28,7 @@ export default function ConfirmModal({
   onCancel,
   children,
 }) {
+
   // Cierra con Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape' && !loading) onCancel() }

@@ -15,6 +15,7 @@
 /* El área principal es la zona de scroll (topbar queda fija arriba) */
 .he-page .hp-main {
   overflow-y: auto;
+  overflow-x: auto;
   scrollbar-gutter: stable;
 }
 
@@ -90,9 +91,7 @@
   font-weight: 700;
   color: var(--text);
   line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 
 /* ─ Fila de calificación ─ */
@@ -121,12 +120,11 @@
   line-height: 1;
 }
 
-/* Fila nombre usuario + rol inline */
+/* Fila nombre usuario + badge de rol inline */
 .he-empresa-user-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .he-empresa-user {
@@ -134,15 +132,15 @@
   font-weight: 500;
   color: var(--text-muted);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Badge de rol — inline junto al nombre del usuario */
+/* Badge de rol — a la derecha del nombre del usuario */
 .he-empresa-rol {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  position: relative;
-  top: 2px;
   font-size: 11px;
   font-weight: 700;
   border-radius: 20px;
@@ -357,7 +355,25 @@
 }
 
 /* ── Responsive ── */
-@media (max-width: 767px) {
+
+/* Apila cuando las tarjetas ya no caben a su ancho original:
+   2 × 418px + 16px gap + 48px padding = 900px = max-width del grid.
+   Por debajo de 900px empieza el encogimiento; se apilan antes de eso. */
+@media (max-width: 899px) {
   .he-empresa-header { padding: 14px 14px 12px; margin-top: 16px; }
-  .he-grid           { grid-template-columns: 1fr; padding: 8px 14px 40px; }
+  /* Columna única fija al ancho original. Scroll cuando no entra. */
+  .he-grid {
+    grid-template-columns: 418px;
+    justify-content: start;
+    padding: 8px 14px 40px;
+  }
+}
+
+@media (max-width: 403px) {
+  /* Padding lateral baja a 8px: se ajusta también el header para que el logo
+     quede alineado con el borde izquierdo de la tarjeta */
+  .he-empresa-header { padding: 14px 8px 12px; }
+  .he-grid        { padding: 8px 8px 40px; gap: 12px; }
+  .he-card        { padding: 14px 10px; }
+  .he-card__icon  { width: 40px; height: 40px; font-size: 24px; }
 }

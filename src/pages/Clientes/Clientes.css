@@ -28,6 +28,7 @@
 /* ── Barra de búsqueda ── */
 .cli-search-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   margin-bottom: 16px;
@@ -63,10 +64,11 @@
   margin-right: auto;
 }
 
-/* Contenedor del input — ocupa el espacio disponible sin bajar de fila */
+/* Contenedor del input — ocupa el espacio disponible.
+   min-width dispara el salto de línea antes de que el input quede visualmente comprimido. */
 .cli-search-bar__input {
   flex: 1;
-  min-width: 0;
+  min-width: 260px;
 }
 
 /* Fondo blanco (override del var(--bg) de HomeUsuario) */
@@ -118,7 +120,7 @@
 /* ── Grid de tarjetas — 2 columnas alineadas con la barra buscadora ── */
 .cli-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   max-width: 770px;
   margin: 0 auto;
@@ -260,11 +262,20 @@
 
 /* ── Responsive ── */
 @media (max-width: 767px) {
-  .cli-content { padding: 16px 14px 40px; }
+  .cli-content { padding: 24px 14px 48px; }
   .cli-search-bar { gap: 8px; }
 }
 
-@media (max-width: 499px) {
-  .cli-grid { grid-template-columns: 1fr; }
-  .cli-filter__btn { padding: 7px 10px; font-size: 12px; }
+@media (max-width: 640px) {
+  .cli-search-bar { flex-direction: column; align-items: stretch; }
+  .cli-search-bar__input { min-width: 0; }
+  .cli-filter { width: 100%; }
+}
+
+/* Tarjetas llegan al ~80% (303px de 379px original): apila, recupera tamaño original centrado */
+@media (max-width: 650px) {
+  .cli-grid {
+    grid-template-columns: 1fr;
+    max-width: 379px;
+  }
 }

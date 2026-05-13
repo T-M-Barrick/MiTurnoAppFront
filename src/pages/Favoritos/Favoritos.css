@@ -11,6 +11,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: auto;
   width: 100%;
   padding: 20px 24px 48px;
 }
@@ -29,20 +30,27 @@
   text-align: center;
 }
 
-/* 2 columnas en escritorio — max 520px cada una */
+/* 2 columnas proporcionales — se reducen hasta el 70% del tamaño original (30% máx de reducción) */
 .fav-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
-/* 1 columna en móvil */
-@media (max-width: 600px) {
-  .fav-body {
-    padding: 20px 14px 48px;
-  }
-
+/* Cada columna llegaría a <364px (70% de 520px): apila con ancho fijo = tamaño original */
+@media (max-width: 790px) {
   .fav-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 520px;
+    justify-content: center;
   }
+}
+
+@media (max-width: 600px) {
+  .fav-body { padding: 20px 14px 48px; }
+}
+
+/* Cuando la tarjeta (520px) no entra en pantalla: alinea al inicio para que el
+   scroll arranque desde el borde izquierdo y no corte contenido a la izquierda */
+@media (max-width: 547px) {
+  .fav-grid { justify-content: start; }
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
+import { useFitPlaceholder } from '../../utils/useFitPlaceholder'
 import { useParams, useMatch } from 'react-router-dom'
 import { sucursalService } from '../../services/sucursalService'
 import { empresaService } from '../../services/empresaService'
@@ -81,6 +82,8 @@ export default function Clientes() {
   const empresaId      = isSucursalMode ? null : id
   const { empresaPanel, setEmpresaPanel, sucursalPanel } = useAuth()
   const miRol          = isSucursalMode ? (sucursalPanel?.panel?.rol ?? null) : null
+  const searchInputRef = useRef(null)
+  useFitPlaceholder(searchInputRef, 'Buscar por nombre, apellido, DNI, email, teléfono u observación')
 
   // Sucursales
   const [sucursales,       setSucursales]       = useState([])
@@ -305,6 +308,7 @@ export default function Clientes() {
                   <span className="hp-search__icon hp-search__icon--btn" onClick={() => selectedSucursal && fetchClientes(selectedSucursal.id, searchInput, activoFilter)} role="button" aria-label="Buscar">🔍</span>
                   <input
                     type="search"
+                    ref={searchInputRef}
                     className="hp-search__input"
                     placeholder="Buscar por nombre, apellido, DNI, email, teléfono u observación"
                     value={searchInput}

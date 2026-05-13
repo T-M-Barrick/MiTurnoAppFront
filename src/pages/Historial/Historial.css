@@ -38,7 +38,7 @@
 /* ── Grid de turnos — igual que en HomeUsuario ── */
 .hist-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -71,6 +71,11 @@
   .hist-content { padding: 24px 14px 40px; }
 }
 
-@media (max-width: 599px) {
-  .hist-list { grid-template-columns: 1fr; }
+/* Tarjetas llegan al ~80% (323px de 404px original): apila, recupera tamaño original centrado */
+@media (max-width: 690px) {
+  .hist-list {
+    grid-template-columns: 1fr;
+    max-width: 404px;
+    margin: 0 auto;
+  }
 }

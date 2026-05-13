@@ -12,6 +12,7 @@
 
 .hs-page .hp-main {
   overflow-y: auto;
+  overflow-x: auto;
   scrollbar-gutter: stable;
 }
 

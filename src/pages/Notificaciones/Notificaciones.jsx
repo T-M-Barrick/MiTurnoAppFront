@@ -36,7 +36,9 @@ export default function Notificaciones() {
   const stateContext = location.state?.notifContext
   const notifContext = stateContext ?? (
     params.id
-      ? { type: 'empresa', id: params.id }
+      ? location.pathname.includes('/sucursal/')
+        ? { type: 'sucursal', id: params.id }
+        : { type: 'empresa',  id: params.id }
       : { type: 'usuario' }
   )
 

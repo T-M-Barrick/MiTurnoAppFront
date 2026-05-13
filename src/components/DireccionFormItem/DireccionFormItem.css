@@ -49,8 +49,12 @@
   margin-bottom: 0;
 }
 
-.dir-item__calle-group { flex: 2; }   /* calle ocupa ~65% */
-.dir-item__altura-group { flex: 1; }  /* altura+botón ~35% */
+/* Iguala la altura de los labels para que calle (*) y altura queden alineados */
+.dir-item__calle-row .form-group label { min-height: 20px; }
+
+.dir-item__calle-group { flex: 2; }
+/* min-width = 4 dígitos (≈36px) + padding (28px) + botón buscar (46px) + gap interno (6px) */
+.dir-item__altura-group { flex: 1; min-width: 116px; }
 
 /* ── Subrow: input de altura + botón buscar ── */
 .dir-item__altura-row {

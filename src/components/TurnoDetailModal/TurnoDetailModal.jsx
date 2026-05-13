@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { formatFechaCompleta, labelEstado, formatDireccionCascade } from '../../utils/dateUtils'
 import { usuarioService } from '../../services/usuarioService'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import RecordatorioField from '../RecordatorioField/RecordatorioField'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import CustomSelect from '../CustomSelect/CustomSelect'
@@ -82,6 +83,9 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [turno, onClose, confirmAction, recModalOpen])
+
+  const actionsRef  = useRef(null)
+  const actionsMode = useFooterLayout(actionsRef)
 
   // Ref para achicar el nombre de la empresa si no entra en una línea
   const nombreRef = useRef(null)
@@ -379,7 +383,7 @@ export default function TurnoDetailModal({ turno, onClose, onCanceled, onUpdated
         </div>
 
         {/* ═══ ACCIONES según estado (Cerrar siempre primero/izquierda) ═══ */}
-        <div className="tdmodal__actions">
+        <div ref={actionsRef} className={`tdmodal__actions tdmodal__actions--${actionsMode}`}>
 
           {/* Solo lectura (historial): únicamente Cerrar */}
           {readOnly && (

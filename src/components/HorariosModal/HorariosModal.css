@@ -177,7 +177,8 @@
   background: var(--bg-alt);
   border: 1.5px solid var(--border);
   border-radius: 10px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .hm-slot--error {
@@ -390,6 +391,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 10px;
   padding: 14px 20px 18px;
   border-top: 1px solid var(--border);
@@ -400,14 +402,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 160px;
+  width: 140px;
+  flex-shrink: 0;
   height: 40px;
-  padding: 0 20px;
   background: transparent;
   border: 1.5px solid var(--border);
   border-radius: 10px;
   color: var(--text-muted);
-  font-size: 14px;
   transition: background .15s;
 }
 
@@ -419,13 +420,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 160px;
+  width: 140px;
+  flex-shrink: 0;
   height: 40px;
-  padding: 0 20px;
   background: var(--brand);
   border-radius: 10px;
   color: #fff;
-  font-size: 14px;
   transition: background .15s;
 }
 
@@ -453,22 +453,10 @@
   .hm-body {
     padding: 14px 14px 16px;
   }
-
-  /* En mobile las franjas se envuelven naturalmente por flex-wrap */
-  .hm-slot {
-    gap: 8px;
-  }
-
-  .hm-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .hm-btn-cancel,
-  .hm-btn-save {
-    width: 100%;
-  }
 }
+
+/* ── Modos de layout del footer (gestionados por useFooterLayout) ── */
+.hm-footer--column { flex-direction: column-reverse; align-items: center; }
 
 /* ── Menú de copia a otro día ── */
 

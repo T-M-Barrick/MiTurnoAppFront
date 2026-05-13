@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { sucursalService } from '../../services/sucursalService'
+import { scrollToFirstError } from '../../utils/validation'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import ErrorModal from '../ErrorModal/ErrorModal'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import DateInput from '../DateInput/DateInput'
@@ -50,6 +52,11 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
   const [backError,    setBackError]    = useState(null)
   const [backSuccess,  setBackSuccess]  = useState(null)
 
+  const footerListRef = useRef(null)
+  const footerFormRef = useRef(null)
+  const listMode      = useFooterLayout(footerListRef)
+  const formMode      = useFooterLayout(footerFormRef)
+
   /** Abre el formulario para crear un nuevo bloqueo. */
   const openCreate = () => {
     setEditingBloqueo(null)
@@ -75,7 +82,7 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
   /** Guarda: crea o actualiza según si hay bloqueo en edición. */
   const handleSave = async () => {
     const errors = validateBloqueo({ fechaInicio, fechaFin })
-    if (Object.keys(errors).length > 0) { setFormErrors(errors); return }
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); scrollToFirstError(); return }
     setFormErrors({})
 
     setSaving(true)
@@ -174,7 +181,7 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
           </div>
 
           {/* Footer */}
-          <div className="blq-footer">
+          <div ref={footerListRef} className={`blq-footer blq-footer--${listMode}`}>
             <button className="btn blq-footer__btn blq-footer__btn--cancel" type="button" onClick={onClose}>
               Cerrar
             </button>
@@ -245,7 +252,7 @@ export default function BloqueoModal({ sucursalId, servicioBaseId, bloqueos: ini
             </div>
 
             {/* Footer */}
-            <div className="blq-footer">
+            <div ref={footerFormRef} className={`blq-footer blq-footer--${formMode}`}>
               <button className="btn blq-footer__btn blq-footer__btn--cancel" type="button" onClick={closeForm} disabled={saving}>
                 Cancelar
               </button>

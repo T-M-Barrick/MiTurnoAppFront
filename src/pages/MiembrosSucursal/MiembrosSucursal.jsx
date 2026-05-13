@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react'
+import { useFitPlaceholder } from '../../utils/useFitPlaceholder'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { sucursalService } from '../../services/sucursalService'
 import { useAuth } from '../../context/AuthContext'
@@ -100,6 +101,8 @@ export default function MiembrosSucursal() {
   const [loading,             setLoading]             = useState(true)
   const [sidebarOpen,         setSidebarOpen]         = useState(false)
   const [search,              setSearch]              = useState('')
+  const searchInputRef        = useRef(null)
+  useFitPlaceholder(searchInputRef, 'Filtrar por nombre, apellido, DNI, email o rol')
   const [miembroSeleccionado, setMiembroSeleccionado] = useState(null)
   const [invitarOpen,         setInvitarOpen]         = useState(false)
   const [abandonarOpen,       setAbandonarOpen]       = useState(false)
@@ -225,14 +228,16 @@ export default function MiembrosSucursal() {
 
             {/* ── Fila de acciones ── */}
             <div className="miem-actions-row">
-              {miRol === 'GERENTE_SUCURSAL' && (
-                <button className="btn svc-btn-add" onClick={() => setInvitarOpen(true)} disabled={loading}>
-                  + Invitar empleado
+              <div className="miem-actions-row__btns">
+                {miRol === 'GERENTE_SUCURSAL' && (
+                  <button className="btn svc-btn-add" onClick={() => setInvitarOpen(true)} disabled={loading}>
+                    + Invitar empleado
+                  </button>
+                )}
+                <button className="btn svc-btn-add svc-btn-add--orange" onClick={() => setAbandonarOpen(true)} disabled={loading}>
+                  Abandonar sucursal
                 </button>
-              )}
-              <button className="btn svc-btn-add svc-btn-add--orange" onClick={() => setAbandonarOpen(true)} disabled={loading}>
-                Abandonar sucursal
-              </button>
+              </div>
             </div>
 
             {/* ── Buscador local ── */}
@@ -245,6 +250,7 @@ export default function MiembrosSucursal() {
                 </span>
                 <input
                   type="search"
+                  ref={searchInputRef}
                   className="hp-search__input"
                   placeholder="Filtrar por nombre, apellido, DNI, email o rol"
                   value={search}
@@ -315,7 +321,7 @@ export default function MiembrosSucursal() {
       {abandonarOpen && (
         <ConfirmModal
           icon="🚪"
-          message="¿Estás seguro que querés abandonar esta sucursal?"
+          message="¿Confirmás que querés abandonar esta sucursal?"
           confirmText="Abandonar"
           confirmVariant="btn-orange"
           loading={actionLoading}

@@ -40,3 +40,10 @@
 @media (max-width: 767px) {
   .tsuc-content { padding: 24px 14px 40px; }
 }
+
+/* El filtro de profesional tiene width:500px como inline style. max-width limita
+   el ancho cuando el contenedor es más angosto que 500px, sin cambiar el PC. */
+.tsuc-profesional-wrap .cselect,
+.tsuc-profesional-wrap .cselect__trigger {
+  max-width: 100% !important;
+}

@@ -44,9 +44,8 @@
   margin-right: 1px;
 }
 
-/* ── Ancho relativo de DNI (estrecho) y Email (amplio) en su fila ── */
-.cfmodal__col-dni   { flex: 0 0 33% !important; }
-.cfmodal__col-email { flex: 1 !important; }
+/* ── Columna DNI: ancho fijo 33% (email hereda flex:1 del global) ── */
+.cfmodal__col-dni { flex: 0 0 33% !important; }
 
 /* ── Asterisco obligatorio — mismo tamaño que csm-required en ServicioModal ── */
 .cfmodal__req {
@@ -64,6 +63,9 @@
   font-size: 13px;
   border-radius: 10px;
 }
+
+/* ── Modos de layout del footer (gestionados por useFooterLayout) ── */
+.cfmodal .tdmodal__actions--column { flex-direction: column-reverse; align-items: center; }
 
 /* ── Botón guardar ── */
 .cfmodal__btn-guardar {
@@ -195,3 +197,12 @@
 .cfmodal__phone-add:hover { background: var(--brand); color: #fff; }
 .cfmodal__phone-add:disabled { opacity: .5; cursor: not-allowed; }
 [data-theme="dark"] .cfmodal__phone-add { background: rgba(229, 57, 53, .12); }
+
+/* En mobile los form-row colapsan a columna (regla global ≤480px).
+   gap: 0 elimina el doble espaciado gap+margin dentro del form-row.
+   margin-bottom en el form-row mismo garantiza 16px antes del siguiente bloque,
+   ya que el margin del último hijo queda atrapado dentro del flex-column. */
+@media (max-width: 480px) {
+  .cfmodal .form-row { gap: 0; margin-bottom: 16px; }
+  .cfmodal .form-row .form-group:last-child { margin-bottom: 0; }
+}

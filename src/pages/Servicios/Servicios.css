@@ -45,7 +45,20 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
+}
+
+/* Los hijos no se achican — solo el media query decide cuándo apilar. */
+.svc-top-bar > * {
+  flex-shrink: 0;
+}
+
+/* Apila y centra solo cuando hay botón + selector y ya no caben en la misma fila.
+   :has() asegura que el botón solo se apile en empresa-mode (2+ sucursales). */
+@media (max-width: 490px) {
+  .svc-top-bar:has(.svc-btn-add):has(.cselect) {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .svc-btn-add-wrap {
@@ -175,9 +188,9 @@
   background: rgba(229, 57, 53, .18);
 }
 
-/* Variante junto al profesional */
+/* Empuja el badge al extremo derecho de la fila del profesional */
 .svc-badge--sm {
-  margin-left: 6px;
+  margin-left: auto;
 }
 
 .svc-card__pro {
@@ -268,16 +281,22 @@
   font-style: italic;
 }
 
+/* Versión abreviada de badges — oculta por defecto */
+.svc-badge__short { display: none; }
+
 /* ── Responsive ── */
 @media (max-width: 767px) {
-  .svc-header        { padding: 16px 14px 0; }
-  .svc-btn-add       { font-size: 12px; padding: 8px 12px; }
-  .svc-content       { padding: 20px 14px 40px; }
-  .svc-top-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .svc-top-bar > * {
-    width: 100% !important;
-  }
+  .svc-header  { padding: 20px 14px 0; }
+  .svc-content { padding: 24px 14px 48px; }
+}
+
+/* A partir de 520px los badges muestran solo la abreviatura */
+@media (max-width: 520px) {
+  .svc-badge__full  { display: none; }
+  .svc-badge__short { display: inline; }
+}
+
+/* A partir de 400px se ocultan las etiquetas de campo */
+@media (max-width: 400px) {
+  .svc-card__meta-label { display: none; }
 }

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { useFooterLayout } from '../../utils/useFooterLayout'
 import { empresaService } from '../../services/empresaService'
 import { sucursalService } from '../../services/sucursalService'
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
@@ -73,7 +74,11 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
   const [loading,              setLoading]              = useState(false)
   const [successMsg,           setSuccessMsg]           = useState(null)
   const [selectedSucursalModal, setSelectedSucursalModal] = useState(null) // sucursal elegida del dropdown multi-sucursal
-  const pendingUpdateRef = useRef(null) // guarda data del back hasta que el usuario acepta el success
+  const pendingUpdateRef  = useRef(null) // guarda data del back hasta que el usuario acepta el success
+  const actionsRef        = useRef(null)
+  const formActionsRef    = useRef(null)
+  const actionsMode       = useFooterLayout(actionsRef)
+  const formActionsMode   = useFooterLayout(formActionsRef)
 
   // Estado para "Modificar rol"
   const [nuevoRol,            setNuevoRol]            = useState('')
@@ -308,7 +313,7 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
           </div>
 
           {/* ═══ ACCIONES ═══ */}
-          <div className="tdmodal__actions mmdetail__actions">
+          <div ref={actionsRef} className={`tdmodal__actions mmdetail__actions tdmodal__actions--${actionsMode}`}>
             <button className="btn btn-ghost" onClick={onClose}>Cerrar</button>
 
             {puedeActuar && (
@@ -437,7 +442,7 @@ export default function MiembroDetailModal({ miembro: miembroNorm, empresaId, su
             </div>
 
             {/* Acciones */}
-            <div className="tdmodal__actions mmdetail__actions mmdetail__actions--form">
+            <div ref={formActionsRef} className={`tdmodal__actions mmdetail__actions mmdetail__actions--form tdmodal__actions--${formActionsMode}`}>
               <button className="btn btn-ghost" onClick={resetForm} disabled={loading}>Cancelar</button>
               <button
                 className="btn btn-indigo"

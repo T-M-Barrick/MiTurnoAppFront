@@ -145,12 +145,14 @@ function calcularSlots(servicio, fecha, allServicios = []) {
 function DateStrip({ servicio, selectedFecha, onSelectFecha, onExcepcion }) {
   const stripRef      = useRef(null)
   const pickerRef     = useRef(null)
+  const monthBtnRef   = useRef(null)
   const today         = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d }, [])
 
   const [visibleMonth,    setVisibleMonth]    = useState(today.getMonth())
   const [visibleYear,     setVisibleYear]     = useState(today.getFullYear())
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
   const [pickerYear,      setPickerYear]      = useState(today.getFullYear())
+  const [pickerUp,        setPickerUp]        = useState(false)
   const [tooltip,         setTooltip]         = useState(null)
 
   // Cierra el picker al hacer click fuera de él
@@ -275,8 +277,17 @@ function DateStrip({ servicio, selectedFecha, onSelectFecha, onExcepcion }) {
         <div className="ps-strip-header__month">
           <button
             className="ps-strip-month-btn"
+            ref={monthBtnRef}
             type="button"
-            onClick={(e) => { e.stopPropagation(); setPickerYear(visibleYear); setMonthPickerOpen(o => !o) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (monthBtnRef.current) {
+                const rect = monthBtnRef.current.getBoundingClientRect()
+                setPickerUp(window.innerHeight - rect.bottom < 250)
+              }
+              setPickerYear(visibleYear)
+              setMonthPickerOpen(o => !o)
+            }}
           >
             <span>{MESES[visibleMonth]} {visibleYear}</span>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -289,7 +300,7 @@ function DateStrip({ servicio, selectedFecha, onSelectFecha, onExcepcion }) {
             const minYear = pickerYears[0]?.year ?? pickerYear
             const maxYear = pickerYears[pickerYears.length - 1]?.year ?? pickerYear
             return (
-              <div className="ps-month-picker" ref={pickerRef} onClick={e => e.stopPropagation()}>
+              <div className={`ps-month-picker${pickerUp ? ' ps-month-picker--up' : ''}`} ref={pickerRef} onClick={e => e.stopPropagation()}>
                 <div className="ps-month-picker__year-nav">
                   <button className="ps-month-picker__year-arrow" type="button"
                     onClick={() => setPickerYear(y => Math.max(minYear, y - 1))}
