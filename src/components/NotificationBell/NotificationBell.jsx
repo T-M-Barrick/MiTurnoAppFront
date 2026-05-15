@@ -18,14 +18,12 @@ const MAX_PREVIEW = 5
  *   ultimoCursorId   — int | null (cursor para paginación hacia atrás)
  *   notifContext     — { type: 'usuario' | 'empresa' | 'sucursal', id?: string }
  *   onNotifLeida     — callback(notifId) para sincronizar con AuthContext
- *   onNuevasNotifs   — no usado (polling en AuthContext), se mantiene por compatibilidad
  */
 export default function NotificationBell({
   notificaciones: notifProp = [],
   ultimoCursorId: cursorProp = null,
   notifContext = { type: 'usuario' },
   onNotifLeida,  // callback(notifId) — actualiza la fuente de verdad en AuthContext
-  onNuevasNotifs, // callback(nuevas[]) — notifica al padre cuando el polling encuentra nuevas
   sucursales,    // array {id, nombre} del panel — para lookup de nombre por sucursal_id
 }) {
   const navigate = useNavigate()

@@ -6,11 +6,10 @@ import { usuarioService } from '../../services/usuarioService'
 import {
   validateDNI, validateNombre, validateTelefono, scrollToFirstError
 } from '../../utils/validation'
-import AppTopBar, { ThemeIcon } from '../../components/AppTopBar/AppTopBar'
+import AppTopBar from '../../components/AppTopBar/AppTopBar'
 import UserTopBarRight from '../../components/UserTopBarRight/UserTopBarRight'
 import ErrorModal from '../../components/ErrorModal/ErrorModal'
 import DireccionFormItem from '../../components/DireccionFormItem/DireccionFormItem'
-import { useTheme } from '../../context/ThemeContext'
 import CustomSelect from '../../components/CustomSelect/CustomSelect'
 import '../../components/RecordatorioField/RecordatorioField.css'
 import './PerfilUsuario.css'
@@ -62,8 +61,6 @@ function initTelefonos(tels) {
 export default function PerfilUsuario() {
   const navigate = useNavigate()
   const { user, updateUser } = useAuth()
-  const { theme, toggleTheme } = useTheme()
-
   // ---- Datos personales ----
   const [dni, setDni]             = useState(user?.dni       ?? '')
   const [apellido, setApellido]   = useState(user?.apellido  ?? '')

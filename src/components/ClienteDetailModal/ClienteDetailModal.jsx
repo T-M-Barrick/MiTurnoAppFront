@@ -242,7 +242,6 @@ export default function ClienteDetailModal({ cliente, sucursalId, onClose, onUpd
           sucursalId={sucursalId}
           cliente={cliente}
           onClose={() => setReservarOpen(false)}
-          onError={onError}
         />
       )}
 

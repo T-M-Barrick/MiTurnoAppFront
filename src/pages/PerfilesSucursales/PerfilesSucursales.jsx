@@ -88,7 +88,7 @@ export default function PerfilesSucursales() {
   const [backError,       setBackError]       = useState(null)
   const [success,         setSuccess]         = useState(null)
   const [confirmAccion,   setConfirmAccion]   = useState(null) // 'activar' | 'desactivar' | null
-  const [sidebarOpen,     setSidebarOpen]     = useState(false)
+  const [,                setSidebarOpen]     = useState(false)
 
   const dirRef = useRef(null)
 

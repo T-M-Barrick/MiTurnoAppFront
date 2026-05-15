@@ -36,7 +36,6 @@ export default function SucursalTopBarRight({ sucursalId }) {
   // Datos del panel de sucursal
   const panel       = sucursalPanel?.sucursalId === String(sucursalId) ? sucursalPanel.panel : null
   const entidad     = panel?.cantidad_sucursales === 1 ? 'empresa' : 'sucursal'
-  const Entidad     = entidad.charAt(0).toUpperCase() + entidad.slice(1)
   const emoji       = entidad === 'empresa' ? '🏢' : '🏪'
   const nombreDisplay = panel?.nombre_sucursal ?? 'Sucursal 1'
   const esEmpleado  = panel?.rol === 'EMPLEADO'

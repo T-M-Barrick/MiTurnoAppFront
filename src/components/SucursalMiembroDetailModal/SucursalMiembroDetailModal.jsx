@@ -22,13 +22,12 @@ const ROL_CLASS = {
  * Props:
  *   miembro   — { id, nombre, apellido, ... }
  *   sucursal  — { id, nombre, rol }
- *   miRol     — rol del usuario logueado
  *   onClose   — cierra este modal
  *   onUpdated — callback(updatedData) tras cambio de rol
  *   onDeleted — callback() tras eliminar de la sucursal
  *   onError   — callback(err)
  */
-export default function SucursalMiembroDetailModal({ miembro, sucursal, miRol, onClose, onUpdated, onDeleted, onError }) {
+export default function SucursalMiembroDetailModal({ miembro, sucursal, onClose, onUpdated, onDeleted, onError }) {
   const [confirmDelete,    setConfirmDelete]    = useState(false)
   const [confirmModificar, setConfirmModificar] = useState(false)
   const [loading,          setLoading]          = useState(false)

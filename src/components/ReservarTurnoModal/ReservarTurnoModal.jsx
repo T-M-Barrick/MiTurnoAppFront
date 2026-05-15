@@ -1,5 +1,4 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } from 'react'
-import { usuarioService } from '../../services/usuarioService'
 import { sucursalService } from '../../services/sucursalService'
 import { formatDuracion, getVersionActiva } from '../../utils/dateUtils'
 import BookingRow from '../BookingRow/BookingRow'
@@ -454,9 +453,8 @@ function ProfReservaLabel({ nombre, apellido, dni }) {
  *   sucursalId — id de la sucursal
  *   cliente    — objeto ClienteOut del cliente al que se le reserva
  *   onClose    — cierra el modal
- *   onError    — callback(errorObj)
  */
-export default function ReservarTurnoModal({ sucursalId, cliente, onClose, onError }) {
+export default function ReservarTurnoModal({ sucursalId, cliente, onClose }) {
 
   const [servicios,  setServicios]  = useState([])
   const [loading,    setLoading]    = useState(true)

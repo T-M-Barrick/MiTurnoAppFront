@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, useMatch } from 'react-router-dom'
+import { useParams, useMatch } from 'react-router-dom'
 import { empresaService } from '../../services/empresaService'
 import { sucursalService } from '../../services/sucursalService'
 import { useAuth } from '../../context/AuthContext'
@@ -86,7 +86,6 @@ export default function Servicios() {
   const matchSucursal  = useMatch('/sucursal/:id/*')
   const isSucursalMode = !!matchSucursal
   const empresaId      = isSucursalMode ? null : id
-  const navigate       = useNavigate()
   const { empresaPanel, setEmpresaPanel, sucursalPanel } = useAuth()
   const miRol          = isSucursalMode ? (sucursalPanel?.panel?.rol ?? null) : null
 

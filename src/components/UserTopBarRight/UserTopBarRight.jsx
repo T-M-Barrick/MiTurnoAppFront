@@ -14,7 +14,7 @@ import './UserTopBarRight.css'
  *               Las notificaciones NO se leen de esta prop — siempre vienen de AuthContext.
  */
 export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}) {
-  const { user, logout, markNotifLeida, empresaNotifs, markEmpresaNotifLeida, addEmpresaNuevasNotifs, clearEmpresaNotifs, empresaPanel } = useAuth()
+  const { user, logout, markNotifLeida, empresaNotifs, markEmpresaNotifLeida, clearEmpresaNotifs, empresaPanel } = useAuth()
   const navigate = useNavigate()
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
@@ -93,11 +93,6 @@ export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}
     else            markEmpresaNotifLeida(notifId)
   }, [empresaId, markNotifLeida, markEmpresaNotifLeida])
 
-  // Callback para cuando el polling de empresa encuentra notificaciones nuevas.
-  const handleNuevasNotifs = useCallback((nuevas) => {
-    if (empresaId) addEmpresaNuevasNotifs(nuevas)
-  }, [empresaId, addEmpresaNuevasNotifs])
-
   return (
     <div className="utr">
       {/* ── Campana de notificaciones ── */}
@@ -106,7 +101,6 @@ export default function UserTopBarRight({ empresaId, empresa: empresaProp } = {}
         ultimoCursorId={notifCursor}
         notifContext={notifContext}
         onNotifLeida={handleNotifLeida}
-        onNuevasNotifs={handleNuevasNotifs}
         sucursales={empresaId ? (
   empresaPanel?.panel?.rol === 'PROPIETARIO'
     ? empresaPanel?.panel?.sucursales

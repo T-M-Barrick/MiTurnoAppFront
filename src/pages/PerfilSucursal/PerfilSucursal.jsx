@@ -67,24 +67,6 @@ function getVersionHoy(servicio) {
  * Detecta si hay una versión futura que cambia precio o duración.
  * Retorna { desde, duracionActual, duracionFutura, precioActual, precioFuturo } o null.
  */
-function getVersionChange(servicio) {
-  if (servicio.servicios.length < 2) return null
-  const sorted = [...servicio.servicios].sort(
-    (a, b) => new Date(a.vigente_desde) - new Date(b.vigente_desde)
-  )
-  const hoy = new Date(); hoy.setHours(0, 0, 0, 0)
-  const futuro = sorted.find(sv => new Date(sv.vigente_desde + 'T00:00:00') > hoy)
-  if (!futuro) return null
-  const actual = getVersionHoy(servicio) ?? sorted[0]
-  return {
-    desde:          futuro.vigente_desde,
-    duracionActual: actual.duracion,
-    duracionFutura: futuro.duracion,
-    precioActual:   Number(actual.precio),
-    precioFuturo:   Number(futuro.precio),
-  }
-}
-
 /** ¿Una fecha tiene disponibilidad según su versión activa? */
 function fechaTieneDisponibilidad(servicio, fecha) {
   const version = getVersionParaFecha(servicio, fecha)
@@ -310,8 +292,6 @@ function DateStrip({ servicio, serviciosGrupo, selectedFecha, onSelectFecha, onE
       })),
     }))
   }, [availableMonths])
-
-  const multiYear = pickerYears.length > 1
 
   // Scroll a un índice concreto
   const scrollToIdx = useCallback((idx) => {

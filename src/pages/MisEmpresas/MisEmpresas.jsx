@@ -27,7 +27,7 @@ const ROL_LABEL = {
 }
 
 /* ── Tarjeta individual ── */
-function MeCard({ id, nombre, logoUrl, email, rol, isLoading, href, onClick }) {
+function MeCard({ nombre, logoUrl, email, rol, isLoading, href, onClick }) {
   const nameRef = useRef(null)
 
   // Reduce la fuente del nombre hasta que entre en una línea (mín. 11px)
