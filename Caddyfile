@@ -1,8 +1,11 @@
+{
+	auto_https off
+	trusted_proxies static private_ranges 100.0.0.0/8
+}
+
 :{$PORT} {
 	root * /app/dist
 	encode gzip
 	try_files {path} /index.html
 	file_server
-
-	header X-Forwarded-Proto https
 }
